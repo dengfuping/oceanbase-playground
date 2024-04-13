@@ -1,0 +1,21 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider     = "mysql"
+    url          = env("DATABASE_URL")
+    relationMode = "prisma"
+}
+
+model CarOrder {
+    orderId      BigInt   @id @default(autoincrement()) @map("order_id")
+    orderTime    DateTime @default(now()) @map("order_time")
+    carPrice     Decimal  @map("car_price")
+    carColor     String   @map("car_color") @db.Text()
+    saleRegion   String   @map("sale_region")
+    saleNation   String   @map("sale_nation")
+    customerName String   @map("customer_name")
+
+    @@map("car_orders")
+}

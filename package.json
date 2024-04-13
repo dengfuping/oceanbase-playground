@@ -1,0 +1,40 @@
+{
+  "private": true,
+  "author": "dengfuping <dengfuping_private@163.com>",
+  "scripts": {
+    "build": "umi build",
+    "dev": "umi dev",
+    "postinstall": "umi setup",
+    "prepare": "husky install",
+    "setup": "prisma generate && umi setup",
+    "start": "npm run dev"
+  },
+  "dependencies": {
+    "@oceanbase/charts": "^0.3.0",
+    "@oceanbase/design": "^0.3.0",
+    "@oceanbase/icons": "^0.3.0",
+    "@oceanbase/ui": "^0.3.0",
+    "@oceanbase/util": "^0.3.0",
+    "@prisma/client": "^4.16.2",
+    "@umijs/plugins": "^4.0.72",
+    "abortcontroller-polyfill": "^1.7.5",
+    "ahooks": "^3.7.8",
+    "antd": "^5.0.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "prisma": "^4.16.2",
+    "umi": "^4.0.72"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
+    "@umijs/fabric": "^4.0.1",
+    "eslint": "^8.44.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.3",
+    "prettier": "^2.8.8",
+    "prettier-plugin-organize-imports": "^2.3.4",
+    "prettier-plugin-packagejson": "^2.4.5",
+    "typescript": "^4.9.5"
+  }
+}
