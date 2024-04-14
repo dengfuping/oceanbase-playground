@@ -1,11 +1,8 @@
-import { BasicLayout as OBUIBasicLayout } from '@oceanbase/ui';
 import React from 'react';
 import { Outlet, useLocation } from 'umi';
 import './index.less';
 
-type BasicLayoutProps = OBUIBasicLayoutProps;
-
-const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
+const BasicLayout: React.FC<any> = (props) => {
   const { pathname } = useLocation();
 
   return (

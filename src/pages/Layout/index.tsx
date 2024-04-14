@@ -1,6 +1,6 @@
-import { Alert, ConfigProvider, theme } from '@oceanbase/design';
-import enUS from '@oceanbase/design/es/locale/en-US';
-import zhCN from '@oceanbase/design/es/locale/zh-CN';
+import { Alert, ConfigProvider } from '@oceanbase/design';
+import enUS from '@oceanbase/ui/es/locale/en-US';
+import zhCN from '@oceanbase/ui/es/locale/zh-CN';
 // 主要用于中断请求的 API AbortController 在低版本浏览器下能正常使用
 import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only';
 import React from 'react';
@@ -19,7 +19,7 @@ const Layout: React.FC<LayoutProps> = () => {
   };
 
   return (
-    <ConfigProvider theme={theme} locale={localeMap[locale] || enUS}>
+    <ConfigProvider locale={localeMap[locale] || enUS}>
       <ErrorBoundary>
         <BlankLayout>
           <Outlet />

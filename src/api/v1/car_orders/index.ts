@@ -4,13 +4,13 @@ import prisma from '../../client';
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
     if (req.method === 'GET') {
-      const connections = await prisma.carOrder.findMany({});
-      res.status(200).json(connections);
+      const carOrders = await prisma.oltp.carOrder.findMany({});
+      res.status(200).json(carOrders);
     } else if (req.method === 'POST') {
-      const connection = await prisma.carOrder.create({
+      const carOrder = await prisma.oltp.carOrder.create({
         data: req.body,
       });
-      res.status(200).json(connection);
+      res.status(200).json(carOrder);
     } else {
       res.status(405).json({ errorMessage: 'Method not allowed' });
     }
