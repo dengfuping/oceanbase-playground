@@ -1,23 +1,73 @@
 import { Col, Row, Space, theme, Typography } from '@oceanbase/design';
 import { Column } from '@oceanbase/charts';
-import { useRequest } from 'ahooks';
-import React from 'react';
-import * as CarOrderController from '@/services/CarOrderController';
-import Buy from './Buy';
+import { useInterval, useRequest } from 'ahooks';
+import React, { useEffect, useRef, useState } from 'react';
 import { CheckCircleOutlined } from '@oceanbase/icons';
+import QueueAnim from 'rc-queue-anim';
+import TweenOne from 'rc-tween-one';
+import CountUp from 'react-countup';
+import * as CarOrderController from '@/services/CarOrderController';
 import { COLOR_LIST } from './constant';
+import { APPEAR_TIME, BLIANK_EASING, UPDATE_TIME } from './animation';
+import Buy from './Buy';
+import Chart from './Chart';
+import { desensitizeName, formatTime } from './util';
+import styles from './index.less';
+import type { CarOrder } from '@prisma/client';
+import { toString, uniqBy } from 'lodash';
 
 interface IndexProps {}
 
 const Index: React.FC<IndexProps> = () => {
   const { token } = theme.useToken();
 
-  const { data: carOrderCount, refresh: getCarOrderCountRefresh } = useRequest(
-    CarOrderController.getCarOrderCount,
+  const { data: total = 0, run: getTotal } = useRequest(
+    CarOrderController.getTotal,
     {
       defaultParams: [{}],
     },
   );
+
+  // to preserve previous total
+  const countRef = useRef(total);
+  useEffect(() => {
+    countRef.current = total;
+  }, [total]);
+
+  const { data: colorTop3 = [], run: getColorTop3 } = useRequest(
+    CarOrderController.getColorTop3,
+    {
+      defaultParams: [{}],
+    },
+  );
+
+  const [orderList, setOrderList] = useState<CarOrder[]>([]);
+  const latestOrder = orderList[0] || {};
+
+  const { run: getLatest } = useRequest(CarOrderController.getLatest, {
+    defaultParams: [
+      {
+        queryTime: latestOrder.orderTime,
+      },
+    ],
+    onSuccess: (res) => {
+      setOrderList(
+        uniqBy([...res, ...orderList], (item) => item.orderId).slice(0, 10),
+      );
+    },
+  });
+
+  const getAllData = () => {
+    getTotal();
+    getColorTop3();
+    getLatest({
+      queryTime: latestOrder.orderTime,
+    });
+  };
+
+  useInterval(() => {
+    getAllData();
+  }, 1000);
 
   return (
     <div style={{ padding: '104px 40px 40px 104px' }}>
@@ -32,7 +82,13 @@ const Index: React.FC<IndexProps> = () => {
               marginTop: '-15%',
             }}
           />
-          <Buy style={{ marginTop: '-100%', padding: '24px 40px 0 24px' }} />
+          <Buy
+            polling={true}
+            onSuccess={() => {
+              getAllData();
+            }}
+            style={{ marginTop: '-100%', padding: '24px 40px 0 24px' }}
+          />
         </Col>
         <Col span={5}>
           <img
@@ -53,26 +109,24 @@ const Index: React.FC<IndexProps> = () => {
             }}
           >
             <Col span={14}>
-              <Space direction="vertical" size={40}>
+              <Space direction="vertical" size={40} style={{ width: '100%' }}>
                 <h2>今日预定量</h2>
-                <h1 style={{ fontSize: 50 }}>{carOrderCount}445,434,123</h1>
+                <h1 style={{ fontSize: 50 }}>
+                  <CountUp duration={1} start={countRef.current} end={total} />
+                </h1>
                 <h2>今日颜色预定量 Top3</h2>
+                {/* <Chart
+                  data={colorTop3?.map((item) => ({
+                    carColor: item.carColor,
+                    count: item._count?.carColor || 0,
+                  }))}
+                /> */}
                 <Column
                   height={300}
-                  data={[
-                    {
-                      carColor: 'blue',
-                      count: 300,
-                    },
-                    {
-                      carColor: 'green',
-                      count: 200,
-                    },
-                    {
-                      carColor: 'purple',
-                      count: 100,
-                    },
-                  ]}
+                  data={colorTop3?.map((item) => ({
+                    carColor: item.carColor,
+                    count: item._count?.carColor || 0,
+                  }))}
                   xField="carColor"
                   yField="count"
                   seriesField="carColor"
@@ -82,6 +136,17 @@ const Index: React.FC<IndexProps> = () => {
                         COLOR_LIST.find((item) => item.value === value)?.label,
                     },
                   }}
+                  animation={{
+                    appear: {
+                      duration: APPEAR_TIME,
+                      easing: BLIANK_EASING,
+                    },
+                    update: {
+                      animation: 'element-update',
+                      duration: UPDATE_TIME,
+                      easing: BLIANK_EASING,
+                    },
+                  }}
                 />
               </Space>
             </Col>
@@ -89,14 +154,14 @@ const Index: React.FC<IndexProps> = () => {
               <h2>下单详情</h2>
               <div
                 style={{
-                  maxHeight: '540px',
+                  maxHeight: '590px',
                   overflow: 'auto',
                   paddingRight: 12,
                 }}
               >
-                {Array.from(Array(20)).map((item) => (
+                {orderList.map((item) => (
                   <div
-                    key={item}
+                    key={toString(item.orderId)}
                     style={{
                       padding: '12px 16px',
                       border: `1px solid ${token.colorBorder}`,
@@ -105,7 +170,9 @@ const Index: React.FC<IndexProps> = () => {
                       marginBottom: 14,
                       display: 'flex',
                       alignItems: 'center',
+                      transition: 'all 0.3s ease',
                     }}
+                    className={styles.orderItem}
                   >
                     <CheckCircleOutlined
                       style={{
@@ -116,20 +183,36 @@ const Index: React.FC<IndexProps> = () => {
                     />
                     <div style={{ maxWidth: 'calc(100% - 40px)' }}>
                       <Typography.Text
-                        ellipsis={true}
+                        ellipsis={{ tooltip: true }}
                         style={{ fontWeight: 700, marginBottom: 8 }}
                       >
-                        11:45 福*玲下单成功
+                        {`${formatTime(item.orderTime)} ${desensitizeName(
+                          item.customerName,
+                        )} 下单成功`}
                       </Typography.Text>
                       <Typography.Text
-                        ellipsis={true}
+                        ellipsis={{ tooltip: true }}
                         style={{ color: token.colorTextDescription }}
                       >
-                        订单详情：蓝色吉普蓝色吉普蓝色吉普蓝色吉普蓝色吉普蓝色吉普
+                        {`车辆颜色：${
+                          COLOR_LIST.find(
+                            (color) => color.value === item.carColor,
+                          )?.label
+                        }`}
                       </Typography.Text>
                     </div>
                   </div>
                 ))}
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    height: 135,
+                    width: '100%',
+                    backgroundImage:
+                      'linear-gradient(180deg, rgba(245,248,253,0.00) 0%, #F5F8FD 62%)',
+                  }}
+                />
               </div>
             </Col>
           </Row>

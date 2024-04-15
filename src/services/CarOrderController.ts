@@ -1,24 +1,44 @@
 import { request } from 'umi';
 import type { RequestOptions } from 'umi';
-import type { Prisma } from '@prisma/client';
-
-export async function getCarOrderCount(options?: RequestOptions) {
-  return request<{ count: number }>(`/api/v1/car_orders/count`, {
-    method: 'GET',
-    ...(options || {}),
-  });
-}
+import type { Prisma, CarOrder } from '@prisma/client';
 
 export async function createCarOrder(
   body: Prisma.CarOrderCreateInput,
   options?: RequestOptions,
 ) {
-  return request<Prisma.CarOrderCreateInput>(`/api/v1/car_orders`, {
+  return request<CarOrder>(`/api/v1/car_orders`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     data: body,
+    ...(options || {}),
+  });
+}
+
+export async function getTotal(options?: RequestOptions) {
+  return request<number>(`/api/v1/car_orders/total`, {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
+export async function getColorTop3(options?: RequestOptions) {
+  return request<CarOrder[]>(`/api/v1/car_orders/color_top3`, {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
+export async function getLatest(
+  params: {
+    queryTime?: string | Date;
+  },
+  options?: RequestOptions,
+) {
+  return request<CarOrder[]>(`/api/v1/car_orders/latest`, {
+    method: 'GET',
+    params,
     ...(options || {}),
   });
 }

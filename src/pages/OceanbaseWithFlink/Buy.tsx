@@ -1,15 +1,18 @@
 import { Button, Form, InputNumber, message, Select } from '@oceanbase/design';
 import type { CarOrder } from '@prisma/client';
-import { useRequest } from 'ahooks';
-import React, { useState } from 'react';
+import { useInterval, useRequest } from 'ahooks';
+import React, { useEffect, useState } from 'react';
 import { history } from 'umi';
 import { sample } from 'lodash';
 import * as CarOrderController from '@/services/CarOrderController';
 import { COLOR_LIST } from './constant';
 
-interface BuyProps extends React.HTMLProps<HTMLDivElement> {}
+interface BuyProps extends React.HTMLProps<HTMLDivElement> {
+  polling?: boolean;
+  onSuccess?: () => void;
+}
 
-const Buy: React.FC<BuyProps> = (props) => {
+const Buy: React.FC<BuyProps> = ({ polling, onSuccess, ...restProps }) => {
   const [form] = Form.useForm();
 
   const { run: createCarOrder, loading: createCarOrderLoading } = useRequest(
@@ -18,6 +21,17 @@ const Buy: React.FC<BuyProps> = (props) => {
       manual: true,
       onSuccess: () => {
         message.success('下单成功');
+        onSuccess?.();
+      },
+    },
+  );
+
+  const { run: createCarOrderForPolling } = useRequest(
+    CarOrderController.createCarOrder,
+    {
+      manual: true,
+      onSuccess: () => {
+        onSuccess?.();
       },
     },
   );
@@ -35,8 +49,21 @@ const Buy: React.FC<BuyProps> = (props) => {
     });
   };
 
+  useInterval(
+    () => {
+      createCarOrderForPolling({
+        carPrice: sample([215000, 245900, 299900]),
+        carColor: sample(COLOR_LIST.map((item) => item.value)),
+        saleRegion: sample(['Beijing', 'Shanghai', 'Shenzhen', 'Hangzhou']),
+        saleNation: 'China',
+        customerName: sample(['张三', '李四', '王五']),
+      });
+    },
+    polling ? 1000 : undefined,
+  );
+
   return (
-    <Form form={form} layout="vertical" {...props}>
+    <Form form={form} layout="vertical" {...restProps}>
       <Form.Item label="预定量" name="count" initialValue={1} required={true}>
         <Select
           options={[
