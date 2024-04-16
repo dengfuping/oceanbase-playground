@@ -1,8 +1,9 @@
 {
   "private": true,
+  "repository": "git@github.com:dengfuping/oceanbase-playground.git",
   "author": "dengfuping <dengfuping_private@163.com>",
   "scripts": {
-    "build": "umi build",
+    "build": "umi build && ls",
     "dev": "umi dev",
     "postinstall": "umi setup",
     "prepare": "husky install",
@@ -53,6 +54,5 @@
     "prettier-plugin-organize-imports": "^2.3.4",
     "prettier-plugin-packagejson": "^2.4.5",
     "typescript": "^4.9.5"
-  },
-  "repository": "git@github.com:dengfuping/oceanbase-playground.git"
+  }
 }
