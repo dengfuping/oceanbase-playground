@@ -2,6 +2,9 @@ import { defineConfig } from 'umi';
 import routes from './routes';
 
 export default defineConfig({
+  favicons: [
+    'https://mdn.alipayobjects.com/huamei_n8rchn/afts/img/A*d_ZTR7sdVzAAAAAAAAAAAAAADvSFAQ/original',
+  ],
   routes,
   npmClient: 'pnpm',
   // Enable API route and deploy to vercel

@@ -4,7 +4,7 @@ import zhCN from '@oceanbase/ui/es/locale/zh-CN';
 // 主要用于中断请求的 API AbortController 在低版本浏览器下能正常使用
 import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only';
 import React from 'react';
-import { getLocale, Outlet } from 'umi';
+import { getLocale, Helmet, Outlet } from 'umi';
 import BlankLayout from './BlankLayout';
 
 const { ErrorBoundary } = Alert;
@@ -21,6 +21,9 @@ const Layout: React.FC<LayoutProps> = () => {
   return (
     <ConfigProvider locale={localeMap[locale] || enUS}>
       <ErrorBoundary>
+        <Helmet>
+          <title>OceanBase Playground</title>
+        </Helmet>
         <BlankLayout>
           <Outlet />
         </BlankLayout>
