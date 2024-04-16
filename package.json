@@ -7,7 +7,7 @@
     "dev": "umi dev",
     "postinstall": "umi setup",
     "prepare": "husky install",
-    "setup": "umi setup && npm build build",
+    "setup": "umi setup && npm run dev",
     "start": "npm run dev"
   },
   "dependencies": {
