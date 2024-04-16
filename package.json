@@ -3,11 +3,11 @@
   "repository": "git@github.com:dengfuping/oceanbase-playground.git",
   "author": "dengfuping <dengfuping_private@163.com>",
   "scripts": {
-    "build": "umi build",
+    "build": "npm run dev && exit 0 && umi build",
     "dev": "umi dev",
     "postinstall": "umi setup",
     "prepare": "husky install",
-    "setup": "umi setup && npm run dev",
+    "setup": "umi setup",
     "start": "npm run dev"
   },
   "dependencies": {
