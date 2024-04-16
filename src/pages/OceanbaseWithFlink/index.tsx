@@ -123,10 +123,7 @@ const Index: React.FC<IndexProps> = () => {
                 /> */}
                 <Column
                   height={300}
-                  data={colorTop3?.map((item) => ({
-                    carColor: item.carColor,
-                    count: item._count?.carColor || 0,
-                  }))}
+                  data={colorTop3}
                   xField="carColor"
                   yField="count"
                   seriesField="carColor"

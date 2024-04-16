@@ -3,7 +3,7 @@ import type { RequestOptions } from 'umi';
 import type { Prisma, CarOrder } from '@prisma/client';
 
 export async function createCarOrder(
-  body: Prisma.CarOrderCreateInput,
+  body: Omit<Prisma.CarOrderCreateInput, 'orderTime'>,
   options?: RequestOptions,
 ) {
   return request<CarOrder>(`/api/v1/car_orders`, {

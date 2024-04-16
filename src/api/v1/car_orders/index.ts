@@ -1,14 +1,16 @@
 import type { UmiApiRequest, UmiApiResponse } from 'umi';
-import prisma from '../../client';
+import model from '../../model';
+import moment from 'moment';
 
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
     if (req.method === 'GET') {
-      const carOrders = await prisma.oltp.carOrder.findMany({});
+      const carOrders = await model.OLAPCarOrder.findAll();
       res.status(200).json(carOrders);
     } else if (req.method === 'POST') {
-      const carOrder = await prisma.oltp.carOrder.create({
-        data: req.body,
+      const carOrder = await model.OLTPCarOrder.create({
+        ...req.body,
+        orderTime: moment().format(),
       });
       res.status(200).json(carOrder);
     } else {

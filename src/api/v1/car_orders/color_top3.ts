@@ -1,20 +1,15 @@
 import type { UmiApiRequest, UmiApiResponse } from 'umi';
-import prisma from '../../client';
+import { Sequelize } from 'sequelize';
+import model from '../../model';
 
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
     if (req.method === 'GET') {
-      const result = await prisma.oltp.carOrder.groupBy({
-        by: ['carColor'],
-        _count: {
-          carColor: true,
-        },
-        orderBy: {
-          _count: {
-            carColor: 'desc',
-          },
-        },
-        take: 3,
+      const result = await model.OLAPCarOrder.findAll({
+        group: 'car_color',
+        attributes: ['carColor', [Sequelize.fn('COUNT', 'car_color'), 'count']],
+        order: [['count', 'DESC']],
+        limit: 3,
       });
       res.status(200).json(result);
     } else {

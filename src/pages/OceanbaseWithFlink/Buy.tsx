@@ -4,6 +4,7 @@ import { useInterval, useRequest } from 'ahooks';
 import React, { useEffect, useState } from 'react';
 import { history } from 'umi';
 import { sample } from 'lodash';
+import { fullName } from 'full-name-generator';
 import * as CarOrderController from '@/services/CarOrderController';
 import { COLOR_LIST } from './constant';
 
@@ -36,31 +37,29 @@ const Buy: React.FC<BuyProps> = ({ polling, onSuccess, ...restProps }) => {
     },
   );
 
+  const generateCarOrder = () => {
+    return {
+      carPrice: sample([215000, 245900, 299900]),
+      carColor: sample(COLOR_LIST.map((item) => item.value)),
+      saleRegion: sample(['Beijing', 'Shanghai', 'Shenzhen', 'Hangzhou']),
+      saleNation: 'China',
+      customerName: fullName('CN', sample([0, 1])),
+    } as any;
+  };
+
   const handleSubmit = () => {
     form.validateFields().then((values) => {
       const { count, carColor } = values;
-      createCarOrder({
-        carPrice: sample([215000, 245900, 299900]),
-        carColor: sample(COLOR_LIST.map((item) => item.value)),
-        saleRegion: sample(['Beijing', 'Shanghai', 'Shenzhen', 'Hangzhou']),
-        saleNation: 'China',
-        customerName: sample(['张三', '李四', '王五']),
-      });
+      createCarOrder(generateCarOrder());
     });
   };
 
-  useInterval(
-    () => {
-      createCarOrderForPolling({
-        carPrice: sample([215000, 245900, 299900]),
-        carColor: sample(COLOR_LIST.map((item) => item.value)),
-        saleRegion: sample(['Beijing', 'Shanghai', 'Shenzhen', 'Hangzhou']),
-        saleNation: 'China',
-        customerName: sample(['张三', '李四', '王五']),
-      });
-    },
-    polling ? 1000 : undefined,
-  );
+  // useInterval(
+  //   () => {
+  //     createCarOrderForPolling(generateCarOrder());
+  //   },
+  //   polling ? 1000 : undefined,
+  // );
 
   return (
     <Form form={form} layout="vertical" {...restProps}>
