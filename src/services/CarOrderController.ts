@@ -16,6 +16,20 @@ export async function createCarOrder(
   });
 }
 
+export async function batchCreateCarOrder(
+  body: Omit<Prisma.CarOrderCreateInput, 'orderTime'>[],
+  options?: RequestOptions,
+) {
+  return request<CarOrder>(`/api/v1/car_orders/batch`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 export async function getTotal(options?: RequestOptions) {
   return request<number>(`/api/v1/car_orders/total`, {
     method: 'GET',

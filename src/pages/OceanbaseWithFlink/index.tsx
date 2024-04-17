@@ -1,5 +1,6 @@
 import { Col, Row, Space, theme, Typography } from '@oceanbase/design';
-import { Column } from '@oceanbase/charts';
+// import { Column } from '@oceanbase/charts';
+import { Column } from '@ant-design/charts';
 import { useInterval, useRequest } from 'ahooks';
 import React, { useEffect, useRef, useState } from 'react';
 import { CheckCircleOutlined } from '@oceanbase/icons';
@@ -11,11 +12,13 @@ import { COLOR_LIST } from './constant';
 import { APPEAR_TIME, BLIANK_EASING, UPDATE_TIME } from './animation';
 import Buy from './Buy';
 import Chart from './Chart';
+import EChart from './EChart';
 import { desensitizeName, formatTime } from './util';
 import styles from './index.less';
 import type { CarOrder } from '@prisma/client';
 import { toString, uniqBy } from 'lodash';
 import { Helmet } from 'umi';
+// import './animation/custom-update';
 
 interface IndexProps {}
 
@@ -92,7 +95,7 @@ const Index: React.FC<IndexProps> = () => {
               onSuccess={() => {
                 getAllData();
               }}
-              style={{ marginTop: '-100%', padding: '24px 40px 0 24px' }}
+              style={{ marginTop: '-115%', padding: '24px 40px 0 24px' }}
             />
           </Col>
           <Col span={5}>
@@ -130,30 +133,45 @@ const Index: React.FC<IndexProps> = () => {
                     count: item._count?.carColor || 0,
                   }))}
                 /> */}
+                  {/* <EChart data={colorTop3} /> */}
                   <Column
                     height={300}
-                    data={colorTop3}
+                    data={colorTop3.map((item) => ({
+                      ...item,
+                      carColor: COLOR_LIST.find(
+                        (color) => color.value === item.carColor,
+                      )?.label,
+                    }))}
                     xField="carColor"
                     yField="count"
-                    seriesField="carColor"
-                    meta={{
-                      carColor: {
-                        formatter: (value) =>
-                          COLOR_LIST.find((item) => item.value === value)
-                            ?.label,
-                      },
+                    colorField="carColor"
+                    // meta={{
+                    //   carColor: {
+                    //     formatter: (value) =>
+                    //       COLOR_LIST.find((item) => item.value === value)
+                    //         ?.label,
+                    //   },
+                    // }}
+                    legend={false}
+                    label={{
+                      textBaseline: 'bottom',
                     }}
-                    animation={{
-                      appear: {
-                        duration: APPEAR_TIME,
-                        easing: BLIANK_EASING,
-                      },
-                      update: {
-                        animation: 'element-update',
-                        duration: UPDATE_TIME,
-                        easing: BLIANK_EASING,
-                      },
-                    }}
+                    // animation={{
+                    //   // appear: {
+                    //   //   duration: APPEAR_TIME,
+                    //   //   easing: BLIANK_EASING,
+                    //   // },
+                    //   // update: {
+                    //   //   animation: 'element-update',
+                    //   //   duration: UPDATE_TIME,
+                    //   //   easing: BLIANK_EASING,
+                    //   // },
+                    //   update: {
+                    //     animation: 'custom-update',
+                    //     // duration: UPDATE_TIME,
+                    //     // easing: BLIANK_EASING,
+                    //   },
+                    // }}
                   />
                 </Space>
               </Col>
@@ -193,9 +211,9 @@ const Index: React.FC<IndexProps> = () => {
                           ellipsis={{ tooltip: true }}
                           style={{ fontWeight: 700, marginBottom: 8 }}
                         >
-                          {`${formatTime(item.orderTime)} ${desensitizeName(
-                            item.customerName,
-                          )} 下单成功`}
+                          {`${formatTime(item.orderTime)} ${
+                            item.customerName
+                          } 下单成功`}
                         </Typography.Text>
                         <Typography.Text
                           ellipsis={{ tooltip: true }}

@@ -1,10 +1,17 @@
-import { Button, Form, InputNumber, message, Select } from '@oceanbase/design';
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Select,
+} from '@oceanbase/design';
 import type { CarOrder } from '@prisma/client';
 import { useInterval, useRequest } from 'ahooks';
 import React, { useEffect, useState } from 'react';
 import { history } from 'umi';
-import { sample } from 'lodash';
-import { fullName } from 'full-name-generator';
+import { range, sample } from 'lodash';
+import { firstName, fullName, lastName } from 'full-name-generator';
 import * as CarOrderController from '@/services/CarOrderController';
 import { COLOR_LIST } from './constant';
 
@@ -37,20 +44,45 @@ const Buy: React.FC<BuyProps> = ({ polling, onSuccess, ...restProps }) => {
     },
   );
 
+  const { run: batchCreateCarOrder, loading: batchCreateCarOrderLoading } =
+    useRequest(CarOrderController.batchCreateCarOrder, {
+      manual: true,
+      onSuccess: () => {
+        message.success('下单成功');
+        onSuccess?.();
+      },
+    });
+
+  const generateCustomerName = () => {
+    return `${lastName('CN', sample([0, 1]))}${firstName(
+      'CN',
+      sample([0, 1]),
+    )}`;
+  };
+
   const generateCarOrder = () => {
     return {
       carPrice: sample([215000, 245900, 299900]),
       carColor: sample(COLOR_LIST.map((item) => item.value)),
       saleRegion: sample(['Beijing', 'Shanghai', 'Shenzhen', 'Hangzhou']),
       saleNation: 'China',
-      customerName: fullName('CN', sample([0, 1])),
+      customerName: generateCustomerName(),
     } as any;
   };
 
   const handleSubmit = () => {
     form.validateFields().then((values) => {
-      const { count, carColor } = values;
-      createCarOrder(generateCarOrder());
+      const { count, carColor, customerName } = values;
+
+      batchCreateCarOrder(
+        range(0, count).map(() => {
+          return {
+            ...generateCarOrder(),
+            carColor,
+            customerName,
+          };
+        }),
+      );
     });
   };
 
@@ -63,6 +95,14 @@ const Buy: React.FC<BuyProps> = ({ polling, onSuccess, ...restProps }) => {
 
   return (
     <Form form={form} layout="vertical" {...restProps}>
+      <Form.Item
+        label="客户名"
+        name="customerName"
+        initialValue={generateCustomerName()}
+        required={true}
+      >
+        <Input />
+      </Form.Item>
       <Form.Item label="预定量" name="count" initialValue={1} required={true}>
         <Select
           options={[
@@ -102,7 +142,7 @@ const Buy: React.FC<BuyProps> = ({ polling, onSuccess, ...restProps }) => {
           size="large"
           type="primary"
           onClick={handleSubmit}
-          loading={createCarOrderLoading}
+          loading={createCarOrderLoading || batchCreateCarOrderLoading}
           block={true}
         >
           预定下单

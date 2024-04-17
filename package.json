@@ -11,7 +11,7 @@
     "start": "npm run dev"
   },
   "dependencies": {
-    "@ant-design/charts": "^1.4.3",
+    "@ant-design/charts": "^2.0.3",
     "@antv/g2plot": "^2.4.31",
     "@oceanbase/charts": "^0.3.0",
     "@oceanbase/design": "^0.3.0",
