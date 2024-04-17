@@ -1,5 +1,9 @@
 export default [
   {
+    path: 'oceanbase-with-flink/order',
+    component: 'OceanbaseWithFlink/Order',
+  },
+  {
     path: '/',
     component: 'Layout',
     routes: [

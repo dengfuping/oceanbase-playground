@@ -10,7 +10,7 @@ import CountUp from 'react-countup';
 import * as CarOrderController from '@/services/CarOrderController';
 import { COLOR_LIST } from './constant';
 import { APPEAR_TIME, BLIANK_EASING, UPDATE_TIME } from './animation';
-import Buy from './Buy';
+import Order from './Order';
 import Chart from './Chart';
 import EChart from './EChart';
 import { desensitizeName, formatTime } from './util';
@@ -117,7 +117,7 @@ const Index: React.FC<IndexProps> = () => {
                 marginTop: '-15%',
               }}
             />
-            <Buy
+            <Order
               onSuccess={() => {
                 getStatus({
                   orderId: latestOrder?.orderId,

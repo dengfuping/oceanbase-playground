@@ -13,11 +13,11 @@ import { firstName, lastName } from 'full-name-generator';
 import * as CarOrderController from '@/services/CarOrderController';
 import { COLOR_LIST } from './constant';
 
-interface BuyProps extends React.HTMLProps<HTMLDivElement> {
+interface OrderProps extends React.HTMLProps<HTMLDivElement> {
   onSuccess?: () => void;
 }
 
-const Buy: React.FC<BuyProps> = ({ onSuccess, ...restProps }) => {
+const Order: React.FC<OrderProps> = ({ onSuccess, ...restProps }) => {
   const [form] = Form.useForm();
   const [createPolling, setCreatePolling] = useState(false);
   const [batchCreatePolling, setBatchCreatePolling] = useState(false);
@@ -195,4 +195,4 @@ const Buy: React.FC<BuyProps> = ({ onSuccess, ...restProps }) => {
   );
 };
 
-export default Buy;
+export default Order;

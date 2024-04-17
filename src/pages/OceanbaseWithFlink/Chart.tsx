@@ -209,11 +209,11 @@ function processData(data, yField) {
   }));
 }
 
-interface BuyProps extends React.HTMLProps<HTMLDivElement> {
+interface ChartProps extends React.HTMLProps<HTMLDivElement> {
   data?: { carColor: string; count: number }[];
 }
 
-const Chart: React.FC<BuyProps> = ({ data = [], ...restProps }) => {
+const Chart: React.FC<ChartProps> = ({ data = [], ...restProps }) => {
   const ref = useRef<Bar>();
   useEffect(() => {
     const newData = processData(data, 'carColor');
