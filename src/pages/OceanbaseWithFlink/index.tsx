@@ -80,8 +80,24 @@ const Index: React.FC<IndexProps> = () => {
     });
   };
 
+  // 获取同步状态和是否应该刷新
+  const { data: statusData, run: getStatus } = useRequest(
+    CarOrderController.getStatus,
+    {
+      defaultParams: [{}],
+      onSuccess: (res) => {
+        if (res.shouldRefresh) {
+          getAllData();
+        }
+      },
+    },
+  );
+  const { syncing } = statusData || {};
+
   useInterval(() => {
-    getAllData();
+    getStatus({
+      orderId: latestOrder.orderId,
+    });
   }, 1000);
 
   return (
@@ -103,19 +119,29 @@ const Index: React.FC<IndexProps> = () => {
             />
             <Buy
               onSuccess={() => {
-                getAllData();
+                getStatus({
+                  orderId: latestOrder?.orderId,
+                });
               }}
               style={{ marginTop: '-115%', padding: '24px 40px 0 24px' }}
             />
           </Col>
           <Col span={5}>
-            <img
+            <div
+              style={{
+                marginTop: 150,
+              }}
+              className={`effect-olap-flink ${
+                syncing ? 'effect-olap-flink-animate' : ''
+              }`}
+            />
+            {/* <img
               src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*w-dvQIGYbBMAAAAAAAAAAAAADmfOAQ/original"
               style={{
                 width: '100%',
                 marginTop: 118,
               }}
-            />
+            /> */}
           </Col>
           <Col span={13}>
             <h2 style={{ marginBottom: 56 }}>数据可视化</h2>
@@ -143,7 +169,14 @@ const Index: React.FC<IndexProps> = () => {
                     count: item._count?.carColor || 0,
                   }))}
                 /> */}
-                  {/* <EChart data={colorTop3} /> */}
+                  {/* <EChart
+                    data={colorTop3.map((item) => ({
+                      ...item,
+                      carColor: COLOR_LIST.find(
+                        (color) => color.value === item.carColor,
+                      )?.label,
+                    }))}
+                  /> */}
                   <Column
                     height={300}
                     data={colorTop3.map((item) => ({
@@ -155,33 +188,10 @@ const Index: React.FC<IndexProps> = () => {
                     xField="carColor"
                     yField="count"
                     colorField="carColor"
-                    // meta={{
-                    //   carColor: {
-                    //     formatter: (value) =>
-                    //       COLOR_LIST.find((item) => item.value === value)
-                    //         ?.label,
-                    //   },
-                    // }}
                     legend={false}
                     label={{
                       textBaseline: 'bottom',
                     }}
-                    // animation={{
-                    //   // appear: {
-                    //   //   duration: APPEAR_TIME,
-                    //   //   easing: BLIANK_EASING,
-                    //   // },
-                    //   // update: {
-                    //   //   animation: 'element-update',
-                    //   //   duration: UPDATE_TIME,
-                    //   //   easing: BLIANK_EASING,
-                    //   // },
-                    //   update: {
-                    //     animation: 'custom-update',
-                    //     // duration: UPDATE_TIME,
-                    //     // easing: BLIANK_EASING,
-                    //   },
-                    // }}
                   />
                 </Space>
               </Col>

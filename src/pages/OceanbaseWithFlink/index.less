@@ -18,9 +18,6 @@
   font-display: swap;
 }
 
-.orderItem {
-}
-
 h1 {
   font-family: Alibaba PuHuiTi;
   font-size: 66px;
@@ -41,4 +38,21 @@ h3 {
   line-height: 32px;
   margin-bottom: 0px;
   color: rgba(0, 0, 0, 0.65);
+}
+
+.effect-olap-flink {
+  width: 283px;
+  height: 552px;
+  background: url(https://img.alicdn.com/imgextra/i4/O1CN014y9KCm1cadWE8PReY_!!6000000003617-2-tps-6792-1104.png) no-repeat 0 0;
+  background-size: auto 100%;
+}
+
+.effect-olap-flink.effect-olap-flink-animate {
+  animation: effect-bg-animate 1.25s steps(11, end) infinite;
+}
+
+@keyframes effect-bg-animate {
+  to {
+    background-position-x: 100%;
+  }
 }

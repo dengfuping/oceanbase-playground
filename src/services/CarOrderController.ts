@@ -56,3 +56,19 @@ export async function getLatest(
     ...(options || {}),
   });
 }
+
+export async function getStatus(
+  params: {
+    orderId?: string | Date;
+  },
+  options?: RequestOptions,
+) {
+  return request<{ syncing?: boolean; shouldRefresh?: boolean }>(
+    `/api/v1/car_orders/status`,
+    {
+      method: 'GET',
+      params,
+      ...(options || {}),
+    },
+  );
+}

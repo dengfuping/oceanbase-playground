@@ -5,6 +5,10 @@ export default defineConfig({
   favicons: [
     'https://mdn.alipayobjects.com/huamei_n8rchn/afts/img/A*d_ZTR7sdVzAAAAAAAAAAAAAADvSFAQ/original',
   ],
+  headScripts: [
+    'https://g.alicdn.com/AWSC/et/1.76.3/et_f.js',
+    'https://g.alicdn.com/AWSC/Bee/index.js',
+  ],
   routes,
   npmClient: 'pnpm',
   // Enable API route and deploy to vercel
