@@ -3,10 +3,12 @@ import mysql2 from 'mysql2';
 
 const oltp = new Sequelize(process.env.OLTP_DATABASE_URL as string, {
   logging: false,
+  timezone: '+08:00',
   dialectModule: mysql2,
 });
 const olap = new Sequelize(process.env.OLAP_DATABASE_URL as string, {
   logging: false,
+  timezone: '+08:00',
   dialectModule: mysql2,
 });
 

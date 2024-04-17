@@ -5,20 +5,20 @@ import model from '../../model';
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
     if (req.method === 'GET') {
-      const { queryTime } = req.params || {};
-      if (queryTime) {
+      const { orderId } = req.query || {};
+      if (orderId) {
         const result = await model.OLAPCarOrder.findAll({
           where: {
-            orderTime: {
-              [Op.gte]: req.params.queryTime,
+            orderId: {
+              [Op.gt]: orderId,
             },
           },
-          order: [['order_time', 'DESC']],
+          order: [['orderId', 'DESC']],
         });
         res.status(200).json(result);
       } else {
         const result = await model.OLAPCarOrder.findAll({
-          order: [['order_time', 'DESC']],
+          order: [['orderId', 'DESC']],
           limit: 10,
         });
         res.status(200).json(result);

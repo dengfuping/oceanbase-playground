@@ -46,7 +46,7 @@ export async function getColorTop3(options?: RequestOptions) {
 
 export async function getLatest(
   params: {
-    queryTime?: string | Date;
+    orderId?: string | Date;
   },
   options?: RequestOptions,
 ) {

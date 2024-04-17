@@ -2,17 +2,14 @@ import {
   Button,
   Form,
   Input,
-  InputNumber,
   message,
   Select,
   Switch,
 } from '@oceanbase/design';
-import type { CarOrder } from '@prisma/client';
 import { useInterval, useRequest } from 'ahooks';
-import React, { useEffect, useState } from 'react';
-import { history } from 'umi';
+import React, { useState } from 'react';
 import { range, sample } from 'lodash';
-import { firstName, fullName, lastName } from 'full-name-generator';
+import { firstName, lastName } from 'full-name-generator';
 import * as CarOrderController from '@/services/CarOrderController';
 import { COLOR_LIST } from './constant';
 
@@ -22,29 +19,10 @@ interface BuyProps extends React.HTMLProps<HTMLDivElement> {
 
 const Buy: React.FC<BuyProps> = ({ onSuccess, ...restProps }) => {
   const [form] = Form.useForm();
-  const [polling, setPolling] = useState(false);
+  const [createPolling, setCreatePolling] = useState(false);
+  const [batchCreatePolling, setBatchCreatePolling] = useState(false);
 
-  const { run: createCarOrder, loading: createCarOrderLoading } = useRequest(
-    CarOrderController.createCarOrder,
-    {
-      manual: true,
-      onSuccess: () => {
-        message.success('下单成功');
-        onSuccess?.();
-      },
-    },
-  );
-
-  const { run: createCarOrderForPolling } = useRequest(
-    CarOrderController.createCarOrder,
-    {
-      manual: true,
-      onSuccess: () => {
-        onSuccess?.();
-      },
-    },
-  );
-
+  // 下单
   const { run: batchCreateCarOrder, loading: batchCreateCarOrderLoading } =
     useRequest(CarOrderController.batchCreateCarOrder, {
       manual: true,
@@ -54,6 +32,18 @@ const Buy: React.FC<BuyProps> = ({ onSuccess, ...restProps }) => {
       },
     });
 
+  // 用于模拟场景的下单
+  const { run: batchCreateCarOrderForPolling } = useRequest(
+    CarOrderController.batchCreateCarOrder,
+    {
+      manual: true,
+      onSuccess: () => {
+        onSuccess?.();
+      },
+    },
+  );
+
+  // 随机生成用户名
   const generateCustomerName = () => {
     return `${lastName('CN', sample([0, 1]))}${firstName(
       'CN',
@@ -61,6 +51,7 @@ const Buy: React.FC<BuyProps> = ({ onSuccess, ...restProps }) => {
     )}`;
   };
 
+  // 随机生成订单
   const generateCarOrder = () => {
     return {
       carPrice: sample([215000, 245900, 299900]),
@@ -71,10 +62,10 @@ const Buy: React.FC<BuyProps> = ({ onSuccess, ...restProps }) => {
     } as any;
   };
 
+  // 通过表单提交订单
   const handleSubmit = () => {
     form.validateFields().then((values) => {
       const { count, carColor, customerName } = values;
-
       batchCreateCarOrder(
         range(0, count).map(() => {
           return {
@@ -87,90 +78,130 @@ const Buy: React.FC<BuyProps> = ({ onSuccess, ...restProps }) => {
     });
   };
 
+  // 模拟单人连续下单
   useInterval(
     () => {
-      createCarOrderForPolling(generateCarOrder());
+      batchCreateCarOrderForPolling([generateCarOrder()]);
     },
-    polling ? 100 : undefined,
+    createPolling ? 1000 : undefined,
+  );
+
+  // 模拟多人同时下单
+  useInterval(
+    () => {
+      batchCreateCarOrderForPolling(
+        range(0, 10).map(() => {
+          return generateCarOrder();
+        }),
+      );
+    },
+    batchCreatePolling ? 1000 : undefined,
   );
 
   return (
-    <Form form={form} layout="vertical" {...restProps}>
-      <Form.Item
-        label="用户名"
-        name="customerName"
-        initialValue={generateCustomerName()}
-        rules={[
-          {
-            required: true,
-            message: '请输入用户名',
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item label="预定量" name="count" initialValue={1} required={true}>
-        <Select
-          options={[
+    <>
+      <Form form={form} layout="vertical" {...restProps}>
+        <Form.Item
+          label="用户名"
+          name="customerName"
+          initialValue={generateCustomerName()}
+          rules={[
             {
-              value: 1,
-              label: '1 辆',
-            },
-            {
-              value: 10,
-              label: '10 辆',
-            },
-            {
-              value: 100,
-              label: '100 辆',
-            },
-            {
-              value: 1000,
-              label: '1000 辆',
-            },
-            {
-              value: 10000,
-              label: '10000 辆',
+              required: true,
+              message: '请输入用户名',
             },
           ]}
-        />
-      </Form.Item>
-      <Form.Item
-        label="颜色"
-        name="carColor"
-        initialValue="blue"
-        required={true}
-      >
-        <Select options={COLOR_LIST} />
-      </Form.Item>
-      <Form.Item>
-        <Button
-          size="large"
-          type="primary"
-          onClick={handleSubmit}
-          loading={createCarOrderLoading || batchCreateCarOrderLoading}
-          block={true}
         >
-          预定下单
-        </Button>
-      </Form.Item>
-      <Form.Item
-        label="模拟多人在线同时下单"
-        name="polling"
-        initialValue={false}
-        valuePropName="checked"
-        required={true}
+          <Input />
+        </Form.Item>
+        <Form.Item label="预定量" name="count" initialValue={1} required={true}>
+          <Select
+            options={[
+              {
+                value: 1,
+                label: '1 辆',
+              },
+              {
+                value: 10,
+                label: '10 辆',
+              },
+              {
+                value: 100,
+                label: '100 辆',
+              },
+              {
+                value: 1000,
+                label: '1000 辆',
+              },
+              {
+                value: 10000,
+                label: '10000 辆',
+              },
+            ]}
+          />
+        </Form.Item>
+        <Form.Item
+          label="颜色"
+          name="carColor"
+          initialValue="blue"
+          required={true}
+        >
+          <Select options={COLOR_LIST} />
+        </Form.Item>
+        <Form.Item>
+          <Button
+            size="large"
+            type="primary"
+            onClick={handleSubmit}
+            loading={batchCreateCarOrderLoading}
+            block={true}
+          >
+            预定下单
+          </Button>
+        </Form.Item>
+      </Form>
+      <Form
+        layout="inline"
         style={{
-          marginTop: 100,
+          marginTop: 60,
         }}
       >
-        <Switch
-          onChange={(value) => {
-            setPolling(value);
-          }}
-        />
-      </Form.Item>
-    </Form>
+        <Form.Item
+          label="模拟单人连续下单"
+          name="createPolling"
+          initialValue={false}
+          valuePropName="checked"
+          required={true}
+        >
+          <Switch
+            size="small"
+            onChange={(value) => {
+              setCreatePolling(value);
+              if (value) {
+                setBatchCreatePolling(false);
+              }
+            }}
+          />
+        </Form.Item>
+        <Form.Item
+          label="模拟多人同时下单"
+          name="batchCreatePolling"
+          initialValue={false}
+          valuePropName="checked"
+          required={true}
+        >
+          <Switch
+            size="small"
+            onChange={(value) => {
+              setBatchCreatePolling(value);
+              if (value) {
+                setCreatePolling(false);
+              }
+            }}
+          />
+        </Form.Item>
+      </Form>
+    </>
   );
 };
 

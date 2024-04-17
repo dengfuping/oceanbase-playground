@@ -44,6 +44,9 @@ dependencies:
   ahooks:
     specifier: ^3.7.8
     version: 3.7.8(react@16.14.0)
+  animate.css:
+    specifier: ^4.1.1
+    version: 4.1.1
   antd:
     specifier: ^5.0.0
     version: 5.16.1(moment@2.29.4)(react-dom@18.1.0)(react@16.14.0)
@@ -6226,6 +6229,10 @@ packages:
   /amdefine@1.0.1:
     resolution: {integrity: sha512-S2Hw0TtNkMJhIabBwIojKL9YHO5T0n5eNqWJ7Lrlel/zDbftQpxpapi8tZs3X1HWa+u+QeydGmzzNU0m09+Rcg==}
     engines: {node: '>=0.4.2'}
+    dev: false
+
+  /animate.css@4.1.1:
+    resolution: {integrity: sha512-+mRmCTv6SbCmtYJCN4faJMNFVNN5EuCTTprDTAo7YzIGji2KADmakjVA3+8mVDkZ2Bf09vayB35lSQIex2+QaQ==}
     dev: false
 
   /ansi-escapes@4.3.2:

@@ -14,11 +14,14 @@ import Buy from './Buy';
 import Chart from './Chart';
 import EChart from './EChart';
 import { desensitizeName, formatTime } from './util';
-import styles from './index.less';
 import type { CarOrder } from '@prisma/client';
 import { toString, uniqBy } from 'lodash';
 import { Helmet } from 'umi';
 // import './animation/custom-update';
+import 'animate.css';
+import './index.less';
+import { sortByNumber } from '@oceanbase/util';
+import moment from 'moment';
 
 interface IndexProps {}
 
@@ -51,13 +54,13 @@ const Index: React.FC<IndexProps> = () => {
   const { run: getLatest } = useRequest(CarOrderController.getLatest, {
     defaultParams: [
       {
-        queryTime: latestOrder.orderTime,
+        orderId: latestOrder.orderId,
       },
     ],
     onSuccess: (res) => {
-      setOrderList(
-        uniqBy([...res, ...orderList], (item) => item.orderId).slice(0, 10),
-      );
+      const newOrderList =
+        res.length >= 10 ? res : [...res, ...orderList].slice(0, 10);
+      setOrderList(newOrderList);
     },
   });
 
@@ -65,7 +68,7 @@ const Index: React.FC<IndexProps> = () => {
     getTotal();
     getColorTop3();
     getLatest({
-      queryTime: latestOrder.orderTime,
+      orderId: latestOrder.orderId,
     });
   };
 
@@ -185,7 +188,8 @@ const Index: React.FC<IndexProps> = () => {
                 >
                   {orderList.map((item) => (
                     <div
-                      key={toString(item.orderId)}
+                      // 增加时间戳，每次都生成唯一 key，保证滚动动画正常执行
+                      key={`${toString(item.orderId)}-${moment().format()}`}
                       style={{
                         padding: '12px 16px',
                         border: `1px solid ${token.colorBorder}`,
@@ -196,7 +200,7 @@ const Index: React.FC<IndexProps> = () => {
                         alignItems: 'center',
                         transition: 'all 0.3s ease',
                       }}
-                      className={styles.orderItem}
+                      className="animate__animated animate__slideInDown"
                     >
                       <CheckCircleOutlined
                         style={{
