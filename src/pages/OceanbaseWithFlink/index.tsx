@@ -58,9 +58,17 @@ const Index: React.FC<IndexProps> = () => {
       },
     ],
     onSuccess: (res) => {
-      const newOrderList =
-        res.length >= 10 ? res : [...res, ...orderList].slice(0, 10);
-      setOrderList(newOrderList);
+      if (res.length > 0) {
+        const newOrderList =
+          res.length >= 10 ? res : [...res, ...orderList].slice(0, 10);
+        setOrderList(
+          newOrderList.map((item) => ({
+            ...item,
+            // 增加时间戳，每次都生成唯一 key，保证滚动动画正常执行
+            key: `${toString(item.orderId)}-${moment().format()}`,
+          })),
+        );
+      }
     },
   });
 
@@ -188,8 +196,7 @@ const Index: React.FC<IndexProps> = () => {
                 >
                   {orderList.map((item) => (
                     <div
-                      // 增加时间戳，每次都生成唯一 key，保证滚动动画正常执行
-                      key={`${toString(item.orderId)}-${moment().format()}`}
+                      key={item.key}
                       style={{
                         padding: '12px 16px',
                         border: `1px solid ${token.colorBorder}`,

@@ -7,19 +7,19 @@ interface ChartProps {
   className?: string;
 }
 
-const Chart: React.FC<ChartProps> = ({ data = [], style, ...restProps }) => {
+const Chart: React.FC<ChartProps> = ({ data = [], ...restProps }) => {
   const option = {
+    // height: 300,
     xAxis: {
-      max: 'dataMax',
-    },
-    yAxis: {
       type: 'category',
       data: data.map((item) => item.carColor),
       // inverse: true,
       animationDuration: 300,
       animationDurationUpdate: 300,
     },
-
+    yAxis: {
+      // max: 'dataMax',
+    },
     series: [
       {
         realtimeSort: true,
@@ -41,13 +41,7 @@ const Chart: React.FC<ChartProps> = ({ data = [], style, ...restProps }) => {
     animationEasing: 'linear',
     animationEasingUpdate: 'linear',
   };
-  return (
-    <ReactECharts
-      option={option}
-      style={{ height: 300, ...style }}
-      {...restProps}
-    />
-  );
+  return <ReactECharts option={option} {...restProps} />;
 };
 
 export default Chart;
