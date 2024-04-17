@@ -166,15 +166,10 @@ const Buy: React.FC<BuyProps> = ({ onSuccess, ...restProps }) => {
           marginTop: 60,
         }}
       >
-        <Form.Item
-          label="模拟单人连续下单"
-          name="createPolling"
-          initialValue={false}
-          valuePropName="checked"
-          required={true}
-        >
+        <Form.Item label="模拟单人连续下单" required={true}>
           <Switch
             size="small"
+            value={createPolling}
             onChange={(value) => {
               setCreatePolling(value);
               if (value) {
@@ -183,15 +178,10 @@ const Buy: React.FC<BuyProps> = ({ onSuccess, ...restProps }) => {
             }}
           />
         </Form.Item>
-        <Form.Item
-          label="模拟多人同时下单"
-          name="batchCreatePolling"
-          initialValue={false}
-          valuePropName="checked"
-          required={true}
-        >
+        <Form.Item label="模拟多人同时下单" required={true}>
           <Switch
             size="small"
+            value={batchCreatePolling}
             onChange={(value) => {
               setBatchCreatePolling(value);
               if (value) {
