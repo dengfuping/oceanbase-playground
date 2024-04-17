@@ -5,6 +5,7 @@ import {
   InputNumber,
   message,
   Select,
+  Switch,
 } from '@oceanbase/design';
 import type { CarOrder } from '@prisma/client';
 import { useInterval, useRequest } from 'ahooks';
@@ -16,12 +17,12 @@ import * as CarOrderController from '@/services/CarOrderController';
 import { COLOR_LIST } from './constant';
 
 interface BuyProps extends React.HTMLProps<HTMLDivElement> {
-  polling?: boolean;
   onSuccess?: () => void;
 }
 
-const Buy: React.FC<BuyProps> = ({ polling, onSuccess, ...restProps }) => {
+const Buy: React.FC<BuyProps> = ({ onSuccess, ...restProps }) => {
   const [form] = Form.useForm();
+  const [polling, setPolling] = useState(false);
 
   const { run: createCarOrder, loading: createCarOrderLoading } = useRequest(
     CarOrderController.createCarOrder,
@@ -86,20 +87,25 @@ const Buy: React.FC<BuyProps> = ({ polling, onSuccess, ...restProps }) => {
     });
   };
 
-  // useInterval(
-  //   () => {
-  //     createCarOrderForPolling(generateCarOrder());
-  //   },
-  //   polling ? 1000 : undefined,
-  // );
+  useInterval(
+    () => {
+      createCarOrderForPolling(generateCarOrder());
+    },
+    polling ? 100 : undefined,
+  );
 
   return (
     <Form form={form} layout="vertical" {...restProps}>
       <Form.Item
-        label="客户名"
+        label="用户名"
         name="customerName"
         initialValue={generateCustomerName()}
-        required={true}
+        rules={[
+          {
+            required: true,
+            message: '请输入用户名',
+          },
+        ]}
       >
         <Input />
       </Form.Item>
@@ -147,6 +153,22 @@ const Buy: React.FC<BuyProps> = ({ polling, onSuccess, ...restProps }) => {
         >
           预定下单
         </Button>
+      </Form.Item>
+      <Form.Item
+        label="模拟多人在线同时下单"
+        name="polling"
+        initialValue={false}
+        valuePropName="checked"
+        required={true}
+        style={{
+          marginTop: 100,
+        }}
+      >
+        <Switch
+          onChange={(value) => {
+            setPolling(value);
+          }}
+        />
       </Form.Item>
     </Form>
   );

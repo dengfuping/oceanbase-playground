@@ -91,7 +91,6 @@ const Index: React.FC<IndexProps> = () => {
               }}
             />
             <Buy
-              polling={true}
               onSuccess={() => {
                 getAllData();
               }}
