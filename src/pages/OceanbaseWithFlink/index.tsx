@@ -179,18 +179,26 @@ const Index: React.FC<IndexProps> = () => {
                   /> */}
                   <Column
                     height={300}
-                    data={colorTop3.map((item) => ({
-                      ...item,
-                      carColor: COLOR_LIST.find(
+                    data={colorTop3.map((item) => {
+                      const colorItem = COLOR_LIST.find(
                         (color) => color.value === item.carColor,
-                      )?.label,
-                    }))}
+                      );
+                      return {
+                        ...item,
+                        carColor: colorItem?.label,
+                        color: colorItem?.color,
+                      };
+                    })}
                     xField="carColor"
                     yField="count"
-                    colorField="carColor"
                     legend={false}
                     label={{
                       textBaseline: 'bottom',
+                    }}
+                    style={{
+                      fill: (datum) => {
+                        return datum?.color;
+                      },
                     }}
                   />
                 </Space>
