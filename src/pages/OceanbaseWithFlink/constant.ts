@@ -29,12 +29,12 @@ export const COLOR_LIST = [
     image:
       'https://mdn.alipayobjects.com/huamei_wspxri/afts/file/A*1ifxTp05Ti8AAAAAAAAAAAAADnh5AQ',
   },
-  // {
-  //   value: 'white',
-  //   label: '珍珠白',
-  //   image:
-  //     'https://mdn.alipayobjects.com/huamei_wspxri/afts/file/A*1ifxTp05Ti8AAAAAAAAAAAAADnh5AQ',
-  // },
+  {
+    value: 'white',
+    label: '珍珠白',
+    image:
+      'https://mdn.alipayobjects.com/huamei_wspxri/afts/file/A*1ifxTp05Ti8AAAAAAAAAAAAADnh5AQ',
+  },
   {
     value: 'black',
     label: '钻石黑',
