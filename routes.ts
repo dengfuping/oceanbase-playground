@@ -4,6 +4,10 @@ export default [
     component: 'OceanbaseWithFlink/Order',
   },
   {
+    path: 'oceanbase-with-flink/new-order',
+    component: 'OceanbaseWithFlink/NewOrder',
+  },
+  {
     path: '/',
     component: 'Layout',
     routes: [

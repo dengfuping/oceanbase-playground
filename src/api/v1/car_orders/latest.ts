@@ -1,5 +1,6 @@
 import type { UmiApiRequest, UmiApiResponse } from 'umi';
 import { Op } from 'sequelize';
+import { toNumber } from 'lodash';
 import model from '../../model';
 
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
@@ -10,7 +11,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
         const result = await model.OLAPCarOrder.findAll({
           where: {
             orderId: {
-              [Op.gt]: orderId,
+              [Op.gt]: toNumber(orderId),
             },
           },
           order: [['orderId', 'DESC']],

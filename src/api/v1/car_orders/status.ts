@@ -1,9 +1,10 @@
 import type { UmiApiRequest, UmiApiResponse } from 'umi';
+import { toNumber } from 'lodash';
 import model from '../../model';
 
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
-    const orderId = req.query || {};
+    const { orderId } = req.query || {};
     if (req.method === 'GET') {
       const lastestTPCarOrder = await model.OLTPCarOrder.findOne({
         order: [['orderId', 'DESC']],
@@ -15,7 +16,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
       });
       res.status(200).json({
         syncing: lastestAPCarOrder?.orderId !== lastestTPCarOrder?.orderId,
-        shouldRefresh: orderId !== lastestAPCarOrder?.orderId,
+        shouldRefresh: toNumber(orderId) !== lastestAPCarOrder?.orderId,
       });
     } else {
       res.status(405).json({ errorMessage: 'Method not allowed' });
