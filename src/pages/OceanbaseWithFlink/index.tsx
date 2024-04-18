@@ -146,7 +146,7 @@ const Index: React.FC<IndexProps> = () => {
             >
               <Col span={14}>
                 <Space direction="vertical" size={40} style={{ width: '100%' }}>
-                  <h3>今日预定量</h3>
+                  <h3>预定总量</h3>
                   <h1>
                     <CountUp
                       duration={1}

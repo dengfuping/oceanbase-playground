@@ -8,11 +8,9 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
     if (req.method === 'GET') {
       const lastestTPCarOrder = await model.OLTPCarOrder.findOne({
         order: [['orderId', 'DESC']],
-        limit: 1,
       });
       const lastestAPCarOrder = await model.OLAPCarOrder.findOne({
         order: [['orderId', 'DESC']],
-        limit: 1,
       });
       res.status(200).json({
         syncing: lastestAPCarOrder?.orderId !== lastestTPCarOrder?.orderId,

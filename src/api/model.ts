@@ -7,7 +7,7 @@ const oltp = new Sequelize(process.env.OLTP_DATABASE_URL as string, {
   dialectModule: mysql2,
 });
 const olap = new Sequelize(process.env.OLAP_DATABASE_URL as string, {
-  logging: false,
+  logging: true,
   timezone: '+08:00',
   dialectModule: mysql2,
 });

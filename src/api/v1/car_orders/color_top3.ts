@@ -1,11 +1,19 @@
 import type { UmiApiRequest, UmiApiResponse } from 'umi';
-import { Sequelize } from 'sequelize';
+import { Sequelize, Op } from 'sequelize';
 import model from '../../model';
 
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
     if (req.method === 'GET') {
       const result = await model.OLAPCarOrder.findAll({
+        where: {
+          [Op.and]: [
+            Sequelize.where(
+              Sequelize.fn('DATE', Sequelize.col('order_time')),
+              Sequelize.literal('CURRENT_DATE'),
+            ),
+          ],
+        },
         group: 'car_color',
         attributes: ['carColor', [Sequelize.fn('COUNT', 'car_color'), 'count']],
         order: [['count', 'DESC']],
