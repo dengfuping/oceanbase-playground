@@ -1,27 +1,19 @@
 import { Col, Row, Space, theme, Typography } from '@oceanbase/design';
-// import { Column } from '@oceanbase/charts';
-import { Column } from '@ant-design/charts';
 import { useInterval, useRequest } from 'ahooks';
 import React, { useEffect, useRef, useState } from 'react';
 import { CheckCircleOutlined } from '@oceanbase/icons';
-import QueueAnim from 'rc-queue-anim';
-import TweenOne from 'rc-tween-one';
 import CountUp from 'react-countup';
 import * as CarOrderController from '@/services/CarOrderController';
 import { COLOR_LIST } from './constant';
-import { APPEAR_TIME, BLIANK_EASING, UPDATE_TIME } from './animation';
 import Order from './Order';
 import Chart from './Chart';
-import EChart from './EChart';
-import { desensitizeName, formatTime } from './util';
+import { formatTime } from './util';
 import type { CarOrder } from '@prisma/client';
-import { toString, uniqBy } from 'lodash';
+import { toString } from 'lodash';
 import { Helmet } from 'umi';
-// import './animation/custom-update';
+import moment from 'moment';
 import 'animate.css';
 import './index.less';
-import { sortByNumber } from '@oceanbase/util';
-import moment from 'moment';
 
 interface IndexProps {}
 
@@ -163,44 +155,7 @@ const Index: React.FC<IndexProps> = () => {
                     />
                   </h1>
                   <h3>今日颜色预定量 Top3</h3>
-                  {/* <Chart
-                  data={colorTop3?.map((item) => ({
-                    carColor: item.carColor,
-                    count: item._count?.carColor || 0,
-                  }))}
-                /> */}
-                  {/* <EChart
-                    data={colorTop3.map((item) => ({
-                      ...item,
-                      carColor: COLOR_LIST.find(
-                        (color) => color.value === item.carColor,
-                      )?.label,
-                    }))}
-                  /> */}
-                  <Column
-                    height={300}
-                    data={colorTop3.map((item) => {
-                      const colorItem = COLOR_LIST.find(
-                        (color) => color.value === item.carColor,
-                      );
-                      return {
-                        ...item,
-                        carColor: colorItem?.label,
-                        color: colorItem?.color,
-                      };
-                    })}
-                    xField="carColor"
-                    yField="count"
-                    legend={false}
-                    label={{
-                      textBaseline: 'bottom',
-                    }}
-                    style={{
-                      fill: (datum) => {
-                        return datum?.color;
-                      },
-                    }}
-                  />
+                  <Chart data={colorTop3} />
                 </Space>
               </Col>
               <Col span={10} style={{ paddingLeft: 48 }}>

@@ -38,10 +38,13 @@ export async function getTotal(options?: RequestOptions) {
 }
 
 export async function getColorTop3(options?: RequestOptions) {
-  return request<CarOrder[]>(`/api/v1/car_orders/color_top3`, {
-    method: 'GET',
-    ...(options || {}),
-  });
+  return request<{ carColor: string; count: number }[]>(
+    `/api/v1/car_orders/color_top3`,
+    {
+      method: 'GET',
+      ...(options || {}),
+    },
+  );
 }
 
 export async function getLatest(

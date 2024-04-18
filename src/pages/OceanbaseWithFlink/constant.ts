@@ -55,4 +55,9 @@ export const COLOR_LIST = [
     image:
       'https://mdn.alipayobjects.com/huamei_wspxri/afts/file/A*1ifxTp05Ti8AAAAAAAAAAAAADnh5AQ',
   },
+  {
+    value: 'Red',
+    label: '玫瑰红',
+    color: '#C73030',
+  },
 ];

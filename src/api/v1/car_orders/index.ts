@@ -1,6 +1,6 @@
 import type { UmiApiRequest, UmiApiResponse } from 'umi';
-import model from '../../model';
 import moment from 'moment';
+import model from '../../model';
 
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
@@ -10,7 +10,8 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
     } else if (req.method === 'POST') {
       const carOrder = await model.OLTPCarOrder.create({
         ...req.body,
-        orderTime: moment().format(),
+        // 由于数据库中并不保存时区信息，需要创建东八区时间之后再写入，保证查询出的时间符合预期
+        orderTime: moment().utcOffset(8).format(),
       });
       res.status(200).json(carOrder);
     } else {
