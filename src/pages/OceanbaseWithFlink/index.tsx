@@ -14,6 +14,7 @@ import { Helmet } from 'umi';
 import moment from 'moment';
 import 'animate.css';
 import './index.less';
+import { sortByNumber } from '@oceanbase/util';
 
 interface IndexProps {}
 
@@ -61,15 +62,30 @@ const Index: React.FC<IndexProps> = () => {
     onSuccess: (res) => {
       const latest = res.data || [];
       if (latest.length > 0) {
-        const newOrderList =
+        let newOrderList =
           latest.length >= 10 ? latest : [...latest, ...orderList].slice(0, 10);
-        setOrderList(
-          newOrderList.map((item) => ({
+        newOrderList = newOrderList
+          .map((item) => ({
             ...item,
+            isNew: orderList
+              .map((order) => order.orderId)
+              .includes(item.orderId)
+              ? false
+              : true,
             // 增加时间戳，每次都生成唯一 key，保证滚动动画正常执行
             key: `${toString(item.orderId)}-${moment().format()}`,
-          })),
-        );
+          }))
+          // 从大到小排序
+          .sort((a, b) => sortByNumber(b, a, 'orderId'));
+        setOrderList(newOrderList);
+        setTimeout(() => {
+          setOrderList(
+            newOrderList.map((item) => ({
+              ...item,
+              isNew: false,
+            })),
+          );
+        }, 1000);
       }
     },
   });
@@ -268,7 +284,9 @@ const Index: React.FC<IndexProps> = () => {
                         padding: '12px 16px',
                         border: `1px solid ${token.colorBorder}`,
                         borderRadius: token.borderRadiusSM,
-                        backgroundColor: token.colorBgContainer,
+                        backgroundColor: item.isNew
+                          ? token.colorSuccessBg
+                          : token.colorBgContainer,
                         marginBottom: 14,
                         display: 'flex',
                         alignItems: 'center',

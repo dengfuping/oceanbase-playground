@@ -17,7 +17,15 @@ const Layout: React.FC<LayoutProps> = () => {
   };
 
   return (
-    <ConfigProvider locale={localeMap[locale] || enUS}>
+    <ConfigProvider
+      locale={localeMap[locale] || enUS}
+      theme={{
+        token: {
+          colorSuccess: '#07C846',
+          colorSuccessBg: '#F6FFED',
+        },
+      }}
+    >
       <ErrorBoundary>
         <Helmet>
           <title>OceanBase Playground</title>
