@@ -5,6 +5,7 @@ import {
   message,
   Select,
   Switch,
+  theme,
 } from '@oceanbase/design';
 import { useInterval, useRequest } from 'ahooks';
 import React, { useState } from 'react';
@@ -18,6 +19,7 @@ interface OrderFormProps extends React.HTMLProps<HTMLDivElement> {
 }
 
 const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
+  const { token } = theme.useToken();
   const [form] = Form.useForm();
   const [createPolling, setCreatePolling] = useState(false);
   const [batchCreatePolling, setBatchCreatePolling] = useState(false);
@@ -109,7 +111,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
         <Form.Item
           label="用户名"
           name="customerName"
-          initialValue={generateCustomerName()}
+          initialValue="OceanBase"
           rules={[
             {
               required: true,
@@ -117,7 +119,21 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
             },
           ]}
         >
-          <Input />
+          <Input.Search
+            allowClear={true}
+            enterButton={
+              <Button
+                onClick={() => {
+                  form.setFieldsValue({
+                    customerName: generateCustomerName(),
+                  });
+                }}
+                style={{ color: token.colorText }}
+              >
+                随机生成
+              </Button>
+            }
+          />
         </Form.Item>
         <Form.Item label="预定量" name="count" initialValue={1} required={true}>
           <Select
