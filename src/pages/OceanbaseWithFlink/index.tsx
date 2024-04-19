@@ -111,13 +111,13 @@ const Index: React.FC<IndexProps> = () => {
       <div style={{ padding: '104px 40px 40px 68px' }}>
         <Row gutter={12}>
           <Col span={6}>
-            <h2 style={{ marginBottom: 56 }}>汽车下单 Demo</h2>
+            <h2 style={{ marginBottom: 32 }}>汽车下单 Demo</h2>
             <img
               src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*nJT5Sr-UI5gAAAAAAAAAAAAADmfOAQ/original"
               style={{
-                width: '125%',
+                width: '128%',
                 marginLeft: '-15%',
-                marginTop: '-15%',
+                marginTop: '-10%',
               }}
             />
             <OrderForm
@@ -132,7 +132,27 @@ const Index: React.FC<IndexProps> = () => {
           <Col span={5}>
             <div
               style={{
-                marginTop: 150,
+                display:
+                  process.env.NODE_ENV === 'development' ? 'flex' : 'none',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <img
+                src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*XNLHS4D8osUAAAAAAAAAAAAADmfOAQ/original"
+                style={{
+                  width: '80px',
+                  marginRight: 20,
+                }}
+              />
+              <div>
+                <h4>快来扫码试试吧！</h4>
+                <h5>支持多人同时下单</h5>
+              </div>
+            </div>
+            <div
+              style={{
+                marginTop: 80,
               }}
               className={`effect-olap-flink ${
                 syncing ? 'effect-olap-flink-animate' : ''
@@ -147,7 +167,7 @@ const Index: React.FC<IndexProps> = () => {
             /> */}
           </Col>
           <Col span={13}>
-            <h2 style={{ marginBottom: 56 }}>数据可视化</h2>
+            <h2 style={{ marginBottom: 50 }}>数据可视化</h2>
             <Row
               style={{
                 backgroundColor: token.colorBgLayout,
@@ -219,7 +239,7 @@ const Index: React.FC<IndexProps> = () => {
                 </Space>
                 <div
                   style={{
-                    maxHeight: '590px',
+                    maxHeight: '580px',
                     overflow: 'auto',
                   }}
                 >

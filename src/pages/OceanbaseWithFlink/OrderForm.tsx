@@ -120,7 +120,6 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
           ]}
         >
           <Input.Search
-            allowClear={true}
             enterButton={
               <Button
                 onClick={() => {
