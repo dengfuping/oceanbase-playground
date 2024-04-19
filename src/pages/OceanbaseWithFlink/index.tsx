@@ -5,7 +5,7 @@ import { CheckCircleOutlined, LoadingOutlined } from '@oceanbase/icons';
 import CountUp from 'react-countup';
 import * as CarOrderController from '@/services/CarOrderController';
 import { COLOR_LIST } from './constant';
-import Order from './Order';
+import OrderForm from './OrderForm';
 import Chart from './Chart';
 import { formatTime } from './util';
 import type { CarOrder } from '@prisma/client';
@@ -120,7 +120,7 @@ const Index: React.FC<IndexProps> = () => {
                 marginTop: '-15%',
               }}
             />
-            <Order
+            <OrderForm
               onSuccess={() => {
                 getStatus({
                   orderId: latestOrder?.orderId,
