@@ -108,7 +108,7 @@ const Index: React.FC<IndexProps> = () => {
       <Helmet>
         <title>OceanBase With Flink | OceanBase Playground</title>
       </Helmet>
-      <div style={{ padding: '104px 40px 40px 104px' }}>
+      <div style={{ padding: '104px 40px 40px 68px' }}>
         <Row gutter={12}>
           <Col span={6}>
             <h2 style={{ marginBottom: 56 }}>汽车下单 Demo</h2>
@@ -151,7 +151,7 @@ const Index: React.FC<IndexProps> = () => {
             <Row
               style={{
                 backgroundColor: token.colorBgLayout,
-                padding: 40,
+                padding: '40px 40px 0px 40px',
                 borderRadius: 30,
               }}
             >
@@ -163,7 +163,7 @@ const Index: React.FC<IndexProps> = () => {
                       style={{ fontSize: 12, color: token.colorTextTertiary }}
                     >
                       <div style={{ marginTop: 4 }}>
-                        {`SQL 耗时：${totalLatency}ms`}
+                        {`SQL 耗时：${totalLatency || ''}ms`}
                       </div>
                       <Spin
                         spinning={totalLoading}
@@ -185,7 +185,7 @@ const Index: React.FC<IndexProps> = () => {
                       style={{ fontSize: 12, color: token.colorTextTertiary }}
                     >
                       <div style={{ marginTop: 4 }}>
-                        {`SQL 耗时：${colorTop3Latency}ms`}
+                        {`SQL 耗时：${colorTop3Latency || ''}ms`}
                       </div>
                       <Spin
                         spinning={colorTop3Loading}
@@ -208,7 +208,7 @@ const Index: React.FC<IndexProps> = () => {
                     style={{ fontSize: 12, color: token.colorTextTertiary }}
                   >
                     <div style={{ marginTop: 4 }}>
-                      {`SQL 耗时：${latestLantency}ms`}
+                      {`SQL 耗时：${latestLantency || ''}ms`}
                     </div>
                     <Spin
                       spinning={latestLoading}
@@ -221,7 +221,6 @@ const Index: React.FC<IndexProps> = () => {
                   style={{
                     maxHeight: '590px',
                     overflow: 'auto',
-                    paddingRight: 12,
                   }}
                 >
                   {orderList.map((item) => (

@@ -160,37 +160,39 @@ const Order: React.FC<OrderProps> = ({ onSuccess, ...restProps }) => {
           </Button>
         </Form.Item>
       </Form>
-      <Form
-        layout="inline"
-        style={{
-          marginTop: 60,
-        }}
-      >
-        <Form.Item label="模拟单人连续下单" required={true}>
-          <Switch
-            size="small"
-            value={createPolling}
-            onChange={(value) => {
-              setCreatePolling(value);
-              if (value) {
-                setBatchCreatePolling(false);
-              }
-            }}
-          />
-        </Form.Item>
-        <Form.Item label="模拟多人同时下单" required={true}>
-          <Switch
-            size="small"
-            value={batchCreatePolling}
-            onChange={(value) => {
-              setBatchCreatePolling(value);
-              if (value) {
-                setCreatePolling(false);
-              }
-            }}
-          />
-        </Form.Item>
-      </Form>
+      {process.env.NODE_ENV === 'development' && (
+        <Form
+          layout="inline"
+          style={{
+            marginTop: 60,
+          }}
+        >
+          <Form.Item label="模拟单人连续下单" required={true}>
+            <Switch
+              size="small"
+              value={createPolling}
+              onChange={(value) => {
+                setCreatePolling(value);
+                if (value) {
+                  setBatchCreatePolling(false);
+                }
+              }}
+            />
+          </Form.Item>
+          <Form.Item label="模拟多人同时下单" required={true}>
+            <Switch
+              size="small"
+              value={batchCreatePolling}
+              onChange={(value) => {
+                setBatchCreatePolling(value);
+                if (value) {
+                  setCreatePolling(false);
+                }
+              }}
+            />
+          </Form.Item>
+        </Form>
+      )}
     </>
   );
 };
