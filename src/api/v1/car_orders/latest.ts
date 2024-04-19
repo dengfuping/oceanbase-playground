@@ -5,6 +5,7 @@ import model from '../../model';
 
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
+    let latency;
     if (req.method === 'GET') {
       const { orderId } = req.query || {};
       if (orderId) {
@@ -15,14 +16,26 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
             },
           },
           order: [['orderId', 'DESC']],
+          logging: (sql, timing) => {
+            latency = timing;
+          },
         });
-        res.status(200).json(result);
+        res.status(200).header('X-Sql-Latency', `${latency}`).json({
+          data: result,
+          latency,
+        });
       } else {
         const result = await model.OLAPCarOrder.findAll({
           order: [['orderId', 'DESC']],
           limit: 10,
+          logging: (sql, timing) => {
+            latency = timing;
+          },
         });
-        res.status(200).json(result);
+        res.status(200).header('X-Sql-Latency', `${latency}`).json({
+          data: result,
+          latency,
+        });
       }
     } else {
       res.status(405).json({ errorMessage: 'Method not allowed' });

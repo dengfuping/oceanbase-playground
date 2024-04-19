@@ -4,6 +4,7 @@ import model from '../../model';
 
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
+    let latency;
     if (req.method === 'GET') {
       const result = await model.OLAPCarOrder.findAll({
         where: {
@@ -18,8 +19,14 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
         attributes: ['carColor', [Sequelize.fn('COUNT', 'car_color'), 'count']],
         order: [['count', 'DESC']],
         limit: 3,
+        logging: (sql, timing) => {
+          latency = timing;
+        },
       });
-      res.status(200).json(result);
+      res.status(200).header('X-Sql-Latency', `${latency}`).json({
+        data: result,
+        latency,
+      });
     } else {
       res.status(405).json({ errorMessage: 'Method not allowed' });
     }

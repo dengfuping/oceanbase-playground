@@ -33,6 +33,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "mysql2": "^3.9.4",
+    "on-headers": "^1.0.2",
     "pg-hstore": "^2.3.4",
     "prisma": "^4.16.2",
     "rc-queue-anim": "^2.0.0",
@@ -45,6 +46,7 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.17.0",
+    "@types/on-headers": "^1.0.3",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
     "@umijs/fabric": "^4.0.1",

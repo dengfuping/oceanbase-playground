@@ -31,20 +31,23 @@ export async function batchCreateCarOrder(
 }
 
 export async function getTotal(options?: RequestOptions) {
-  return request<number>(`/api/v1/car_orders/total`, {
+  return request<{
+    total: number;
+    latency: number;
+  }>(`/api/v1/car_orders/total`, {
     method: 'GET',
     ...(options || {}),
   });
 }
 
 export async function getColorTop3(options?: RequestOptions) {
-  return request<{ carColor: string; count: number }[]>(
-    `/api/v1/car_orders/color_top3`,
-    {
-      method: 'GET',
-      ...(options || {}),
-    },
-  );
+  return request<{
+    data?: { carColor: string; count: number }[];
+    latency?: number;
+  }>(`/api/v1/car_orders/color_top3`, {
+    method: 'GET',
+    ...(options || {}),
+  });
 }
 
 export async function getLatest(
@@ -53,7 +56,10 @@ export async function getLatest(
   },
   options?: RequestOptions,
 ) {
-  return request<CarOrder[]>(`/api/v1/car_orders/latest`, {
+  return request<{
+    data?: CarOrder[];
+    latency?: number;
+  }>(`/api/v1/car_orders/latest`, {
     method: 'GET',
     params,
     ...(options || {}),

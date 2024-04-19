@@ -1,7 +1,7 @@
-import { Col, Row, Space, theme, Typography } from '@oceanbase/design';
+import { Col, Row, Space, Spin, theme, Typography } from '@oceanbase/design';
 import { useInterval, useRequest } from 'ahooks';
 import React, { useEffect, useRef, useState } from 'react';
-import { CheckCircleOutlined } from '@oceanbase/icons';
+import { CheckCircleOutlined, LoadingOutlined } from '@oceanbase/icons';
 import CountUp from 'react-countup';
 import * as CarOrderController from '@/services/CarOrderController';
 import { COLOR_LIST } from './constant';
@@ -20,12 +20,14 @@ interface IndexProps {}
 const Index: React.FC<IndexProps> = () => {
   const { token } = theme.useToken();
 
-  const { data: total = 0, run: getTotal } = useRequest(
-    CarOrderController.getTotal,
-    {
-      defaultParams: [{}],
-    },
-  );
+  const {
+    data: totalData,
+    run: getTotal,
+    loading: totalLoading,
+  } = useRequest(CarOrderController.getTotal, {
+    defaultParams: [{}],
+  });
+  const { total = 0, latency: totalLatency } = totalData || {};
 
   // to preserve previous total
   const countRef = useRef(total);
@@ -33,26 +35,34 @@ const Index: React.FC<IndexProps> = () => {
     countRef.current = total;
   }, [total]);
 
-  const { data: colorTop3 = [], run: getColorTop3 } = useRequest(
-    CarOrderController.getColorTop3,
-    {
-      defaultParams: [{}],
-    },
-  );
+  const {
+    data: colorTop3Data,
+    run: getColorTop3,
+    loading: colorTop3Loading,
+  } = useRequest(CarOrderController.getColorTop3, {
+    defaultParams: [{}],
+  });
+  const { data: colorTop3 = [], latency: colorTop3Latency } =
+    colorTop3Data || {};
 
   const [orderList, setOrderList] = useState<CarOrder[]>([]);
   const latestOrder = orderList[0] || {};
 
-  const { run: getLatest } = useRequest(CarOrderController.getLatest, {
+  const {
+    data: latestData,
+    loading: latestLoading,
+    run: getLatest,
+  } = useRequest(CarOrderController.getLatest, {
     defaultParams: [
       {
         orderId: latestOrder.orderId,
       },
     ],
     onSuccess: (res) => {
-      if (res.length > 0) {
+      const latest = res.data || [];
+      if (latest.length > 0) {
         const newOrderList =
-          res.length >= 10 ? res : [...res, ...orderList].slice(0, 10);
+          latest.length >= 10 ? latest : [...latest, ...orderList].slice(0, 10);
         setOrderList(
           newOrderList.map((item) => ({
             ...item,
@@ -63,6 +73,7 @@ const Index: React.FC<IndexProps> = () => {
       }
     },
   });
+  const { latency: latestLantency } = latestData || {};
 
   const getAllData = () => {
     getTotal();
@@ -146,7 +157,21 @@ const Index: React.FC<IndexProps> = () => {
             >
               <Col span={14}>
                 <Space direction="vertical" size={40} style={{ width: '100%' }}>
-                  <h3>预定总量</h3>
+                  <Space direction="vertical" size={4}>
+                    <h3>预定总量</h3>
+                    <Space
+                      style={{ fontSize: 12, color: token.colorTextTertiary }}
+                    >
+                      <div style={{ marginTop: 4 }}>
+                        {`SQL 耗时：${totalLatency}ms`}
+                      </div>
+                      <Spin
+                        spinning={totalLoading}
+                        indicator={<LoadingOutlined style={{ fontSize: 14 }} />}
+                        style={{ marginTop: 4 }}
+                      />
+                    </Space>
+                  </Space>
                   <h1>
                     <CountUp
                       duration={1}
@@ -154,12 +179,44 @@ const Index: React.FC<IndexProps> = () => {
                       end={total}
                     />
                   </h1>
-                  <h3>今日颜色预定量 Top3</h3>
+                  <Space direction="vertical" size={4}>
+                    <h3>今日颜色预定量 Top3</h3>
+                    <Space
+                      style={{ fontSize: 12, color: token.colorTextTertiary }}
+                    >
+                      <div style={{ marginTop: 4 }}>
+                        {`SQL 耗时：${colorTop3Latency}ms`}
+                      </div>
+                      <Spin
+                        spinning={colorTop3Loading}
+                        indicator={<LoadingOutlined style={{ fontSize: 14 }} />}
+                        style={{ marginTop: 4 }}
+                      />
+                    </Space>
+                  </Space>
                   <Chart data={colorTop3} />
                 </Space>
               </Col>
               <Col span={10} style={{ paddingLeft: 48 }}>
-                <h3 style={{ marginBottom: 32 }}>实时订单</h3>
+                <Space
+                  direction="vertical"
+                  size={4}
+                  style={{ marginBottom: 32 }}
+                >
+                  <h3>实时订单</h3>
+                  <Space
+                    style={{ fontSize: 12, color: token.colorTextTertiary }}
+                  >
+                    <div style={{ marginTop: 4 }}>
+                      {`SQL 耗时：${latestLantency}ms`}
+                    </div>
+                    <Spin
+                      spinning={latestLoading}
+                      indicator={<LoadingOutlined style={{ fontSize: 14 }} />}
+                      style={{ marginTop: 4 }}
+                    />
+                  </Space>
+                </Space>
                 <div
                   style={{
                     maxHeight: '590px',
