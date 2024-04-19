@@ -130,7 +130,7 @@ const Index: React.FC<IndexProps> = () => {
             />
           </Col>
           <Col span={5}>
-            <div
+            {/* <div
               style={{
                 display:
                   process.env.NODE_ENV === 'development' ? 'flex' : 'none',
@@ -149,10 +149,10 @@ const Index: React.FC<IndexProps> = () => {
                 <h4>快来扫码试试吧！</h4>
                 <h5>支持多人同时下单</h5>
               </div>
-            </div>
+            </div> */}
             <div
               style={{
-                marginTop: 80,
+                marginTop: 150,
               }}
               className={`effect-olap-flink ${
                 syncing ? 'effect-olap-flink-animate' : ''

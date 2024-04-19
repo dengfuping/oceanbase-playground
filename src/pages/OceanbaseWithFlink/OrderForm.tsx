@@ -180,7 +180,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
           </Button>
         </Form.Item>
       </Form>
-      {process.env.NODE_ENV === 'development' && (
+      {false && (
         <Form
           layout="inline"
           style={{
