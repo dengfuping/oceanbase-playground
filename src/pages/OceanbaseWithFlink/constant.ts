@@ -7,14 +7,14 @@ export const COLOR_LIST = [
     image:
       'https://mdn.alipayobjects.com/huamei_wspxri/afts/file/A*1ifxTp05Ti8AAAAAAAAAAAAADnh5AQ',
   },
-  {
-    value: 'gray',
-    label: '雅灰',
-    color: '#B3B3B5',
-    colorSecondary: '#525254',
-    image:
-      'https://mdn.alipayobjects.com/huamei_wspxri/afts/file/A*1ifxTp05Ti8AAAAAAAAAAAAADnh5AQ',
-  },
+  // {
+  //   value: 'gray',
+  //   label: '雅灰',
+  //   color: '#B3B3B5',
+  //   colorSecondary: '#525254',
+  //   image:
+  //     'https://mdn.alipayobjects.com/huamei_wspxri/afts/file/A*1ifxTp05Ti8AAAAAAAAAAAAADnh5AQ',
+  // },
   {
     value: 'green',
     label: '橄榄绿',
@@ -55,9 +55,9 @@ export const COLOR_LIST = [
     image:
       'https://mdn.alipayobjects.com/huamei_wspxri/afts/file/A*1ifxTp05Ti8AAAAAAAAAAAAADnh5AQ',
   },
-  {
-    value: 'Red',
-    label: '玫瑰红',
-    color: '#C73030',
-  },
+  // {
+  //   value: 'Red',
+  //   label: '玫瑰红',
+  //   color: '#C73030',
+  // },
 ];

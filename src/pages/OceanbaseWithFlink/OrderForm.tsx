@@ -128,20 +128,20 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
               },
               {
                 value: 10,
-                label: '10 辆',
+                label: '瞬间连续下单 10 辆',
               },
               {
                 value: 100,
-                label: '100 辆',
+                label: '瞬间连续下单 100 辆',
               },
               {
                 value: 1000,
-                label: '1000 辆',
+                label: '瞬间连续下单 1000 辆',
               },
-              {
-                value: 10000,
-                label: '10000 辆',
-              },
+              // {
+              //   value: 10000,
+              //   label: '瞬间连续下单 10000 辆',
+              // },
             ]}
           />
         </Form.Item>

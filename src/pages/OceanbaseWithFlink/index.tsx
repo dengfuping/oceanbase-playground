@@ -158,7 +158,7 @@ const Index: React.FC<IndexProps> = () => {
               <Col span={14}>
                 <Space direction="vertical" size={40} style={{ width: '100%' }}>
                   <Space direction="vertical" size={4}>
-                    <h3>预定总量</h3>
+                    <h3>总预定量</h3>
                     <Space
                       style={{ fontSize: 12, color: token.colorTextTertiary }}
                     >
