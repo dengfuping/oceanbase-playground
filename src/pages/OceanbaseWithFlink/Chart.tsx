@@ -1,16 +1,17 @@
 import React from 'react';
 import { Column } from '@ant-design/charts';
 import { COLOR_LIST } from './constant';
-import { isEqual } from 'lodash';
+import { isEqual, max, omit } from 'lodash';
 
 interface ChartProps {
   data?: { carColor: string; count: number }[];
 }
 
 const Chart: React.FC<ChartProps> = ({ data = [] }) => {
+  const maxCount = max(data.map((item) => item.count)) || 0;
   return (
     <Column
-      height={300}
+      height={320}
       data={data.map((item) => {
         const colorItem = COLOR_LIST.find(
           (color) => color.value === item.carColor,
@@ -33,6 +34,15 @@ const Chart: React.FC<ChartProps> = ({ data = [] }) => {
       style={{
         fill: (datum) => {
           return datum?.color;
+        },
+        maxWidth: 64,
+      }}
+      axis={{
+        x: {
+          tick: false,
+        },
+        y: {
+          tick: false,
         },
       }}
     />
