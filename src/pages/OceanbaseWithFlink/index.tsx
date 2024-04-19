@@ -126,7 +126,7 @@ const Index: React.FC<IndexProps> = () => {
                   orderId: latestOrder?.orderId,
                 });
               }}
-              style={{ marginTop: '-115%', padding: '24px 40px 0 24px' }}
+              style={{ marginTop: '-115%', padding: '16px 40px 0px 28px' }}
             />
           </Col>
           <Col span={5}>

@@ -1,8 +1,6 @@
 import { Alert, ConfigProvider } from '@oceanbase/design';
-import enUS from '@oceanbase/ui/es/locale/en-US';
-import zhCN from '@oceanbase/ui/es/locale/zh-CN';
-// 主要用于中断请求的 API AbortController 在低版本浏览器下能正常使用
-import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only';
+import enUS from '@oceanbase/design/es/locale/en-US';
+import zhCN from '@oceanbase/design/es/locale/zh-CN';
 import React from 'react';
 import { getLocale, Helmet, Outlet } from 'umi';
 import BlankLayout from './BlankLayout';

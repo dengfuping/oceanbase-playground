@@ -20,8 +20,7 @@ export default defineConfig({
     dataField: '',
   },
   locale: {
-    // 默认使用 src/locales/en-US.ts 作为多语言文件
-    default: 'en-US',
+    default: 'zh-CN',
     baseSeparator: '-',
   },
   esbuildMinifyIIFE: true,
