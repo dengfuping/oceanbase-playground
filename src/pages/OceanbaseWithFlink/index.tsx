@@ -179,15 +179,21 @@ const Index: React.FC<IndexProps> = () => {
                 <Space direction="vertical" size={40} style={{ width: '100%' }}>
                   <Space direction="vertical" size={4}>
                     <h3>总预定量</h3>
-                    <Space
-                      style={{ fontSize: 12, color: token.colorTextTertiary }}
-                    >
+                    <Space style={{ color: token.colorSuccess }}>
                       <div style={{ marginTop: 4 }}>
-                        {`SQL 耗时：${totalLatency || ''}ms`}
+                        SQL 耗时：
+                        <span style={{ fontSize: 24 }}>
+                          {totalLatency || ''}
+                        </span>
+                        ms
                       </div>
                       <Spin
                         spinning={totalLoading}
-                        indicator={<LoadingOutlined style={{ fontSize: 14 }} />}
+                        indicator={
+                          <LoadingOutlined
+                            style={{ fontSize: 14, color: token.colorSuccess }}
+                          />
+                        }
                         style={{ marginTop: 4 }}
                       />
                     </Space>
@@ -201,15 +207,21 @@ const Index: React.FC<IndexProps> = () => {
                   </h1>
                   <Space direction="vertical" size={4}>
                     <h3>今日颜色预定量 Top3</h3>
-                    <Space
-                      style={{ fontSize: 12, color: token.colorTextTertiary }}
-                    >
+                    <Space style={{ color: token.colorSuccess }}>
                       <div style={{ marginTop: 4 }}>
-                        {`SQL 耗时：${colorTop3Latency || ''}ms`}
+                        SQL 耗时：
+                        <span style={{ fontSize: 24 }}>
+                          {colorTop3Latency || ''}
+                        </span>
+                        ms
                       </div>
                       <Spin
                         spinning={colorTop3Loading}
-                        indicator={<LoadingOutlined style={{ fontSize: 14 }} />}
+                        indicator={
+                          <LoadingOutlined
+                            style={{ fontSize: 14, color: token.colorSuccess }}
+                          />
+                        }
                         style={{ marginTop: 4 }}
                       />
                     </Space>
@@ -224,15 +236,21 @@ const Index: React.FC<IndexProps> = () => {
                   style={{ marginBottom: 32 }}
                 >
                   <h3>实时订单</h3>
-                  <Space
-                    style={{ fontSize: 12, color: token.colorTextTertiary }}
-                  >
+                  <Space style={{ color: token.colorSuccess }}>
                     <div style={{ marginTop: 4 }}>
-                      {`SQL 耗时：${latestLantency || ''}ms`}
+                      SQL 耗时：
+                      <span style={{ fontSize: 24 }}>
+                        {latestLantency || ''}
+                      </span>
+                      ms
                     </div>
                     <Spin
                       spinning={latestLoading}
-                      indicator={<LoadingOutlined style={{ fontSize: 14 }} />}
+                      indicator={
+                        <LoadingOutlined
+                          style={{ fontSize: 14, color: token.colorSuccess }}
+                        />
+                      }
                       style={{ marginTop: 4 }}
                     />
                   </Space>
