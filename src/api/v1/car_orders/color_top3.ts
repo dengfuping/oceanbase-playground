@@ -21,6 +21,9 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
         limit: 3,
         logging: (sql, timing) => {
           latency = timing;
+          console.log(sql);
+          console.log(`SQL 耗时：`, timing, 'ms');
+          console.log('\n');
         },
       });
       res.status(200).header('X-Sql-Latency', `${latency}`).json({

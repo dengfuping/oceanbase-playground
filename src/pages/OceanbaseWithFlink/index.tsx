@@ -67,11 +67,11 @@ const Index: React.FC<IndexProps> = () => {
         newOrderList = newOrderList
           .map((item) => ({
             ...item,
-            isNew: orderList
-              .map((order) => order.orderId)
-              .includes(item.orderId)
-              ? false
-              : true,
+            isNew:
+              orderList.length === 0 ||
+              orderList.map((order) => order.orderId).includes(item.orderId)
+                ? false
+                : true,
             // 增加时间戳，每次都生成唯一 key，保证滚动动画正常执行
             key: `${toString(item.orderId)}-${moment().format()}`,
           }))
