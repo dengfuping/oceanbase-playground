@@ -62,8 +62,7 @@ const Index: React.FC<IndexProps> = () => {
     onSuccess: (res) => {
       const latest = res.data || [];
       if (latest.length > 0) {
-        let newOrderList =
-          latest.length >= 10 ? latest : [...latest, ...orderList].slice(0, 10);
+        let newOrderList = [...latest, ...orderList].slice(0, 10);
         newOrderList = newOrderList
           .map((item) => ({
             ...item,
