@@ -26,7 +26,9 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
         .header('X-AP-Sql-Latency', `${latencyAP}`)
         .json({
           syncing: lastestAPCarOrder?.orderId !== lastestTPCarOrder?.orderId,
-          shouldRefresh: toNumber(orderId) !== lastestAPCarOrder?.orderId,
+          shouldRefresh: orderId
+            ? toNumber(orderId) !== lastestAPCarOrder?.orderId
+            : false,
         });
     } else {
       res.status(405).json({ errorMessage: 'Method not allowed' });

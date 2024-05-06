@@ -18,9 +18,9 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
           order: [['orderId', 'DESC']],
           logging: (sql, timing) => {
             latency = timing;
-            console.log(sql);
-            console.log(`SQL 耗时：`, timing, 'ms');
-            console.log('\n');
+            // console.log(sql);
+            // console.log(`SQL 耗时：`, timing, 'ms');
+            // console.log('\n');
           },
         });
         res.status(200).header('X-Sql-Latency', `${latency}`).json({
@@ -33,9 +33,9 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
           limit: 10,
           logging: (sql, timing) => {
             latency = timing;
-            console.log(sql);
-            console.log(`SQL 耗时：`, timing, 'ms');
-            console.log('\n');
+            // console.log(sql);
+            // console.log(`SQL 耗时：`, timing, 'ms');
+            // console.log('\n');
           },
         });
         res.status(200).header('X-Sql-Latency', `${latency}`).json({
