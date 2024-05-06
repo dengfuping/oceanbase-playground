@@ -5,7 +5,7 @@ export default [
     routes: [
       {
         path: 'oceanbase-with-flink/order',
-        component: 'OceanbaseWithFlink/Order',
+        component: 'OceanBaseWithFlink/Order',
       },
       {
         path: '/',
@@ -17,7 +17,7 @@ export default [
           },
           {
             path: 'oceanbase-with-flink',
-            component: 'OceanbaseWithFlink',
+            component: 'OceanBaseWithFlink',
           },
         ],
       },
