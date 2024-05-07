@@ -10,7 +10,7 @@ import Chart from './Chart';
 import { formatTime } from './util';
 import type { CarOrder } from '@prisma/client';
 import { toString } from 'lodash';
-import { Helmet } from 'umi';
+import { formatMessage, Helmet } from 'umi';
 import moment from 'moment';
 import 'animate.css';
 import './index.less';
@@ -126,7 +126,12 @@ const Index: React.FC<IndexProps> = () => {
       <div style={{ padding: '104px 40px 40px 68px' }}>
         <Row gutter={12}>
           <Col span={6}>
-            <h2 style={{ marginBottom: 32 }}>汽车下单 Demo</h2>
+            <h2 style={{ marginBottom: 32 }}>
+              {formatMessage({
+                id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.CarOrderSystemDemo',
+                defaultMessage: '汽车下单 Demo',
+              })}
+            </h2>
             <img
               src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*nJT5Sr-UI5gAAAAAAAAAAAAADmfOAQ/original"
               style={{
@@ -145,7 +150,7 @@ const Index: React.FC<IndexProps> = () => {
             />
           </Col>
           <Col span={5}>
-            <div
+            {/* <div
               style={{
                 display:
                   process.env.NODE_ENV === 'development' ? 'flex' : 'none',
@@ -161,13 +166,23 @@ const Index: React.FC<IndexProps> = () => {
                 }}
               />
               <div>
-                <h4>快来扫码试试吧！</h4>
-                <h5>支持多人同时下单</h5>
+                <h4>
+                  {formatMessage({
+                    id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.ScanQrCodeToTry',
+                    defaultMessage: '快来扫码试试吧！',
+                  })}
+                </h4>
+                <h5>
+                  {formatMessage({
+                    id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SupportMultiplePeopleOrder',
+                    defaultMessage: '支持多人同时下单',
+                  })}
+                </h5>
               </div>
-            </div>
+            </div> */}
             <div
               style={{
-                marginTop: 80,
+                marginTop: 150,
               }}
               className={`effect-olap-flink ${
                 syncing ? 'effect-olap-flink-animate' : ''
@@ -182,7 +197,12 @@ const Index: React.FC<IndexProps> = () => {
             /> */}
           </Col>
           <Col span={13}>
-            <h2 style={{ marginBottom: 50 }}>数据可视化</h2>
+            <h2 style={{ marginBottom: 50 }}>
+              {formatMessage({
+                id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.DataVisualization',
+                defaultMessage: '数据可视化',
+              })}
+            </h2>
             <Row
               style={{
                 backgroundColor: token.colorBgLayout,
@@ -193,10 +213,18 @@ const Index: React.FC<IndexProps> = () => {
               <Col span={14}>
                 <Space direction="vertical" size={40} style={{ width: '100%' }}>
                   <Space direction="vertical" size={4}>
-                    <h3>总预定量</h3>
+                    <h3>
+                      {formatMessage({
+                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.TotalOrderCount',
+                        defaultMessage: '总预定量',
+                      })}
+                    </h3>
                     <Space style={{ color: token.colorSuccess }}>
                       <div style={{ marginTop: 4 }}>
-                        SQL 耗时：
+                        {formatMessage({
+                          id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
+                          defaultMessage: 'SQL 耗时：',
+                        })}
                         <span style={{ fontSize: 24 }}>
                           {totalLatency || ''}
                         </span>
@@ -221,10 +249,18 @@ const Index: React.FC<IndexProps> = () => {
                     />
                   </h1>
                   <Space direction="vertical" size={4}>
-                    <h3>今日颜色预定量 Top3</h3>
+                    <h3>
+                      {formatMessage({
+                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Top3ColorsOfToday',
+                        defaultMessage: '今日颜色预定量 Top3',
+                      })}
+                    </h3>
                     <Space style={{ color: token.colorSuccess }}>
                       <div style={{ marginTop: 4 }}>
-                        SQL 耗时：
+                        {formatMessage({
+                          id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
+                          defaultMessage: 'SQL 耗时：',
+                        })}
                         <span style={{ fontSize: 24 }}>
                           {colorTop3Latency || ''}
                         </span>
@@ -250,10 +286,18 @@ const Index: React.FC<IndexProps> = () => {
                   size={4}
                   style={{ marginBottom: 32 }}
                 >
-                  <h3>实时订单</h3>
+                  <h3>
+                    {formatMessage({
+                      id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders',
+                      defaultMessage: '实时订单',
+                    })}
+                  </h3>
                   <Space style={{ color: token.colorSuccess }}>
                     <div style={{ marginTop: 4 }}>
-                      SQL 耗时：
+                      {formatMessage({
+                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
+                        defaultMessage: 'SQL 耗时：',
+                      })}
                       <span style={{ fontSize: 24 }}>
                         {latestLantency || ''}
                       </span>
@@ -305,19 +349,33 @@ const Index: React.FC<IndexProps> = () => {
                           ellipsis={{ tooltip: true }}
                           style={{ fontWeight: 700, marginBottom: 8 }}
                         >
-                          {`${formatTime(item.orderTime)} ${
-                            item.customerName
-                          } 下单成功`}
+                          {formatMessage(
+                            {
+                              id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess',
+                              defaultMessage:
+                                '{orderTime} {customerName} 下单成功',
+                            },
+                            {
+                              orderTime: formatTime(item.orderTime),
+                              customerName: item.customerName,
+                            },
+                          )}
                         </Typography.Text>
                         <Typography.Text
                           ellipsis={{ tooltip: true }}
                           style={{ color: token.colorTextDescription }}
                         >
-                          {`车辆颜色：${
-                            COLOR_LIST.find(
-                              (color) => color.value === item.carColor,
-                            )?.label
-                          }`}
+                          {formatMessage(
+                            {
+                              id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeCarColor',
+                              defaultMessage: '车辆颜色：{color}',
+                            },
+                            {
+                              color: COLOR_LIST.find(
+                                (color) => color.value === item.carColor,
+                              )?.label,
+                            },
+                          )}
                         </Typography.Text>
                       </div>
                     </div>

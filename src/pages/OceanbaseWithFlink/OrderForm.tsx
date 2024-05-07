@@ -4,6 +4,7 @@ import {
   Input,
   message,
   Select,
+  Space,
   Switch,
   theme,
 } from '@oceanbase/design';
@@ -13,12 +14,14 @@ import { range, sample } from 'lodash';
 import { firstName, lastName } from 'full-name-generator';
 import * as CarOrderController from '@/services/CarOrderController';
 import { COLOR_LIST } from './constant';
+import { formatMessage, getLocale } from 'umi';
 
 interface OrderFormProps extends React.HTMLProps<HTMLDivElement> {
   onSuccess?: () => void;
 }
 
 const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
+  const locale = getLocale();
   const { token } = theme.useToken();
   const [form] = Form.useForm();
   const [createPolling, setCreatePolling] = useState(false);
@@ -29,7 +32,12 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
     useRequest(CarOrderController.batchCreateCarOrder, {
       manual: true,
       onSuccess: () => {
-        message.success('下单成功');
+        message.success(
+          formatMessage({
+            id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.OrderSuccess',
+            defaultMessage: '下单成功',
+          }),
+        );
         onSuccess?.();
       },
     });
@@ -47,10 +55,9 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
 
   // 随机生成用户名
   const generateCustomerName = () => {
-    return `${lastName('CN', sample([0, 1]))}${firstName(
-      'CN',
-      sample([0, 1]),
-    )}`;
+    return locale === 'en-US'
+      ? `${firstName('US', sample([0, 1]))}`
+      : `${lastName('CN', sample([0, 1]))}${firstName('CN', sample([0, 1]))}`;
   };
 
   // 随机生成订单
@@ -58,8 +65,11 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
     return {
       carPrice: sample([215000, 245900, 299900]),
       carColor: sample(COLOR_LIST.map((item) => item.value)),
-      saleRegion: sample(['Beijing', 'Shanghai', 'Shenzhen', 'Hangzhou']),
-      saleNation: 'China',
+      saleRegion:
+        locale === 'en-US'
+          ? sample(['New York', 'Los Angeles', 'Washington', 'Chicago'])
+          : sample(['Beijing', 'Shanghai', 'Shenzhen', 'Hangzhou']),
+      saleNation: locale === 'en-US' ? 'America' : 'China',
       customerName: generateCustomerName(),
     } as any;
   };
@@ -109,13 +119,19 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
         {...restProps}
       >
         <Form.Item
-          label="用户名"
+          label={formatMessage({
+            id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Username',
+            defaultMessage: '用户名',
+          })}
           name="customerName"
           initialValue="OceanBase"
           rules={[
             {
               required: true,
-              message: '请输入用户名',
+              message: formatMessage({
+                id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.PleaseEnterUsername',
+                defaultMessage: '请输入用户名',
+              }),
             },
           ]}
         >
@@ -129,44 +145,90 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
                 }}
                 style={{ color: token.colorText }}
               >
-                随机生成
+                {formatMessage({
+                  id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.GenerateRandomly',
+                  defaultMessage: '随机生成',
+                })}
               </Button>
             }
           />
         </Form.Item>
-        <Form.Item label="预定量" name="count" initialValue={1} required={true}>
+        <Form.Item
+          label={formatMessage({
+            id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.OrderCount',
+            defaultMessage: '预定量',
+          })}
+          name="count"
+          initialValue={1}
+          required={true}
+        >
           <Select
             options={[
               {
                 value: 1,
-                label: '1 辆',
+                label: formatMessage({
+                  id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Count1',
+                  defaultMessage: '1 辆',
+                }),
               },
               {
                 value: 10,
-                label: '瞬间连续下单 10 辆',
+                label: formatMessage({
+                  id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Count10',
+                  defaultMessage: '瞬间连续下单 10 辆',
+                }),
               },
               {
                 value: 100,
-                label: '瞬间连续下单 100 辆',
+                label: formatMessage({
+                  id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Count100',
+                  defaultMessage: '瞬间连续下单 100 辆',
+                }),
               },
               {
                 value: 1000,
-                label: '瞬间连续下单 1000 辆',
+                label: formatMessage({
+                  id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Count1000',
+                  defaultMessage: '瞬间连续下单 1000 辆',
+                }),
               },
               // {
               //   value: 10000,
-              //   label: '瞬间连续下单 10000 辆',
+              //   label: formatMessage({
+              //     id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Count10000',
+              //     defaultMessage: '瞬间连续下单 10000 辆',
+              //   }),
               // },
             ]}
           />
         </Form.Item>
         <Form.Item
-          label="颜色"
+          label={formatMessage({
+            id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.OrderColor',
+            defaultMessage: '颜色',
+          })}
           name="carColor"
           initialValue="blue"
           required={true}
         >
-          <Select options={COLOR_LIST} />
+          <Select
+            options={COLOR_LIST.map((item) => ({
+              ...item,
+              label: (
+                <Space>
+                  <div
+                    style={{
+                      background: item.color,
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                    }}
+                  />
+                  {item.label}
+                </Space>
+              ),
+            }))}
+          />
         </Form.Item>
         <Form.Item>
           <Button
@@ -176,7 +238,10 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
             loading={batchCreateCarOrderLoading}
             block={true}
           >
-            预定下单
+            {formatMessage({
+              id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.OrderSubmit',
+              defaultMessage: '预定下单',
+            })}
           </Button>
         </Form.Item>
       </Form>
