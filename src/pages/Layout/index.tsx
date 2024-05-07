@@ -1,8 +1,8 @@
 import { Alert, ConfigProvider } from '@oceanbase/design';
 import enUS from '@oceanbase/design/es/locale/en-US';
 import zhCN from '@oceanbase/design/es/locale/zh-CN';
-import React, { useEffect } from 'react';
-import { getLocale, setLocale, Helmet, Outlet } from 'umi';
+import React from 'react';
+import { getLocale, Helmet, Outlet } from 'umi';
 import BlankLayout from './BlankLayout';
 
 const { ErrorBoundary } = Alert;
@@ -15,10 +15,6 @@ const Layout: React.FC<LayoutProps> = () => {
     'en-US': enUS,
     'zh-CN': zhCN,
   };
-
-  useEffect(() => {
-    setLocale('en-US');
-  }, []);
 
   return (
     <ConfigProvider

@@ -1,7 +1,19 @@
-import { Col, Row, Space, Spin, theme, Typography } from '@oceanbase/design';
+import {
+  Col,
+  Dropdown,
+  Row,
+  Space,
+  Spin,
+  theme,
+  Typography,
+} from '@oceanbase/design';
 import { useInterval, useRequest } from 'ahooks';
 import React, { useEffect, useRef, useState } from 'react';
-import { CheckCircleOutlined, LoadingOutlined } from '@oceanbase/icons';
+import {
+  CheckCircleOutlined,
+  GlobalOutlined,
+  LoadingOutlined,
+} from '@oceanbase/icons';
 import CountUp from 'react-countup';
 import * as CarOrderController from '@/services/CarOrderController';
 import { COLOR_LIST } from './constant';
@@ -10,7 +22,7 @@ import Chart from './Chart';
 import { formatTime } from './util';
 import type { CarOrder } from '@prisma/client';
 import { toString } from 'lodash';
-import { formatMessage, Helmet } from 'umi';
+import { formatMessage, getLocale, setLocale, Helmet } from 'umi';
 import moment from 'moment';
 import 'animate.css';
 import './index.less';
@@ -20,6 +32,18 @@ interface IndexProps {}
 
 const Index: React.FC<IndexProps> = () => {
   const { token } = theme.useToken();
+  const locale = getLocale();
+
+  const localeList = [
+    {
+      value: 'zh-CN',
+      label: '简体中文',
+    },
+    {
+      value: 'en-US',
+      label: 'English',
+    },
+  ];
 
   const {
     data: totalData,
@@ -124,6 +148,29 @@ const Index: React.FC<IndexProps> = () => {
         <title>OceanBase With Flink | OceanBase Playground</title>
       </Helmet>
       <div style={{ padding: '104px 40px 40px 68px' }}>
+        <Dropdown
+          menu={{
+            items: localeList.map((item) => ({
+              key: item.value,
+              label: item.label,
+            })),
+            onClick: ({ key }) => {
+              setLocale(key);
+            },
+          }}
+        >
+          <Space
+            style={{
+              cursor: 'pointer',
+              position: 'absolute',
+              right: 24,
+              top: 24,
+            }}
+          >
+            <GlobalOutlined />
+            {localeList.find((item) => item.value === locale)?.label}
+          </Space>
+        </Dropdown>
         <Row gutter={12}>
           <Col span={6}>
             <h2 style={{ marginBottom: 32 }}>
