@@ -22,7 +22,7 @@ export default defineConfig({
   locale: {
     // use navigator.language as default locale
     baseNavigator: true,
-    default: 'zh-CN',
+    default: 'en-US',
     baseSeparator: '-',
   },
   esbuildMinifyIIFE: true,

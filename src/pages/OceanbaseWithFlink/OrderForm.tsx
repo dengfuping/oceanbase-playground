@@ -10,11 +10,11 @@ import {
 } from '@oceanbase/design';
 import { useInterval, useRequest } from 'ahooks';
 import React, { useState } from 'react';
-import { range, sample } from 'lodash';
-import { firstName, lastName } from 'full-name-generator';
+import { range } from 'lodash';
 import * as CarOrderController from '@/services/CarOrderController';
-import { COLOR_LIST } from './constant';
 import { formatMessage, getLocale } from 'umi';
+import { COLOR_LIST } from './constant';
+import { generateCustomerName, generateCarOrder } from './util';
 
 interface OrderFormProps extends React.HTMLProps<HTMLDivElement> {
   onSuccess?: () => void;
@@ -53,27 +53,6 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
     },
   );
 
-  // 随机生成用户名
-  const generateCustomerName = () => {
-    return locale === 'en-US'
-      ? `${firstName('US', sample([0, 1]))}`
-      : `${lastName('CN', sample([0, 1]))}${firstName('CN', sample([0, 1]))}`;
-  };
-
-  // 随机生成订单
-  const generateCarOrder = () => {
-    return {
-      carPrice: sample([215000, 245900, 299900]),
-      carColor: sample(COLOR_LIST.map((item) => item.value)),
-      saleRegion:
-        locale === 'en-US'
-          ? sample(['New York', 'Los Angeles', 'Washington', 'Chicago'])
-          : sample(['Beijing', 'Shanghai', 'Shenzhen', 'Hangzhou']),
-      saleNation: locale === 'en-US' ? 'America' : 'China',
-      customerName: generateCustomerName(),
-    } as any;
-  };
-
   // 通过表单提交订单
   const handleSubmit = () => {
     form.validateFields().then((values) => {
@@ -81,7 +60,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
       batchCreateCarOrder(
         range(0, count).map(() => {
           return {
-            ...generateCarOrder(),
+            ...generateCarOrder(locale),
             carColor,
             customerName,
           };
@@ -93,7 +72,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
   // 模拟单人连续下单
   useInterval(
     () => {
-      batchCreateCarOrderForPolling([generateCarOrder()]);
+      batchCreateCarOrderForPolling([generateCarOrder(locale)]);
     },
     createPolling ? 1000 : undefined,
   );
@@ -103,7 +82,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
     () => {
       batchCreateCarOrderForPolling(
         range(0, 10).map(() => {
-          return generateCarOrder();
+          return generateCarOrder(locale);
         }),
       );
     },
@@ -140,7 +119,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
               <Button
                 onClick={() => {
                   form.setFieldsValue({
-                    customerName: generateCustomerName(),
+                    customerName: generateCustomerName(locale),
                   });
                 }}
                 style={{ color: token.colorText }}

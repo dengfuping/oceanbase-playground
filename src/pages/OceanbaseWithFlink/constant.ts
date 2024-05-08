@@ -1,4 +1,6 @@
-import { formatMessage } from 'umi';
+import { formatMessage as umiFormatMessage } from 'umi';
+
+const formatMessage = umiFormatMessage || (() => undefined);
 
 export const COLOR_LIST = [
   {
