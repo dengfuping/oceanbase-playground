@@ -197,10 +197,9 @@ const Index: React.FC<IndexProps> = () => {
             />
           </Col>
           <Col span={5}>
-            {/* <div
+            <div
               style={{
-                display:
-                  process.env.NODE_ENV === 'development' ? 'flex' : 'none',
+                display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
@@ -226,10 +225,10 @@ const Index: React.FC<IndexProps> = () => {
                   })}
                 </h5>
               </div>
-            </div> */}
+            </div>
             <div
               style={{
-                marginTop: 150,
+                marginTop: 80,
               }}
               className={`effect-olap-flink ${
                 syncing ? 'effect-olap-flink-animate' : ''
