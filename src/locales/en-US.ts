@@ -10,6 +10,7 @@ export default {
   "oceanbase-playground.src.pages.OceanBaseWithFlink.TotalOrderCount": "Number of Orders",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency": "SQL Execution Time: ",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.Top3ColorsOfToday": "Top3 Colors of Today",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.OrderCountOfToday": "Order Count of Today",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders": "Real Time Orders",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.OrderSuccess": "Place order successfully",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess": "{orderTime} {customerName} placed an order",

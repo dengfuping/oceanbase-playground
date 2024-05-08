@@ -10,6 +10,7 @@ export default {
   "oceanbase-playground.src.pages.OceanBaseWithFlink.TotalOrderCount": "总预定量",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency": "SQL 耗时：",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.Top3ColorsOfToday": "今日颜色预定量 Top3",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.OrderCountOfToday": "今日预定量",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders": "实时订单",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.OrderSuccess": "下单成功",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess": "{orderTime} {customerName} 下单成功",

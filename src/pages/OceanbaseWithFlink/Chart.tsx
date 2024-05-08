@@ -2,6 +2,7 @@ import React from 'react';
 import { Column } from '@ant-design/charts';
 import { COLOR_LIST } from './constant';
 import { isEqual, max, omit } from 'lodash';
+import { formatMessage } from 'umi';
 
 interface ChartProps {
   data?: { carColor: string; count: number }[];
@@ -29,7 +30,15 @@ const Chart: React.FC<ChartProps> = ({ data = [] }) => {
         textBaseline: 'bottom',
       }}
       tooltip={{
-        items: [{ name: '今日预定量', channel: 'y' }],
+        items: [
+          {
+            name: formatMessage({
+              id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.OrderCountOfToday',
+              defaultMessage: '今日预定量',
+            }),
+            channel: 'y',
+          },
+        ],
       }}
       style={{
         fill: (datum) => {
