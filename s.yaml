@@ -9,7 +9,7 @@ services:
       service:
         name: oceanbase-playground-serverless
       function:
-        name: /v1/car_orders
+        name: oceanbase-playground
         description:
         runtime: custom
         environmentVariables:
