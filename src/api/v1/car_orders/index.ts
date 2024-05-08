@@ -18,8 +18,8 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
     } else if (req.method === 'POST') {
       const carOrder = await model.OLTPCarOrder.create({
         ...req.body,
-        // 由于数据库中并不保存时区信息，需要创建东八区时间之后再写入，保证查询出的时间符合预期
-        orderTime: moment().utcOffset(8).format(),
+        // 入库时使用 UTC 时间
+        orderTime: moment().utc().format(),
       });
       res.status(200).header('X-Sql-Latency', `${latency}`).json(carOrder);
     } else {
