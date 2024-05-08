@@ -1,5 +1,4 @@
 import type { UmiApiRequest, UmiApiResponse } from 'umi';
-import moment from 'moment';
 import model from '../../model';
 
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
@@ -16,11 +15,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
       });
       res.status(200).header('X-Sql-Latency', `${latency}`).json(carOrders);
     } else if (req.method === 'POST') {
-      const carOrder = await model.OLTPCarOrder.create({
-        ...req.body,
-        // 入库时使用 UTC 时间
-        orderTime: moment().utc().format(),
-      });
+      const carOrder = await model.OLTPCarOrder.create(req.body);
       res.status(200).header('X-Sql-Latency', `${latency}`).json(carOrder);
     } else {
       res.status(405).json({ errorMessage: 'Method not allowed' });
