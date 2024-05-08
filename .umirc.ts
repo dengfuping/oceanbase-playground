@@ -20,6 +20,8 @@ export default defineConfig({
     dataField: '',
   },
   locale: {
+    // use navigator.language as default locale
+    baseNavigator: true,
     default: 'zh-CN',
     baseSeparator: '-',
   },
