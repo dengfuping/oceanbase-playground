@@ -29,6 +29,8 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
           shouldRefresh: orderId
             ? toNumber(orderId) !== lastestAPCarOrder?.orderId
             : false,
+          latencyTP,
+          latencyAP,
         });
     } else {
       res.status(405).json({ errorMessage: 'Method not allowed' });
