@@ -3,7 +3,7 @@ import model from '../src/api/model';
 import { generateCarOrder } from '../src/pages/OceanBaseWithFlink/util';
 
 const totalInsertSize = 150000000;
-const batchInsertSize = 100000;
+const batchInsertSize = 10000;
 const batchInsertCount = totalInsertSize / batchInsertSize;
 
 async function batchInsert(i: number) {
