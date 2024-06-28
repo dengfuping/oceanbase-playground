@@ -4,7 +4,6 @@
       "ENABLE_FILE_SYSTEM_API": "1"
     }
   },
-
   "rewrites": [
     {
       "source": "/api/:match*",
