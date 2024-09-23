@@ -1,5 +1,9 @@
 import {
   Button,
+  Col,
+  Row,
+  ConfigProvider,
+  Carousel,
   Form,
   Input,
   message,
@@ -8,24 +12,37 @@ import {
   Switch,
   theme,
 } from '@oceanbase/design';
+import type { CarouselRef } from '@oceanbase/design/es/carousel';
 import { useInterval, useRequest } from 'ahooks';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { range } from 'lodash';
 import * as CarOrderController from '@/services/CarOrderController';
 import { formatMessage, getLocale } from 'umi';
 import { COLOR_LIST } from './constant';
 import { generateCustomerName, generateCarOrder } from './util';
+import styles from './OrderForm.less';
 
 interface OrderFormProps extends React.HTMLProps<HTMLDivElement> {
+  debug?: string | null;
   onSuccess?: () => void;
 }
 
-const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
+const OrderForm: React.FC<OrderFormProps> = ({
+  debug,
+  onSuccess,
+  ...restProps
+}) => {
   const locale = getLocale();
   const { token } = theme.useToken();
   const [form] = Form.useForm();
   const [createPolling, setCreatePolling] = useState(false);
   const [batchCreatePolling, setBatchCreatePolling] = useState(false);
+  const [currentCarColor, setCurrentColor] = useState('blue');
+  const currentCarColorItem = COLOR_LIST.find(
+    (item) => item.value === currentCarColor,
+  );
+
+  const carouselRef = useRef<CarouselRef>(null);
 
   // 下单
   const { run: batchCreateCarOrder, loading: batchCreateCarOrderLoading } =
@@ -94,42 +111,72 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
       <Form
         form={form}
         layout="vertical"
-        style={{ padding: '1em' }}
+        style={{
+          height: '100%',
+          padding: 24,
+          background: `url(https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*915qTIA-IikAAAAAAAAAAAAADmfOAQ/original) no-repeat`,
+          backgroundSize: '100% auto',
+          borderRadius: 46,
+        }}
+        className={styles.form}
         {...restProps}
       >
+        {/* <img
+          src={currentCarColorItem?.image}
+          style={{ width: '100%', margin: '36px 0px' }}
+        /> */}
+        <Carousel
+          ref={carouselRef}
+          arrows={true}
+          draggable={true}
+          afterChange={(current) => {
+            setCurrentColor(COLOR_LIST[current].value);
+          }}
+        >
+          {COLOR_LIST.map((item) => {
+            return (
+              <div key={item.value}>
+                <img
+                  src={item.image}
+                  style={{ width: '100%', margin: '36px 0px' }}
+                />
+              </div>
+            );
+          })}
+        </Carousel>
         <Form.Item
           label={formatMessage({
-            id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Username',
-            defaultMessage: '用户名',
+            id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.OrderColor',
+            defaultMessage: '颜色',
           })}
-          name="customerName"
-          initialValue="OceanBase"
-          rules={[
-            {
-              required: true,
-              message: formatMessage({
-                id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.PleaseEnterUsername',
-                defaultMessage: '请输入用户名',
-              }),
-            },
-          ]}
+          name="carColor"
+          initialValue="blue"
+          required={true}
         >
-          <Input.Search
-            enterButton={
-              <Button
-                onClick={() => {
-                  form.setFieldsValue({
-                    customerName: generateCustomerName(locale),
-                  });
-                }}
-                style={{ color: token.colorText }}
-              >
-                {formatMessage({
-                  id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.GenerateRandomly',
-                  defaultMessage: '随机生成',
-                })}
-              </Button>
-            }
+          <Select
+            options={COLOR_LIST.map((item) => ({
+              ...item,
+              label: (
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      background: item.color,
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      marginRight: 8,
+                    }}
+                  />
+                  {item.label}
+                </div>
+              ),
+            }))}
+            onChange={(value) => {
+              setCurrentColor(value);
+              carouselRef.current?.goTo(
+                COLOR_LIST.findIndex((item) => item.value === value),
+              );
+            }}
           />
         </Form.Item>
         <Form.Item
@@ -183,39 +230,48 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
         </Form.Item>
         <Form.Item
           label={formatMessage({
-            id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.OrderColor',
-            defaultMessage: '颜色',
+            id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Username',
+            defaultMessage: '用户名',
           })}
-          name="carColor"
-          initialValue="blue"
-          required={true}
+          name="customerName"
+          initialValue="OceanBase"
+          rules={[
+            {
+              required: true,
+              message: formatMessage({
+                id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.PleaseEnterUsername',
+                defaultMessage: '请输入用户名',
+              }),
+            },
+          ]}
         >
-          <Select
-            options={COLOR_LIST.map((item) => ({
-              ...item,
-              label: (
-                <Space>
-                  <div
-                    style={{
-                      background: item.color,
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                    }}
-                  />
-                  {item.label}
-                </Space>
-              ),
-            }))}
+          <Input.Search
+            enterButton={
+              <Button
+                onClick={() => {
+                  form.setFieldsValue({
+                    customerName: generateCustomerName(locale),
+                  });
+                }}
+                style={{
+                  color: token.colorLink,
+                }}
+              >
+                {formatMessage({
+                  id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.GenerateRandomly',
+                  defaultMessage: '随机生成',
+                })}
+              </Button>
+            }
           />
         </Form.Item>
         <Form.Item>
           <Button
-            size="large"
             type="primary"
             onClick={handleSubmit}
             loading={batchCreateCarOrderLoading}
             block={true}
+            className={styles.submitButton}
           >
             {formatMessage({
               id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.OrderSubmit',
@@ -224,7 +280,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ onSuccess, ...restProps }) => {
           </Button>
         </Form.Item>
       </Form>
-      {false && (
+      {debug === 'true' && (
         <Form
           layout="inline"
           style={{

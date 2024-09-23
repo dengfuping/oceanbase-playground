@@ -29,6 +29,7 @@
     "mysql2": "^3.9.4",
     "pg-hstore": "^2.3.4",
     "prisma": "^4.16.2",
+    "rc-tween-one": "2",
     "react-countup": "^6.5.3",
     "reflect-metadata": "^0.2.2",
     "sequelize": "^6.37.3",

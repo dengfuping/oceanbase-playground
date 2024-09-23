@@ -12,7 +12,7 @@ const Chart: React.FC<ChartProps> = ({ data = [] }) => {
   const maxCount = max(data.map((item) => item.count)) || 0;
   return (
     <Column
-      height={320}
+      height={188}
       data={data.map((item) => {
         const colorItem = COLOR_LIST.find(
           (color) => color.value === item.carColor,

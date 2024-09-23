@@ -1,5 +1,7 @@
 import {
+  Card,
   Col,
+  ConfigProvider,
   Dropdown,
   Row,
   Space,
@@ -7,13 +9,14 @@ import {
   theme,
   Typography,
 } from '@oceanbase/design';
-import { useInterval, useRequest } from 'ahooks';
+import { useInterval, useRequest, useUpdateEffect } from 'ahooks';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   CheckCircleOutlined,
   GlobalOutlined,
   LoadingOutlined,
 } from '@oceanbase/icons';
+import { sortByNumber } from '@oceanbase/util';
 import CountUp from 'react-countup';
 import * as CarOrderController from '@/services/CarOrderController';
 import { COLOR_LIST } from './constant';
@@ -21,18 +24,61 @@ import OrderForm from './OrderForm';
 import Chart from './Chart';
 import { formatTime } from './util';
 import type { CarOrder } from '@prisma/client';
-import { toString } from 'lodash';
-import { formatMessage, getLocale, setLocale, Helmet } from 'umi';
+import { debounce, toString } from 'lodash';
+import {
+  formatMessage,
+  getLocale,
+  setLocale,
+  Helmet,
+  useSearchParams,
+} from 'umi';
 import moment from 'moment';
 import 'animate.css';
-import './index.less';
-import { sortByNumber } from '@oceanbase/util';
+import TweenOne from 'rc-tween-one';
+import PathPlugin from 'rc-tween-one/lib/plugin/PathPlugin';
+import './global.less';
+import styles from './index.less';
+
+TweenOne.plugins.push(PathPlugin);
+
+function getElementLeft(element: HTMLDivElement) {
+  let actualLeft = element.offsetLeft || 0;
+  let current = element.offsetParent;
+
+  while (current !== null) {
+    // @ts-ignore
+    actualLeft += current.offsetLeft || 0;
+    // @ts-ignore
+    current = current.offsetParent;
+  }
+
+  return actualLeft;
+}
+
+function getElementTop(element: HTMLDivElement) {
+  let actualTop = element.offsetTop || 0;
+  let current = element.offsetParent;
+
+  while (current !== null) {
+    // @ts-ignore
+    actualTop += current.offsetTop || 0;
+    // @ts-ignore
+    current = current.offsetParent;
+  }
+
+  return actualTop;
+}
 
 interface IndexProps {}
 
 const Index: React.FC<IndexProps> = () => {
   const { token } = theme.useToken();
   const locale = getLocale();
+
+  const [searchParams] = useSearchParams();
+  const i18n = searchParams.get('i18n');
+  const qrcode = searchParams.get('qrcode');
+  const debug = searchParams.get('debug');
 
   const localeList = [
     {
@@ -45,11 +91,60 @@ const Index: React.FC<IndexProps> = () => {
     },
   ];
 
+  const orderRef = useRef<HTMLDivElement>(null);
+  const oltpRef = useRef<HTMLImageElement>(null);
+  const flinkRef = useRef<HTMLDivElement>(null);
+  const olapRef = useRef<HTMLImageElement>(null);
+  const dashboardRef = useRef<HTMLDivElement>(null);
+  const [path, setPath] = useState<string>('');
+
+  const renderPath = () => {
+    const orderDom = orderRef.current;
+    const oltpDom = oltpRef.current;
+    const flinkDom = flinkRef.current;
+    const olapDom = olapRef.current;
+    const dashboardDom = dashboardRef.current;
+
+    if (orderDom && flinkDom && olapDom && oltpDom && dashboardDom) {
+      const oltpPoint = {
+        x: oltpDom.offsetLeft + oltpDom.offsetWidth / 2,
+        y: oltpDom.offsetTop + oltpDom.offsetHeight / 2,
+      };
+      const orderPoint = {
+        x: dashboardDom.offsetLeft,
+        y: oltpPoint.y,
+      };
+      console.log('orderPoint', orderPoint);
+      console.log('oltpPoint', oltpPoint);
+      const flinkPoint = {
+        x: flinkDom.offsetLeft + flinkDom.offsetWidth / 2,
+        y: flinkDom.offsetTop + flinkDom.offsetHeight / 2,
+      };
+      const olapPoint = {
+        x: olapDom.offsetLeft + olapDom.offsetWidth / 2,
+        y: olapDom.offsetTop + olapDom.offsetHeight / 2,
+      };
+      const dashboardPoint = {
+        x: orderDom.offsetLeft + orderDom.offsetWidth,
+        y: olapPoint.y,
+      };
+      const newPath = `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${flinkPoint.x} ${flinkPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`;
+      setPath(newPath);
+    }
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      renderPath();
+    }, 16);
+  }, []);
+
   const {
     data: totalData,
     run: getTotal,
     loading: totalLoading,
   } = useRequest(CarOrderController.getTotal, {
+    ready: false,
     defaultParams: [{}],
   });
   const { total = 0, latency: totalLatency } = totalData || {};
@@ -65,6 +160,7 @@ const Index: React.FC<IndexProps> = () => {
     run: getColorTop3,
     loading: colorTop3Loading,
   } = useRequest(CarOrderController.getColorTop3, {
+    ready: false,
     defaultParams: [{}],
   });
   const { data: colorTop3 = [], latency: colorTop3Latency } =
@@ -78,6 +174,7 @@ const Index: React.FC<IndexProps> = () => {
     loading: latestLoading,
     run: getLatest,
   } = useRequest(CarOrderController.getLatest, {
+    ready: false,
     defaultParams: [
       {
         orderId: latestOrder.orderId,
@@ -126,6 +223,7 @@ const Index: React.FC<IndexProps> = () => {
   const { data: statusData, run: getStatus } = useRequest(
     CarOrderController.getStatus,
     {
+      ready: false,
       defaultParams: [{}],
       onSuccess: (res) => {
         if (res.shouldRefresh) {
@@ -136,313 +234,552 @@ const Index: React.FC<IndexProps> = () => {
   );
   const { syncing } = statusData || {};
 
-  useInterval(() => {
-    getStatus({
-      orderId: latestOrder.orderId,
-    });
-  }, 1000);
+  // useInterval(() => {
+  //   getStatus({
+  //     orderId: latestOrder.orderId,
+  //   });
+  // }, 1000);
+
+  const demoPath = `M3.5,175V19c0,0,1-8.75,8.25-11.5S26.5,8,26.5,8l54,53.25
+      c0,0,7,8.25,14.5,0.75s51.5-52.25,51.5-52.25s9.75-7,18-2s7.75,11.5,7.75,11.5
+      v104c0,0-0.5,15.75-15.25,15.75s-15.75-15-15.75-15V68.5c0,0-0.125-9.125-6-3.25
+      s-36.25,36-36.25,36s-11.625,11.875-24-0.5S40.25,65.5,40.25,65.5
+      s-5.75-5.25-5.75,2s0,107.25,0,107.25s-0.75,13.5-14.5,13.5S3.5,175,3.5,175z`;
 
   return (
-    <>
+    <ConfigProvider
+      theme={{
+        token: {
+          borderRadius: 4,
+          controlHeight: 40,
+          colorBorder: '#ebedf0',
+          colorPrimary: '#217eff',
+          colorSuccess: '#00c483',
+        },
+      }}
+    >
       <Helmet>
         <title>OceanBase With Flink | OceanBase Playground</title>
       </Helmet>
-      <div style={{ padding: '104px 40px 40px 68px' }}>
-        <Dropdown
-          menu={{
-            items: localeList.map((item) => ({
-              key: item.value,
-              label: item.label,
-            })),
-            onClick: ({ key }) => {
-              setLocale(key);
-            },
-          }}
-        >
-          <Space
-            style={{
-              cursor: 'pointer',
-              position: 'absolute',
-              right: 24,
-              top: 24,
+      <div
+        style={{ padding: 48, position: 'relative' }}
+        className={styles.container}
+      >
+        {i18n === 'true' && (
+          <Dropdown
+            menu={{
+              items: localeList.map((item) => ({
+                key: item.value,
+                label: item.label,
+              })),
+              onClick: ({ key }) => {
+                setLocale(key);
+              },
             }}
           >
-            <GlobalOutlined />
-            {localeList.find((item) => item.value === locale)?.label}
-          </Space>
-        </Dropdown>
-        <Row gutter={12}>
-          <Col span={6}>
-            <h2 style={{ marginBottom: 32 }}>
-              {formatMessage({
-                id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.CarOrderSystemDemo',
-                defaultMessage: '汽车下单 Demo',
-              })}
-            </h2>
-            <img
-              src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*nJT5Sr-UI5gAAAAAAAAAAAAADmfOAQ/original"
+            <Space
               style={{
-                width: '128%',
-                marginLeft: '-15%',
-                marginTop: '-10%',
-              }}
-            />
-            <OrderForm
-              onSuccess={() => {
-                getStatus({
-                  orderId: latestOrder?.orderId,
-                });
-              }}
-              style={{ marginTop: '-115%', padding: '16px 32px 0px 24px' }}
-            />
-          </Col>
-          <Col span={5}>
-            {/* <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
+                cursor: 'pointer',
+                position: 'absolute',
+                right: 48,
+                top: 16,
               }}
             >
-              <img
-                src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*XNLHS4D8osUAAAAAAAAAAAAADmfOAQ/original"
-                style={{
-                  width: '80px',
-                  marginRight: 20,
+              <GlobalOutlined />
+              {localeList.find((item) => item.value === locale)?.label}
+            </Space>
+          </Dropdown>
+        )}
+        <Row gutter={8}>
+          <Col span={6}>
+            <div
+              ref={orderRef}
+              style={{
+                background: '#FFFFFF',
+                border: '1px solid #EBEDF0',
+                boxShadow: '7px 10px 24px 0 rgba(37,48,70,0.08)',
+                borderRadius: 50,
+                padding: 10,
+                height: '100%',
+              }}
+            >
+              <OrderForm
+                debug={debug}
+                onSuccess={() => {
+                  getStatus({
+                    orderId: latestOrder?.orderId,
+                  });
                 }}
               />
-              <div>
-                <h4>
-                  {formatMessage({
-                    id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.ScanQrCodeToTry',
-                    defaultMessage: '快来扫码试试吧！',
-                  })}
-                </h4>
-                <h5>
-                  {formatMessage({
-                    id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SupportMultiplePeopleOrder',
-                    defaultMessage: '支持多人同时下单',
-                  })}
-                </h5>
-              </div>
-            </div> */}
-            <div
-              style={{
-                marginTop: 150,
-              }}
-              className={`effect-olap-flink ${
-                syncing ? 'effect-olap-flink-animate' : ''
-              }`}
-            />
-            {/* <img
-              src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*w-dvQIGYbBMAAAAAAAAAAAAADmfOAQ/original"
-              style={{
-                width: '100%',
-                marginTop: 118,
-              }}
-            /> */}
+            </div>
           </Col>
-          <Col span={13}>
-            <h2 style={{ marginBottom: 50 }}>
-              {formatMessage({
-                id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.DataVisualization',
-                defaultMessage: '数据可视化',
-              })}
-            </h2>
-            <Row
+          <Col span={4}>
+            {qrcode === 'true' && (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <img
+                  src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*XNLHS4D8osUAAAAAAAAAAAAADmfOAQ/original"
+                  style={{
+                    width: '60px',
+                    marginRight: 20,
+                  }}
+                />
+                <div style={{ fontSize: 16, fontFamily: 'Alibaba PuHuiTi' }}>
+                  <div style={{ marginBottom: 8 }}>
+                    {formatMessage({
+                      id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.ScanQrCodeToTry',
+                      defaultMessage: '快来扫码试试吧！',
+                    })}
+                  </div>
+                  <div>
+                    {formatMessage({
+                      id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SupportMultiplePeopleOrder',
+                      defaultMessage: '支持多人同时下单',
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+            {/* <div
               style={{
-                backgroundColor: token.colorBgLayout,
-                padding: '40px 40px 0px 40px',
-                borderRadius: 30,
+                position: 'absolute',
+                top: 0,
               }}
             >
-              <Col span={14}>
-                <Space direction="vertical" size={40} style={{ width: '100%' }}>
-                  <Space direction="vertical" size={4}>
-                    <h3>
-                      {formatMessage({
-                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.TotalOrderCount',
-                        defaultMessage: '总预定量',
-                      })}
-                    </h3>
-                    <Space style={{ color: token.colorSuccess }}>
-                      <div style={{ marginTop: 4 }}>
-                        {formatMessage({
-                          id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
-                          defaultMessage: 'SQL 耗时：',
-                        })}
-                        <span style={{ fontSize: 24 }}>
-                          {totalLatency || ''}
-                        </span>
-                        ms
-                      </div>
-                      <Spin
-                        spinning={totalLoading}
-                        indicator={
-                          <LoadingOutlined
-                            style={{ fontSize: 14, color: token.colorSuccess }}
-                          />
-                        }
-                        style={{ marginTop: 4 }}
-                      />
-                    </Space>
-                  </Space>
-                  <h1>
-                    <CountUp
-                      duration={1}
-                      start={countRef.current}
-                      end={total}
-                    />
-                  </h1>
-                  <Space direction="vertical" size={4}>
-                    <h3>
-                      {formatMessage({
-                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Top3ColorsOfToday',
-                        defaultMessage: '今日颜色预定量 Top3',
-                      })}
-                    </h3>
-                    <Space style={{ color: token.colorSuccess }}>
-                      <div style={{ marginTop: 4 }}>
-                        {formatMessage({
-                          id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
-                          defaultMessage: 'SQL 耗时：',
-                        })}
-                        <span style={{ fontSize: 24 }}>
-                          {colorTop3Latency || ''}
-                        </span>
-                        ms
-                      </div>
-                      <Spin
-                        spinning={colorTop3Loading}
-                        indicator={
-                          <LoadingOutlined
-                            style={{ fontSize: 14, color: token.colorSuccess }}
-                          />
-                        }
-                        style={{ marginTop: 4 }}
-                      />
-                    </Space>
-                  </Space>
-                  <Chart data={colorTop3} />
-                </Space>
-              </Col>
-              <Col span={10} style={{ paddingLeft: 48 }}>
-                <Space
-                  direction="vertical"
-                  size={4}
-                  style={{ marginBottom: 32 }}
-                >
-                  <h3>
-                    {formatMessage({
-                      id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders',
-                      defaultMessage: '实时订单',
-                    })}
-                  </h3>
-                  <Space style={{ color: token.colorSuccess }}>
-                    <div style={{ marginTop: 4 }}>
-                      {formatMessage({
-                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
-                        defaultMessage: 'SQL 耗时：',
-                      })}
-                      <span style={{ fontSize: 24 }}>
-                        {latestLantency || ''}
-                      </span>
-                      ms
-                    </div>
-                    <Spin
-                      spinning={latestLoading}
-                      indicator={
-                        <LoadingOutlined
-                          style={{ fontSize: 14, color: token.colorSuccess }}
-                        />
-                      }
-                      style={{ marginTop: 4 }}
-                    />
-                  </Space>
-                </Space>
+              <TweenOne
+                animation={{
+                  path: demoPath,
+                  repeat: 1000,
+                  duration: 5000,
+                  ease: 'linear',
+                }}
+                style={{
+                  margin: 0,
+                  width: 20,
+                  height: 20,
+                  transform: 'translate(-10px, -10px)',
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  borderRadius: 4,
+                  background: '#1890ff',
+                }}
+                // paused={false}
+              />
+              <svg width="200" height="200">
+                <path
+                  d={demoPath}
+                  fill="none"
+                  stroke="rgba(1, 155, 240, 0.2)"
+                />
+              </svg>
+            </div> */}
+            {path && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  width: 'calc(100% - 8px)',
+                  height: '100%',
+                }}
+              >
+                <TweenOne
+                  animation={{
+                    path,
+                    repeat: 1000,
+                    duration: 1250,
+                    ease: 'linear',
+                  }}
+                  style={{
+                    margin: 0,
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    // width: 20,
+                    // height: 20,
+                    // transform: 'translate(-10px, -10px)',
+                    // borderRadius: 4,
+                    // background: '#1890ff',
+                    width: 12,
+                    height: 12,
+                    transform: 'translate(-6px, -6px)',
+                    borderRadius: '50%',
+                    // border: '1px solid #adb2bd',
+                    background: token.colorPrimary,
+                  }}
+                  // paused={false}
+                />
+                <TweenOne
+                  animation={{
+                    path,
+                    repeat: 1000,
+                    duration: 1250,
+                    ease: 'linear',
+                    delay: 50,
+                  }}
+                  style={{
+                    margin: 0,
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    width: 12,
+                    height: 12,
+                    transform: 'translate(-6px, -6px)',
+                    borderRadius: '50%',
+                    background: token.colorPrimary,
+                  }}
+                  // paused={false}
+                />
+                <TweenOne
+                  animation={{
+                    path,
+                    repeat: 1000,
+                    duration: 1250,
+                    ease: 'linear',
+                    delay: 100,
+                  }}
+                  style={{
+                    margin: 0,
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    width: 12,
+                    height: 12,
+                    transform: 'translate(-6px, -6px)',
+                    borderRadius: '50%',
+                    background: token.colorPrimary,
+                  }}
+                  // paused={false}
+                />
+                <svg style={{ width: '100%', height: '100%' }}>
+                  <path
+                    d={path}
+                    fill="none"
+                    stroke="#adb2bd"
+                    strokeWidth={1}
+                    strokeDasharray="6 6"
+                    markerEnd="url(#arrow)"
+                  />
+                </svg>
+              </div>
+            )}
+
+            {/* <div
+              className={`effect-olap-flink ${
+                true ? 'effect-olap-flink-animate' : ''
+              }`}
+            /> */}
+
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                textAlign: 'center',
+                height: '100%',
+                padding: '64px 0px',
+                zIndex: 10,
+                position: 'relative',
+                fontFamily: 'Roboto',
+              }}
+            >
+              <div>
+                <img
+                  ref={olapRef}
+                  src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*LGTUSYGnB2gAAAAAAAAAAAAADmfOAQ/original"
+                />
                 <div
                   style={{
-                    maxHeight: '580px',
-                    overflow: 'auto',
+                    fontSize: 20,
+                    paddingTop: 8,
+                    paddingBottom: 4,
+                    backgroundColor: '#ffffff',
                   }}
                 >
-                  {orderList.map((item) => (
-                    <div
-                      key={item.key}
-                      style={{
-                        padding: '12px 16px',
-                        border: `1px solid ${token.colorBorder}`,
-                        borderRadius: token.borderRadiusSM,
-                        backgroundColor: item.isNew
-                          ? token.colorSuccessBg
-                          : token.colorBgContainer,
-                        marginBottom: 14,
-                        display: 'flex',
-                        alignItems: 'center',
-                        transition: 'all 0.3s ease',
-                      }}
-                      className="animate__animated animate__slideInDown"
-                    >
-                      <CheckCircleOutlined
-                        style={{
-                          fontSize: 30,
-                          color: token.colorSuccess,
-                          marginRight: 16,
-                        }}
-                      />
-                      <div style={{ maxWidth: 'calc(100% - 40px)' }}>
-                        <Typography.Text
-                          ellipsis={{ tooltip: true }}
-                          style={{ fontWeight: 700, marginBottom: 8 }}
-                        >
-                          {formatMessage(
-                            {
-                              id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess',
-                              defaultMessage:
-                                '{orderTime} {customerName} 下单成功',
-                            },
-                            {
-                              orderTime: formatTime(item.orderTime),
-                              customerName: item.customerName,
-                            },
-                          )}
-                        </Typography.Text>
-                        <Typography.Text
-                          ellipsis={{ tooltip: true }}
-                          style={{ color: token.colorTextDescription }}
-                        >
-                          {formatMessage(
-                            {
-                              id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeCarColor',
-                              defaultMessage: '车辆颜色：{color}',
-                            },
-                            {
-                              color: COLOR_LIST.find(
-                                (color) => color.value === item.carColor,
-                              )?.label,
-                            },
-                          )}
-                        </Typography.Text>
-                      </div>
-                    </div>
-                  ))}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      height: 135,
-                      width: '100%',
-                      backgroundImage:
-                        'linear-gradient(180deg, rgba(245,248,253,0.00) 0%, #F5F8FD 62%)',
-                    }}
-                  />
+                  OLAP
                 </div>
+                <div style={{ paddingBottom: 4, backgroundColor: '#ffffff' }}>
+                  OceanBase V4.3
+                </div>
+              </div>
+              <div
+                ref={flinkRef}
+                style={{
+                  fontSize: 20,
+                  padding: '4px 0px',
+                  backgroundColor: '#ffffff',
+                }}
+              >
+                Flink
+              </div>
+              <div>
+                <img
+                  ref={oltpRef}
+                  src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*3lQQQobix3YAAAAAAAAAAAAADmfOAQ/original"
+                />
+                <div
+                  style={{
+                    fontSize: 20,
+                    marginTop: 12,
+                    marginBottom: 4,
+                  }}
+                >
+                  OLTP
+                </div>
+                <div>OceanBase V4.3</div>
+              </div>
+            </div>
+          </Col>
+          <Col span={14}>
+            <Row gutter={[0, 16]}>
+              <Col span={24}>
+                <Card
+                  ref={dashboardRef}
+                  type="inner"
+                  title={<h4>实时订单看板</h4>}
+                  className={styles.orderViewCard}
+                  bodyStyle={{ padding: 0 }}
+                >
+                  <Row>
+                    <Col
+                      span={12}
+                      style={{
+                        borderRight: `1px solid ${token.colorBorderSecondary}`,
+                      }}
+                    >
+                      <Row>
+                        <Col span={24}>
+                          <div
+                            style={{
+                              borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                              padding: '24px 12px 16px 24px',
+                            }}
+                          >
+                            <Space direction="vertical" size={4}>
+                              <h5>
+                                {formatMessage({
+                                  id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.TotalOrderCount',
+                                  defaultMessage: '总预定量',
+                                })}
+                              </h5>
+                              <Space className="sql-rt">
+                                {formatMessage(
+                                  {
+                                    id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
+                                    defaultMessage: 'SQL 耗时：{latency}ms',
+                                  },
+                                  {
+                                    latency: totalLatency,
+                                  },
+                                )}
+                                <Spin
+                                  spinning={totalLoading}
+                                  indicator={
+                                    <LoadingOutlined
+                                      style={{
+                                        fontSize: 14,
+                                        color: token.colorSuccess,
+                                      }}
+                                    />
+                                  }
+                                  style={{ marginTop: -4 }}
+                                />
+                              </Space>
+                            </Space>
+                            <h1>
+                              <CountUp
+                                duration={1}
+                                start={countRef.current}
+                                end={total}
+                              />
+                            </h1>
+                          </div>
+                        </Col>
+                        <Col span={24}>
+                          <div style={{ padding: '24px 12px 16px 24px' }}>
+                            <Space direction="vertical" size={4}>
+                              <h5>
+                                {formatMessage({
+                                  id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Top3ColorsOfToday',
+                                  defaultMessage: '今日颜色预定量 Top3',
+                                })}
+                              </h5>
+                              <Space className="sql-rt">
+                                {formatMessage(
+                                  {
+                                    id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
+                                    defaultMessage: 'SQL 耗时：{latency}ms',
+                                  },
+                                  { latency: colorTop3Latency },
+                                )}
+                                <Spin
+                                  spinning={colorTop3Loading}
+                                  indicator={
+                                    <LoadingOutlined
+                                      style={{
+                                        fontSize: 14,
+                                        color: token.colorSuccess,
+                                      }}
+                                    />
+                                  }
+                                  style={{ marginTop: -4 }}
+                                />
+                              </Space>
+                            </Space>
+                            <Chart data={colorTop3} />
+                          </div>
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col span={12}>
+                      <div style={{ padding: '24px 12px 16px 24px' }}>
+                        <Space direction="vertical" size={4}>
+                          <h5>
+                            {formatMessage({
+                              id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders',
+                              defaultMessage: '实时订单',
+                            })}
+                          </h5>
+                          <Space className="sql-rt">
+                            {formatMessage(
+                              {
+                                id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
+                                defaultMessage: 'SQL 耗时：{latency}ms',
+                              },
+                              { latency: latestLantency },
+                            )}
+                            <Spin
+                              spinning={latestLoading}
+                              indicator={
+                                <LoadingOutlined
+                                  style={{
+                                    fontSize: 14,
+                                    color: token.colorSuccess,
+                                  }}
+                                />
+                              }
+                              style={{ marginTop: -4 }}
+                            />
+                          </Space>
+                        </Space>
+                        <div
+                          style={{
+                            maxHeight: '580px',
+                            overflow: 'auto',
+                          }}
+                        >
+                          {orderList.map((item) => (
+                            <div
+                              key={item.key}
+                              style={{
+                                padding: '12px 16px',
+                                border: `1px solid ${token.colorBorder}`,
+                                borderRadius: token.borderRadiusSM,
+                                backgroundColor: item.isNew
+                                  ? token.colorSuccessBg
+                                  : token.colorBgContainer,
+                                marginBottom: 14,
+                                display: 'flex',
+                                alignItems: 'center',
+                                transition: 'all 0.3s ease',
+                              }}
+                              className="animate__animated animate__slideInDown"
+                            >
+                              <CheckCircleOutlined
+                                style={{
+                                  fontSize: 30,
+                                  color: token.colorSuccess,
+                                  marginRight: 16,
+                                }}
+                              />
+                              <div style={{ maxWidth: 'calc(100% - 40px)' }}>
+                                <Typography.Text
+                                  ellipsis={{ tooltip: true }}
+                                  style={{ fontWeight: 700, marginBottom: 8 }}
+                                >
+                                  {formatMessage(
+                                    {
+                                      id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess',
+                                      defaultMessage:
+                                        '{orderTime} {customerName} 下单成功',
+                                    },
+                                    {
+                                      orderTime: formatTime(item.orderTime),
+                                      customerName: item.customerName,
+                                    },
+                                  )}
+                                </Typography.Text>
+                                <Typography.Text
+                                  ellipsis={{ tooltip: true }}
+                                  style={{ color: token.colorTextDescription }}
+                                >
+                                  {formatMessage(
+                                    {
+                                      id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeCarColor',
+                                      defaultMessage: '车辆颜色：{color}',
+                                    },
+                                    {
+                                      color: COLOR_LIST.find(
+                                        (color) =>
+                                          color.value === item.carColor,
+                                      )?.label,
+                                    },
+                                  )}
+                                </Typography.Text>
+                              </div>
+                            </div>
+                          ))}
+                          <div
+                            style={{
+                              position: 'absolute',
+                              left: 0,
+                              bottom: 0,
+                              height: 40,
+                              width: '100%',
+                              backgroundImage:
+                                'linear-gradient(180deg, rgba(245,248,253,0.00) 0%, #F5F8FD 62%)',
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
+                </Card>
+              </Col>
+              <Col span={24}>
+                <Card
+                  type="inner"
+                  title={<h4>实时执行 SQL</h4>}
+                  bodyStyle={{
+                    fontFamily: 'Menlo',
+                  }}
+                >
+                  Set your secret key. Remember to switch to your live secret
+                  key in production. See your keys here:
+                  https://dashboard.stripe.com/apikeys
+                  StripeConfiguration.ApiKey = See your keys here:
+                  https://dashboard.stripe.com/apikeys
+                </Card>
               </Col>
             </Row>
           </Col>
         </Row>
       </div>
-    </>
+    </ConfigProvider>
   );
 };
 
