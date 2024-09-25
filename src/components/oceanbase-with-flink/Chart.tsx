@@ -1,8 +1,8 @@
 import React from 'react';
 import { Column } from '@ant-design/plots';
-import { COLOR_LIST } from './constant';
 import { isEqual, max, omit } from 'lodash';
 import { useIntl } from 'react-intl';
+import { COLOR_LIST } from '@/constants';
 
 interface ChartProps {
   data?: { carColor: string; count: number }[];

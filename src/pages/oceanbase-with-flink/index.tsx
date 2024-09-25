@@ -19,10 +19,10 @@ import {
 import { sortByNumber } from '@oceanbase/util';
 import CountUp from 'react-countup';
 import * as CarOrderController from '@/services/CarOrderController';
-import { COLOR_LIST } from './constant';
-import OrderForm from './OrderForm';
-import Chart from './Chart';
-import { formatTime } from './util';
+import { COLOR_LIST } from '@/constants';
+import OrderForm from '@/components/oceanbase-with-flink/OrderForm';
+import Chart from '@/components/oceanbase-with-flink/Chart';
+import { formatTime } from '@/utils';
 import type { CarOrder } from '@prisma/client';
 import { debounce, toString } from 'lodash';
 import { useRouter } from 'next/router';
@@ -113,7 +113,6 @@ const Index: React.FC<IndexProps> = () => {
     run: getTotal,
     loading: totalLoading,
   } = useRequest(CarOrderController.getTotal, {
-    ready: false,
     defaultParams: [{}],
   });
   const { total = 0, latency: totalLatency } = totalData || {};
@@ -129,7 +128,6 @@ const Index: React.FC<IndexProps> = () => {
     run: getColorTop3,
     loading: colorTop3Loading,
   } = useRequest(CarOrderController.getColorTop3, {
-    ready: false,
     defaultParams: [{}],
   });
   const { data: colorTop3 = [], latency: colorTop3Latency } =
@@ -143,7 +141,6 @@ const Index: React.FC<IndexProps> = () => {
     loading: latestLoading,
     run: getLatest,
   } = useRequest(CarOrderController.getLatest, {
-    ready: false,
     defaultParams: [
       {
         orderId: latestOrder.orderId,
@@ -192,7 +189,6 @@ const Index: React.FC<IndexProps> = () => {
   const { data: statusData, run: getStatus } = useRequest(
     CarOrderController.getStatus,
     {
-      ready: false,
       defaultParams: [{}],
       onSuccess: (res) => {
         if (res.shouldRefresh) {

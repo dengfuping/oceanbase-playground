@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { sample } from 'lodash';
 import { firstName, lastName } from 'full-name-generator';
-import { COLOR_LIST } from './constant';
+import { COLOR_LIST } from '@/constants';
 
 export function formatTime(value?: string | Date) {
   return moment(value).format('HH:mm:ss');

@@ -19,8 +19,8 @@ import { range } from 'lodash';
 import * as CarOrderController from '@/services/CarOrderController';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
-import { COLOR_LIST } from './constant';
-import { generateCustomerName, generateCarOrder } from './util';
+import { COLOR_LIST } from '@/constants';
+import { generateCustomerName, generateCarOrder } from '@/utils';
 import styles from './OrderForm.module.less';
 
 interface OrderFormProps extends React.HTMLProps<HTMLDivElement> {

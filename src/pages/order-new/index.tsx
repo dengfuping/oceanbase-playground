@@ -15,8 +15,8 @@ import React, { useRef, useState } from 'react';
 import { range, sample } from 'lodash';
 import { firstName, lastName } from 'full-name-generator';
 import * as CarOrderController from '@/services/CarOrderController';
-import { COLOR_LIST } from './constant';
-import type { CarouselRef } from 'antd/es/carousel';
+import { COLOR_LIST } from '@/constants';
+import type { CarouselRef } from '@oceanbase/design/es/carousel';
 
 interface OrderProps extends React.HTMLProps<HTMLDivElement> {
   onSuccess?: () => void;
