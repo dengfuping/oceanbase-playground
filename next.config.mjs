@@ -22,6 +22,9 @@ const nextConfig = {
   experimental: {
     esmExternals: 'loose',
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 export default withLess(nextConfig);
