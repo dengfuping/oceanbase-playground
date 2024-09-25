@@ -1,6 +1,6 @@
 import { range } from 'lodash';
 import model from '../src/api/model';
-import { generateCarOrder } from '../src/pages/OceanBaseWithFlink/util';
+import { generateCarOrder } from '../src/pages/oceanbase-with-flink/util';
 
 const totalInsertSize = 150000000;
 const batchInsertSize = 10000;

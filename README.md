@@ -1,43 +1,40 @@
-## 🚀 Introduction
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-An OLAP Real-time Analysis Demo based on [OceanBase](https://oceanbase.com/) and [Flink](https://github.com/apache/flink).
+## Getting Started
 
-**Live Demo**: [https://playground.oceanbase.com](https://playground.oceanbase.com)
-
-![2024-05-09-2024-06-28 16_06_59](https://github.com/dengfuping/oceanbase-playground/assets/14918822/4dec9434-88ac-469e-91a3-5fcf22b008c0)
-
-## ⌨️ Development
-
-- Clone and install:
+First, run the development server:
 
 ```bash
-git clone git@github.com:dengfuping/oceanbase-playground.git
-pnpm i
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-- Copy `.env.example` file to `.env` and configure OLTP and OLAP database url:
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-```bash
-OLTP_DATABASE_URL=""
-OLAP_DATABASE_URL=""
-```
+You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
 
-- Start demo:
+[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
-```bash
-pnpm run dev
-```
+The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
-## 🔨 Tech Stack
+This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-- [Umi.js](https://umijs.org/en-US) – Frontend React Framework
-- [Umi API Route](https://umijs.org/en-US/blog/develop-blog-using-umi) - Backend API
-- [TypeScript](https://www.typescriptlang.org/) – Language
-- [OceanBase Design](https://github.com/oceanbase/oceanbase-design) - Design
-- [OB Cloud](https://www.oceanbase.com/product/cloud) – OceanBase Cloud Database
-- [Sequelize](https://sequelize.org/) - ORM
-- [Vercel](https://vercel.com/) – Deployment
+## Learn More
 
-## ⚖️ License
+To learn more about Next.js, take a look at the following resources:
 
-MIT © [OceanBase](https://github.com/oceanbase)
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
