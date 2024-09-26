@@ -144,7 +144,6 @@ const Index: React.FC<IndexProps> = () => {
     run: getTotal,
     loading: totalLoading,
   } = useRequest(CarOrderController.getTotal, {
-    ready: false,
     defaultParams: [{}],
   });
   const { total = 0, latency: totalLatency } = totalData || {};
@@ -160,7 +159,6 @@ const Index: React.FC<IndexProps> = () => {
     run: getColorTop3,
     loading: colorTop3Loading,
   } = useRequest(CarOrderController.getColorTop3, {
-    ready: false,
     defaultParams: [{}],
   });
   const { data: colorTop3 = [], latency: colorTop3Latency } =
@@ -174,7 +172,6 @@ const Index: React.FC<IndexProps> = () => {
     loading: latestLoading,
     run: getLatest,
   } = useRequest(CarOrderController.getLatest, {
-    ready: false,
     defaultParams: [
       {
         orderId: latestOrder.orderId,
@@ -223,7 +220,6 @@ const Index: React.FC<IndexProps> = () => {
   const { data: statusData, run: getStatus } = useRequest(
     CarOrderController.getStatus,
     {
-      ready: false,
       defaultParams: [{}],
       onSuccess: (res) => {
         if (res.shouldRefresh) {
