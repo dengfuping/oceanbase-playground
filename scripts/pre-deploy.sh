@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ls -R .zeabur
+ls -al
 
 cp -r dist/* .zeabur/output/static && cp -r api .zeabur/output/functions
 
