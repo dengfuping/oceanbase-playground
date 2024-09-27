@@ -3,18 +3,18 @@ import model from '../../model';
 
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
+    let sqlText;
     let latency;
     if (req.method === 'GET') {
       const total = await model.OLAPCarOrder.count({
         logging: (sql, timing) => {
+          sqlText = sql;
           latency = timing;
-          // console.log(sql);
-          // console.log(`SQL 耗时：`, timing, 'ms');
-          // console.log('\n');
         },
       });
-      res.status(200).header('X-Sql-Latency', `${latency}`).json({
+      res.status(200).json({
         total,
+        sqlText,
         latency,
       });
     } else {

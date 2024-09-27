@@ -1,14 +1,10 @@
 import {
   Button,
-  Col,
-  Row,
-  ConfigProvider,
   Carousel,
   Form,
   Input,
   message,
   Select,
-  Space,
   Switch,
   theme,
 } from '@oceanbase/design';
@@ -24,7 +20,7 @@ import styles from './OrderForm.less';
 
 interface OrderFormProps extends React.HTMLProps<HTMLDivElement> {
   debug?: string | null;
-  onSuccess?: () => void;
+  onSuccess?: (sqlText?: string) => void;
 }
 
 const OrderForm: React.FC<OrderFormProps> = ({
@@ -38,6 +34,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
   const [createPolling, setCreatePolling] = useState(false);
   const [batchCreatePolling, setBatchCreatePolling] = useState(false);
   const [currentCarColor, setCurrentColor] = useState('blue');
+  // eslint-disable-next-line
   const currentCarColorItem = COLOR_LIST.find(
     (item) => item.value === currentCarColor,
   );
@@ -48,14 +45,15 @@ const OrderForm: React.FC<OrderFormProps> = ({
   const { run: batchCreateCarOrder, loading: batchCreateCarOrderLoading } =
     useRequest(CarOrderController.batchCreateCarOrder, {
       manual: true,
-      onSuccess: () => {
+      onSuccess: (res) => {
         message.success(
           formatMessage({
             id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.OrderSuccess',
             defaultMessage: '下单成功',
           }),
         );
-        onSuccess?.();
+        const batchSqlText = res.sqlText;
+        onSuccess?.(batchSqlText);
       },
     });
 
@@ -130,7 +128,9 @@ const OrderForm: React.FC<OrderFormProps> = ({
           arrows={true}
           draggable={true}
           afterChange={(current) => {
-            setCurrentColor(COLOR_LIST[current].value);
+            const newCarColor = COLOR_LIST[current].value;
+            setCurrentColor(newCarColor);
+            form.setFieldValue('carColor', newCarColor);
           }}
         >
           {COLOR_LIST.map((item) => {

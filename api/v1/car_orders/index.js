@@ -70763,17 +70763,32 @@ var model_default = { OLTPCarOrder, OLAPCarOrder };
 // src/api/v1/car_orders/index.ts
 async function car_orders_default(req, res) {
   try {
+    let sqlText;
     let latency;
     if (req.method === "GET") {
       const carOrders = await model_default.OLAPCarOrder.findAll({
         logging: (sql, timing) => {
+          sqlText = sql;
           latency = timing;
         }
       });
-      res.status(200).header("X-Sql-Latency", `${latency}`).json(carOrders);
+      res.status(200).json({
+        data: carOrders,
+        sqlText,
+        latency
+      });
     } else if (req.method === "POST") {
-      const carOrder = await model_default.OLTPCarOrder.create(req.body);
-      res.status(200).header("X-Sql-Latency", `${latency}`).json(carOrder);
+      const carOrder = await model_default.OLTPCarOrder.create(req.body, {
+        logging: (sql, timing) => {
+          sqlText = sql;
+          latency = timing;
+        }
+      });
+      res.status(200).json({
+        data: carOrder,
+        sqlText,
+        latency
+      });
     } else {
       res.status(405).json({ errorMessage: "Method not allowed" });
     }

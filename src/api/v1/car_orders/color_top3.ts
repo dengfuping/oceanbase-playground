@@ -4,6 +4,7 @@ import model from '../../model';
 
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
+    let sqlText;
     let latency;
     if (req.method === 'GET') {
       const result = await model.OLAPCarOrder.findAll({
@@ -20,14 +21,13 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
         order: [['count', 'DESC']],
         limit: 3,
         logging: (sql, timing) => {
+          sqlText = sql;
           latency = timing;
-          // console.log(sql);
-          // console.log(`SQL 耗时：`, timing, 'ms');
-          // console.log('\n');
         },
       });
-      res.status(200).header('X-Sql-Latency', `${latency}`).json({
+      res.status(200).json({
         data: result,
+        sqlText,
         latency,
       });
     } else {

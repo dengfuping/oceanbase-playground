@@ -70763,6 +70763,7 @@ var model_default = { OLTPCarOrder, OLAPCarOrder };
 // src/api/v1/car_orders/color_top3.ts
 async function color_top3_default(req, res) {
   try {
+    let sqlText;
     let latency;
     if (req.method === "GET") {
       const result2 = await model_default.OLAPCarOrder.findAll({
@@ -70779,11 +70780,13 @@ async function color_top3_default(req, res) {
         order: [["count", "DESC"]],
         limit: 3,
         logging: (sql, timing) => {
+          sqlText = sql;
           latency = timing;
         }
       });
-      res.status(200).header("X-Sql-Latency", `${latency}`).json({
+      res.status(200).json({
         data: result2,
+        sqlText,
         latency
       });
     } else {

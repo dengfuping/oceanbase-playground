@@ -70763,14 +70763,20 @@ var model_default = { OLTPCarOrder, OLAPCarOrder };
 // src/api/v1/car_orders/batch.ts
 async function batch_default(req, res) {
   try {
+    let sqlText;
     let latency;
     if (req.method === "POST") {
       const carOrders = await model_default.OLTPCarOrder.bulkCreate(req.body, {
         logging: (sql, timing) => {
+          sqlText = sql;
           latency = timing;
         }
       });
-      res.status(200).header("X-Sql-Latency", `${latency}`).json(carOrders);
+      res.status(200).json({
+        data: carOrders,
+        sqlText,
+        latency
+      });
     } else {
       res.status(405).json({ errorMessage: "Method not allowed" });
     }

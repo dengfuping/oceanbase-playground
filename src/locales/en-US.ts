@@ -13,7 +13,7 @@ export default {
   "oceanbase-playground.src.pages.OceanBaseWithFlink.OrderCountOfToday": "Order Count of Today",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders": "Real Time Orders",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.OrderSuccess": "Place order successfully",
-  "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess": "{orderTime} {customerName} placed an order",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess": "{customerName} placed an order",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeCarColor": "Color: {color}",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.Blue": "Blue",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.Black": "Black",

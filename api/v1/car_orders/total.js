@@ -70763,15 +70763,18 @@ var model_default = { OLTPCarOrder, OLAPCarOrder };
 // src/api/v1/car_orders/total.ts
 async function total_default(req, res) {
   try {
+    let sqlText;
     let latency;
     if (req.method === "GET") {
       const total = await model_default.OLAPCarOrder.count({
         logging: (sql, timing) => {
+          sqlText = sql;
           latency = timing;
         }
       });
-      res.status(200).header("X-Sql-Latency", `${latency}`).json({
+      res.status(200).json({
         total,
+        sqlText,
         latency
       });
     } else {

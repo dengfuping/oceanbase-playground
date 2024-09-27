@@ -13,7 +13,7 @@ export default {
   "oceanbase-playground.src.pages.OceanBaseWithFlink.OrderCountOfToday": "今日预定量",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders": "实时订单",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.OrderSuccess": "下单成功",
-  "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess": "{orderTime} {customerName} 下单成功",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess": "{customerName} 下单成功",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeCarColor": "车辆颜色：{color}",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.Blue": "蓝色",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.Black": "黑色",

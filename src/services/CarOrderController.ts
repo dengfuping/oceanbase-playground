@@ -6,7 +6,11 @@ export async function createCarOrder(
   body: Omit<Prisma.CarOrderCreateInput, 'orderTime'>,
   options?: RequestOptions,
 ) {
-  return request<CarOrder>(`/api/v1/car_orders`, {
+  return request<{
+    data?: CarOrder;
+    sqlText?: string;
+    latency?: number;
+  }>(`/api/v1/car_orders`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -20,7 +24,11 @@ export async function batchCreateCarOrder(
   body: Omit<Prisma.CarOrderCreateInput, 'orderTime'>[],
   options?: RequestOptions,
 ) {
-  return request<CarOrder>(`/api/v1/car_orders/batch`, {
+  return request<{
+    data?: CarOrder[];
+    sqlText?: string;
+    latency?: number;
+  }>(`/api/v1/car_orders/batch`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -32,8 +40,9 @@ export async function batchCreateCarOrder(
 
 export async function getTotal(options?: RequestOptions) {
   return request<{
-    total: number;
-    latency: number;
+    total?: number;
+    sqlText?: string;
+    latency?: number;
   }>(`/api/v1/car_orders/total`, {
     method: 'GET',
     ...(options || {}),
@@ -43,6 +52,7 @@ export async function getTotal(options?: RequestOptions) {
 export async function getColorTop3(options?: RequestOptions) {
   return request<{
     data?: { carColor: string; count: number }[];
+    sqlText?: string;
     latency?: number;
   }>(`/api/v1/car_orders/color_top3`, {
     method: 'GET',
@@ -58,6 +68,7 @@ export async function getLatest(
 ) {
   return request<{
     data?: CarOrder[];
+    sqlText?: string;
     latency?: number;
   }>(`/api/v1/car_orders/latest`, {
     method: 'GET',

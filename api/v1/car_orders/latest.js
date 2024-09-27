@@ -70766,6 +70766,7 @@ var model_default = { OLTPCarOrder, OLAPCarOrder };
 // src/api/v1/car_orders/latest.ts
 async function latest_default(req, res) {
   try {
+    let sqlText;
     let latency;
     if (req.method === "GET") {
       const { orderId } = req.query || {};
@@ -70778,11 +70779,13 @@ async function latest_default(req, res) {
           },
           order: [["orderId", "DESC"]],
           logging: (sql, timing) => {
+            sqlText = sql;
             latency = timing;
           }
         });
-        res.status(200).header("X-Sql-Latency", `${latency}`).json({
+        res.status(200).json({
           data: result2,
+          sqlText,
           latency
         });
       } else {
@@ -70790,11 +70793,13 @@ async function latest_default(req, res) {
           order: [["orderId", "DESC"]],
           limit: 10,
           logging: (sql, timing) => {
+            sqlText = sql;
             latency = timing;
           }
         });
-        res.status(200).header("X-Sql-Latency", `${latency}`).json({
+        res.status(200).json({
           data: result2,
+          sqlText,
           latency
         });
       }

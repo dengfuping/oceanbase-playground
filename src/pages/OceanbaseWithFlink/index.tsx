@@ -3,19 +3,16 @@ import {
   Col,
   ConfigProvider,
   Dropdown,
+  Empty,
   Row,
   Space,
   Spin,
   theme,
   Typography,
 } from '@oceanbase/design';
-import { useInterval, useRequest, useUpdateEffect } from 'ahooks';
+import { useInterval, useRequest } from 'ahooks';
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  CheckCircleOutlined,
-  GlobalOutlined,
-  LoadingOutlined,
-} from '@oceanbase/icons';
+import { GlobalOutlined, LoadingOutlined } from '@oceanbase/icons';
 import { sortByNumber } from '@oceanbase/util';
 import CountUp from 'react-countup';
 import * as CarOrderController from '@/services/CarOrderController';
@@ -24,7 +21,7 @@ import OrderForm from './OrderForm';
 import Chart from './Chart';
 import { formatTime } from './util';
 import type { CarOrder } from '@prisma/client';
-import { debounce, toString } from 'lodash';
+import { toString } from 'lodash';
 import {
   formatMessage,
   getLocale,
@@ -40,34 +37,6 @@ import './global.less';
 import styles from './index.less';
 
 TweenOne.plugins.push(PathPlugin);
-
-function getElementLeft(element: HTMLDivElement) {
-  let actualLeft = element.offsetLeft || 0;
-  let current = element.offsetParent;
-
-  while (current !== null) {
-    // @ts-ignore
-    actualLeft += current.offsetLeft || 0;
-    // @ts-ignore
-    current = current.offsetParent;
-  }
-
-  return actualLeft;
-}
-
-function getElementTop(element: HTMLDivElement) {
-  let actualTop = element.offsetTop || 0;
-  let current = element.offsetParent;
-
-  while (current !== null) {
-    // @ts-ignore
-    actualTop += current.offsetTop || 0;
-    // @ts-ignore
-    current = current.offsetParent;
-  }
-
-  return actualTop;
-}
 
 interface IndexProps {}
 
@@ -97,6 +66,7 @@ const Index: React.FC<IndexProps> = () => {
   const olapRef = useRef<HTMLImageElement>(null);
   const dashboardRef = useRef<HTMLDivElement>(null);
   const [path, setPath] = useState<string>('');
+  const [sql, setSql] = useState('');
 
   const renderPath = () => {
     const orderDom = orderRef.current;
@@ -145,6 +115,9 @@ const Index: React.FC<IndexProps> = () => {
     loading: totalLoading,
   } = useRequest(CarOrderController.getTotal, {
     defaultParams: [{}],
+    onSuccess: (res) => {
+      setSql(`${sql}\n${res.sqlText}`);
+    },
   });
   const { total = 0, latency: totalLatency } = totalData || {};
 
@@ -160,6 +133,9 @@ const Index: React.FC<IndexProps> = () => {
     loading: colorTop3Loading,
   } = useRequest(CarOrderController.getColorTop3, {
     defaultParams: [{}],
+    onSuccess: (res) => {
+      setSql(`${sql}\n${res.sqlText}`);
+    },
   });
   const { data: colorTop3 = [], latency: colorTop3Latency } =
     colorTop3Data || {};
@@ -203,6 +179,7 @@ const Index: React.FC<IndexProps> = () => {
             })),
           );
         }, 1000);
+        setSql(`${sql}\n${res.sqlText}`);
       }
     },
   });
@@ -230,17 +207,11 @@ const Index: React.FC<IndexProps> = () => {
   );
   const { syncing } = statusData || {};
 
-  // useInterval(() => {
-  //   getStatus({
-  //     orderId: latestOrder.orderId,
-  //   });
-  // }, 1000);
-
-  const demoPath = `M3.5,175V19c0,0,1-8.75,8.25-11.5S26.5,8,26.5,8l54,53.25
-      c0,0,7,8.25,14.5,0.75s51.5-52.25,51.5-52.25s9.75-7,18-2s7.75,11.5,7.75,11.5
-      v104c0,0-0.5,15.75-15.25,15.75s-15.75-15-15.75-15V68.5c0,0-0.125-9.125-6-3.25
-      s-36.25,36-36.25,36s-11.625,11.875-24-0.5S40.25,65.5,40.25,65.5
-      s-5.75-5.25-5.75,2s0,107.25,0,107.25s-0.75,13.5-14.5,13.5S3.5,175,3.5,175z`;
+  useInterval(() => {
+    getStatus({
+      orderId: latestOrder.orderId,
+    });
+  }, 1000);
 
   return (
     <ConfigProvider
@@ -301,10 +272,11 @@ const Index: React.FC<IndexProps> = () => {
             >
               <OrderForm
                 debug={debug}
-                onSuccess={() => {
+                onSuccess={(sqlText) => {
                   getStatus({
                     orderId: latestOrder?.orderId,
                   });
+                  setSql(`${sql}\n${sqlText}`);
                 }}
               />
             </div>
@@ -341,42 +313,6 @@ const Index: React.FC<IndexProps> = () => {
                 </div>
               </div>
             )}
-            {/* <div
-              style={{
-                position: 'absolute',
-                top: 0,
-              }}
-            >
-              <TweenOne
-                animation={{
-                  path: demoPath,
-                  repeat: 1000,
-                  duration: 5000,
-                  ease: 'linear',
-                }}
-                style={{
-                  margin: 0,
-                  width: 20,
-                  height: 20,
-                  transform: 'translate(-10px, -10px)',
-                  position: 'absolute',
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  borderRadius: 4,
-                  background: '#1890ff',
-                }}
-                // paused={false}
-              />
-              <svg width="200" height="200">
-                <path
-                  d={demoPath}
-                  fill="none"
-                  stroke="rgba(1, 155, 240, 0.2)"
-                />
-              </svg>
-            </div> */}
             {path && (
               <div
                 style={{
@@ -386,80 +322,81 @@ const Index: React.FC<IndexProps> = () => {
                   height: '100%',
                 }}
               >
-                <TweenOne
-                  animation={{
-                    path,
-                    repeat: 1000,
-                    duration: 1250,
-                    ease: 'linear',
-                  }}
-                  style={{
-                    margin: 0,
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    // width: 20,
-                    // height: 20,
-                    // transform: 'translate(-10px, -10px)',
-                    // borderRadius: 4,
-                    // background: '#1890ff',
-                    width: 12,
-                    height: 12,
-                    transform: 'translate(-6px, -6px)',
-                    borderRadius: '50%',
-                    // border: '1px solid #adb2bd',
-                    background: token.colorPrimary,
-                  }}
-                  // paused={false}
-                />
-                <TweenOne
-                  animation={{
-                    path,
-                    repeat: 1000,
-                    duration: 1250,
-                    ease: 'linear',
-                    delay: 50,
-                  }}
-                  style={{
-                    margin: 0,
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    width: 12,
-                    height: 12,
-                    transform: 'translate(-6px, -6px)',
-                    borderRadius: '50%',
-                    background: token.colorPrimary,
-                  }}
-                  // paused={false}
-                />
-                <TweenOne
-                  animation={{
-                    path,
-                    repeat: 1000,
-                    duration: 1250,
-                    ease: 'linear',
-                    delay: 100,
-                  }}
-                  style={{
-                    margin: 0,
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    width: 12,
-                    height: 12,
-                    transform: 'translate(-6px, -6px)',
-                    borderRadius: '50%',
-                    background: token.colorPrimary,
-                  }}
-                  // paused={false}
-                />
+                {syncing && (
+                  <>
+                    <TweenOne
+                      animation={{
+                        path,
+                        repeat: 1000,
+                        duration: 1250,
+                        ease: 'linear',
+                      }}
+                      style={{
+                        margin: 0,
+                        position: 'absolute',
+                        top: 0,
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        // width: 20,
+                        // height: 20,
+                        // transform: 'translate(-10px, -10px)',
+                        // borderRadius: 4,
+                        // background: '#1890ff',
+                        width: 12,
+                        height: 12,
+                        transform: 'translate(-6px, -6px)',
+                        borderRadius: '50%',
+                        // border: '1px solid #adb2bd',
+                        background: token.colorPrimary,
+                      }}
+                    />
+                    <TweenOne
+                      animation={{
+                        path,
+                        repeat: 1000,
+                        duration: 1250,
+                        ease: 'linear',
+                        delay: 50,
+                      }}
+                      style={{
+                        margin: 0,
+                        position: 'absolute',
+                        top: 0,
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        width: 12,
+                        height: 12,
+                        transform: 'translate(-6px, -6px)',
+                        borderRadius: '50%',
+                        background: token.colorPrimary,
+                      }}
+                    />
+                    <TweenOne
+                      animation={{
+                        path,
+                        repeat: 1000,
+                        duration: 1250,
+                        ease: 'linear',
+                        delay: 100,
+                      }}
+                      style={{
+                        margin: 0,
+                        position: 'absolute',
+                        top: 0,
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        width: 12,
+                        height: 12,
+                        transform: 'translate(-6px, -6px)',
+                        borderRadius: '50%',
+                        background: token.colorPrimary,
+                      }}
+                    />
+                  </>
+                )}
                 <svg style={{ width: '100%', height: '100%' }}>
                   <path
                     d={path}
@@ -642,7 +579,7 @@ const Index: React.FC<IndexProps> = () => {
                       </Row>
                     </Col>
                     <Col span={12}>
-                      <div style={{ padding: '24px 12px 16px 24px' }}>
+                      <div style={{ padding: '24px 0px 0px 24px' }}>
                         <Space direction="vertical" size={4}>
                           <h5>
                             {formatMessage({
@@ -674,77 +611,91 @@ const Index: React.FC<IndexProps> = () => {
                         </Space>
                         <div
                           style={{
-                            maxHeight: '580px',
+                            maxHeight: '360px',
                             overflow: 'auto',
                           }}
                         >
-                          {orderList.map((item) => (
-                            <div
-                              key={item.key}
-                              style={{
-                                padding: '12px 16px',
-                                border: `1px solid ${token.colorBorder}`,
-                                borderRadius: token.borderRadiusSM,
-                                backgroundColor: item.isNew
-                                  ? token.colorSuccessBg
-                                  : token.colorBgContainer,
-                                marginBottom: 14,
-                                display: 'flex',
-                                alignItems: 'center',
-                                transition: 'all 0.3s ease',
-                              }}
-                              className="animate__animated animate__slideInDown"
-                            >
-                              <CheckCircleOutlined
+                          {orderList.map((item) => {
+                            const colorItem = COLOR_LIST.find(
+                              (color) => color.value === item.carColor,
+                            );
+                            return (
+                              <div
+                                key={item.key}
                                 style={{
-                                  fontSize: 30,
-                                  color: token.colorSuccess,
-                                  marginRight: 16,
+                                  borderRadius: token.borderRadiusSM,
+                                  backgroundColor: item.isNew
+                                    ? token.colorSuccessBg
+                                    : token.colorBgContainer,
+                                  marginBottom: 24,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  transition: 'all 0.3s ease',
                                 }}
-                              />
-                              <div style={{ maxWidth: 'calc(100% - 40px)' }}>
-                                <Typography.Text
-                                  ellipsis={{ tooltip: true }}
-                                  style={{ fontWeight: 700, marginBottom: 8 }}
+                                className="animate__animated animate__slideInDown"
+                              >
+                                <div
+                                  style={{
+                                    width: 70,
+                                    height: 36,
+                                    background: `url(https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*ZgXlRqDlwmYAAAAAAAAAAAAADmfOAQ/original) no-repeat`,
+                                    backgroundSize: 'cover',
+                                    borderRadius: 6,
+                                    padding: '6px 4px',
+                                    marginRight: 8,
+                                  }}
                                 >
-                                  {formatMessage(
-                                    {
-                                      id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess',
-                                      defaultMessage:
-                                        '{orderTime} {customerName} 下单成功',
-                                    },
-                                    {
-                                      orderTime: formatTime(item.orderTime),
-                                      customerName: item.customerName,
-                                    },
-                                  )}
-                                </Typography.Text>
-                                <Typography.Text
-                                  ellipsis={{ tooltip: true }}
-                                  style={{ color: token.colorTextDescription }}
-                                >
-                                  {formatMessage(
-                                    {
-                                      id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeCarColor',
-                                      defaultMessage: '车辆颜色：{color}',
-                                    },
-                                    {
-                                      color: COLOR_LIST.find(
-                                        (color) =>
-                                          color.value === item.carColor,
-                                      )?.label,
-                                    },
-                                  )}
-                                </Typography.Text>
+                                  <img
+                                    src={colorItem?.image}
+                                    style={{ width: '100%' }}
+                                  />
+                                </div>
+                                <div style={{ maxWidth: 'calc(100% - 90px)' }}>
+                                  <Typography.Text
+                                    ellipsis={{ tooltip: true }}
+                                    style={{ fontWeight: 700 }}
+                                  >
+                                    {formatMessage(
+                                      {
+                                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess',
+                                        defaultMessage:
+                                          '{customerName} 下单成功',
+                                      },
+                                      {
+                                        customerName: item.customerName,
+                                      },
+                                    )}
+                                  </Typography.Text>
+                                  <br />
+                                  <Typography.Text
+                                    ellipsis={{ tooltip: true }}
+                                    style={{
+                                      color: token.colorTextDescription,
+                                    }}
+                                  >
+                                    <Space>
+                                      {formatMessage(
+                                        {
+                                          id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeCarColor',
+                                          defaultMessage: '车辆颜色：{color}',
+                                        },
+                                        {
+                                          color: colorItem?.label,
+                                        },
+                                      )}
+                                      {formatTime(item.orderTime)}
+                                    </Space>
+                                  </Typography.Text>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                           <div
                             style={{
                               position: 'absolute',
                               left: 0,
                               bottom: 0,
-                              height: 40,
+                              height: 60,
                               width: '100%',
                               backgroundImage:
                                 'linear-gradient(180deg, rgba(245,248,253,0.00) 0%, #F5F8FD 62%)',
@@ -762,13 +713,11 @@ const Index: React.FC<IndexProps> = () => {
                   title={<h4>实时执行 SQL</h4>}
                   bodyStyle={{
                     fontFamily: 'Menlo',
+                    height: 164,
+                    overflow: 'auto',
                   }}
                 >
-                  Set your secret key. Remember to switch to your live secret
-                  key in production. See your keys here:
-                  https://dashboard.stripe.com/apikeys
-                  StripeConfiguration.ApiKey = See your keys here:
-                  https://dashboard.stripe.com/apikeys
+                  {sql || <Empty style={{ marginTop: 24 }} />}
                 </Card>
               </Col>
             </Row>
