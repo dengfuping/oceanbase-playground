@@ -11,6 +11,7 @@ export default defineConfig({
   ],
   routes,
   npmClient: 'pnpm',
+  devtool: 'cheap-module-source-map',
   // Enable API route and deploy to vercel
   apiRoute: {
     platform: 'vercel',
