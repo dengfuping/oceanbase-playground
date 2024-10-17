@@ -136,6 +136,33 @@ const Index: React.FC<IndexProps> = () => {
     }, 16);
   }, []);
 
+  const handleMessageFromParent = (event: MessageEvent) => {
+    if (
+      event.origin !== window.location.origin &&
+      ![
+        'https://oceanbaseweb-pre.oceanbase.com',
+        'https://www.oceanbase.com',
+      ].includes(event.origin)
+    ) {
+      console.warn('Received message from untrusted origin:', event.origin);
+      return;
+    }
+
+    console.log('Received message from parent:', event.data);
+    console.log(event.origin);
+
+    // 根据消息内容发送响应回父页面
+    if (event.data === 'car-demo') {
+      event.source?.postMessage('iframe-response', {
+        targetOrigin: event.origin,
+      });
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('message', handleMessageFromParent);
+  }, []);
+
   const {
     data: totalData,
     run: getTotal,
