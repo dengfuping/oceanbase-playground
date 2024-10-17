@@ -1,7 +1,6 @@
 import {
   Card,
   Col,
-  ConfigProvider,
   Dropdown,
   Empty,
   Row,
@@ -10,7 +9,7 @@ import {
   theme,
   Typography,
 } from '@oceanbase/design';
-import { useInterval, useRequest } from 'ahooks';
+import { useInterval, useRequest, useScroll } from 'ahooks';
 import React, { useEffect, useRef, useState } from 'react';
 import { GlobalOutlined, LoadingOutlined } from '@oceanbase/icons';
 import { sortByNumber } from '@oceanbase/util';
@@ -33,6 +32,7 @@ import moment from 'moment';
 import 'animate.css';
 import TweenOne from 'rc-tween-one';
 import PathPlugin from 'rc-tween-one/lib/plugin/PathPlugin';
+import type { IAnimObject } from 'rc-tween-one/typings/AnimObject';
 import './global.less';
 import styles from './index.less';
 
@@ -68,6 +68,35 @@ const Index: React.FC<IndexProps> = () => {
   const [path, setPath] = useState<string>('');
   const [sql, setSql] = useState('');
 
+  const latestRef = useRef<HTMLDivElement>(null);
+  const latestElment = latestRef.current;
+  const latestScroll = useScroll(latestRef);
+  const isLatestScroll =
+    latestElment?.scrollHeight !== latestElment?.clientHeight;
+  // start scroll
+  const isLatestStartScroll = (latestScroll?.top || 0) > 0;
+  // Determine if an element has been totally scrolled
+  // ref: https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight#determine_if_an_element_has_been_totally_scrolled
+  const isLatestTotalScroll =
+    Math.abs(
+      (latestElment?.scrollHeight || 0) -
+        (latestElment?.clientHeight || 0) -
+        (latestElment?.scrollTop || 0),
+    ) < 1;
+
+  const sqlRef = useRef<HTMLDivElement>(null);
+  const sqlElment = sqlRef.current;
+
+  const updateSql = (appendSql: string | undefined) => {
+    // 使用 setState 函数形式更新值，保证并发调用的结果符合预期
+    setSql((prevSql) => `${prevSql}${appendSql}\n`);
+    if (sqlElment) {
+      setTimeout(() => {
+        sqlElment.scrollTop = sqlElment.scrollHeight;
+      }, 0);
+    }
+  };
+
   const renderPath = () => {
     const orderDom = orderRef.current;
     const oltpDom = oltpRef.current;
@@ -84,8 +113,6 @@ const Index: React.FC<IndexProps> = () => {
         x: dashboardDom.offsetLeft,
         y: oltpPoint.y,
       };
-      console.log('orderPoint', orderPoint);
-      console.log('oltpPoint', oltpPoint);
       const flinkPoint = {
         x: flinkDom.offsetLeft + flinkDom.offsetWidth / 2,
         y: flinkDom.offsetTop + flinkDom.offsetHeight / 2,
@@ -116,7 +143,7 @@ const Index: React.FC<IndexProps> = () => {
   } = useRequest(CarOrderController.getTotal, {
     defaultParams: [{}],
     onSuccess: (res) => {
-      setSql(`${sql}\n${res.sqlText}`);
+      updateSql(res.sqlText);
     },
   });
   const { total = 0, latency: totalLatency } = totalData || {};
@@ -134,7 +161,7 @@ const Index: React.FC<IndexProps> = () => {
   } = useRequest(CarOrderController.getColorTop3, {
     defaultParams: [{}],
     onSuccess: (res) => {
-      setSql(`${sql}\n${res.sqlText}`);
+      updateSql(res.sqlText);
     },
   });
   const { data: colorTop3 = [], latency: colorTop3Latency } =
@@ -156,6 +183,7 @@ const Index: React.FC<IndexProps> = () => {
     onSuccess: (res) => {
       const latest = res.data || [];
       if (latest.length > 0) {
+        updateSql(res.sqlText);
         let newOrderList = [...latest, ...orderList].slice(0, 10);
         newOrderList = newOrderList
           .map((item) => ({
@@ -179,7 +207,6 @@ const Index: React.FC<IndexProps> = () => {
             })),
           );
         }, 1000);
-        setSql(`${sql}\n${res.sqlText}`);
       }
     },
   });
@@ -213,18 +240,29 @@ const Index: React.FC<IndexProps> = () => {
     });
   }, 1000);
 
+  const animation: IAnimObject = {
+    path,
+    repeat: -1,
+    duration: 1250,
+    ease: 'linear',
+  };
+  const animationStyle: React.CSSProperties = {
+    margin: 0,
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    width: 12,
+    height: 12,
+    transform: 'translate(-6px, -6px)',
+    borderRadius: '50%',
+    // border: '1px solid #adb2bd',
+    background: token.colorPrimary,
+  };
+
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          borderRadius: 4,
-          controlHeight: 40,
-          colorBorder: '#ebedf0',
-          colorPrimary: '#217eff',
-          colorSuccess: '#00c483',
-        },
-      }}
-    >
+    <>
       <Helmet>
         <title>OceanBase With Flink | OceanBase Playground</title>
       </Helmet>
@@ -263,7 +301,7 @@ const Index: React.FC<IndexProps> = () => {
               ref={orderRef}
               style={{
                 background: '#FFFFFF',
-                border: '1px solid #EBEDF0',
+                border: `1px solid ${token.colorBorder}`,
                 boxShadow: '7px 10px 24px 0 rgba(37,48,70,0.08)',
                 borderRadius: 50,
                 padding: 10,
@@ -276,7 +314,7 @@ const Index: React.FC<IndexProps> = () => {
                   getStatus({
                     orderId: latestOrder?.orderId,
                   });
-                  setSql(`${sql}\n${sqlText}`);
+                  updateSql(sqlText);
                 }}
               />
             </div>
@@ -324,77 +362,21 @@ const Index: React.FC<IndexProps> = () => {
               >
                 {syncing && (
                   <>
-                    <TweenOne
+                    <TweenOne animation={animation} style={animationStyle} />
+                    {/* <TweenOne
                       animation={{
-                        path,
-                        repeat: 1000,
-                        duration: 1250,
-                        ease: 'linear',
-                      }}
-                      style={{
-                        margin: 0,
-                        position: 'absolute',
-                        top: 0,
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        // width: 20,
-                        // height: 20,
-                        // transform: 'translate(-10px, -10px)',
-                        // borderRadius: 4,
-                        // background: '#1890ff',
-                        width: 12,
-                        height: 12,
-                        transform: 'translate(-6px, -6px)',
-                        borderRadius: '50%',
-                        // border: '1px solid #adb2bd',
-                        background: token.colorPrimary,
-                      }}
-                    />
-                    <TweenOne
-                      animation={{
-                        path,
-                        repeat: 1000,
-                        duration: 1250,
-                        ease: 'linear',
+                        ...animation,
                         delay: 50,
                       }}
-                      style={{
-                        margin: 0,
-                        position: 'absolute',
-                        top: 0,
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        width: 12,
-                        height: 12,
-                        transform: 'translate(-6px, -6px)',
-                        borderRadius: '50%',
-                        background: token.colorPrimary,
-                      }}
+                      style={animationStyle}
                     />
                     <TweenOne
                       animation={{
-                        path,
-                        repeat: 1000,
-                        duration: 1250,
-                        ease: 'linear',
+                        ...animation,
                         delay: 100,
                       }}
-                      style={{
-                        margin: 0,
-                        position: 'absolute',
-                        top: 0,
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        width: 12,
-                        height: 12,
-                        transform: 'translate(-6px, -6px)',
-                        borderRadius: '50%',
-                        background: token.colorPrimary,
-                      }}
-                    />
+                      style={animationStyle}
+                    /> */}
                   </>
                 )}
                 <svg style={{ width: '100%', height: '100%' }}>
@@ -610,11 +592,25 @@ const Index: React.FC<IndexProps> = () => {
                           </Space>
                         </Space>
                         <div
+                          ref={latestRef}
                           style={{
                             maxHeight: '360px',
                             overflow: 'auto',
                           }}
                         >
+                          {isLatestStartScroll && (
+                            <div
+                              style={{
+                                position: 'absolute',
+                                left: 0,
+                                height: 60,
+                                width: '100%',
+                                backgroundImage:
+                                  'linear-gradient(360deg, #fefefe00 0%, #ffffff 100%)',
+                                zIndex: 10,
+                              }}
+                            />
+                          )}
                           {orderList.map((item) => {
                             const colorItem = COLOR_LIST.find(
                               (color) => color.value === item.carColor,
@@ -624,10 +620,14 @@ const Index: React.FC<IndexProps> = () => {
                                 key={item.key}
                                 style={{
                                   borderRadius: token.borderRadiusSM,
-                                  backgroundColor: item.isNew
-                                    ? token.colorSuccessBg
-                                    : token.colorBgContainer,
-                                  marginBottom: 24,
+                                  borderWidth: 1,
+                                  borderStyle: 'solid',
+                                  borderColor: item.isNew
+                                    ? token.colorSuccess
+                                    : 'transparent',
+                                  marginBottom: 16,
+                                  marginRight: 16,
+                                  padding: '4px 16px 4px 8px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   transition: 'all 0.3s ease',
@@ -690,17 +690,19 @@ const Index: React.FC<IndexProps> = () => {
                               </div>
                             );
                           })}
-                          <div
-                            style={{
-                              position: 'absolute',
-                              left: 0,
-                              bottom: 0,
-                              height: 60,
-                              width: '100%',
-                              backgroundImage:
-                                'linear-gradient(180deg, rgba(245,248,253,0.00) 0%, #F5F8FD 62%)',
-                            }}
-                          />
+                          {isLatestScroll && !isLatestTotalScroll && (
+                            <div
+                              style={{
+                                position: 'absolute',
+                                left: 0,
+                                bottom: 0,
+                                height: 60,
+                                width: '100%',
+                                backgroundImage:
+                                  'linear-gradient(180deg, #fefefe00 0%, #ffffff 100%)',
+                              }}
+                            />
+                          )}
                         </div>
                       </div>
                     </Col>
@@ -712,19 +714,28 @@ const Index: React.FC<IndexProps> = () => {
                   type="inner"
                   title={<h4>实时执行 SQL</h4>}
                   bodyStyle={{
+                    padding: '0px',
                     fontFamily: 'Menlo',
-                    height: 164,
-                    overflow: 'auto',
                   }}
                 >
-                  {sql || <Empty style={{ marginTop: 24 }} />}
+                  <div
+                    ref={sqlRef}
+                    style={{
+                      padding: '16px 24px',
+                      height: 164,
+                      overflow: 'auto',
+                      whiteSpace: 'pre',
+                    }}
+                  >
+                    {sql || <Empty style={{ marginTop: 24 }} />}
+                  </div>
                 </Card>
               </Col>
             </Row>
           </Col>
         </Row>
       </div>
-    </ConfigProvider>
+    </>
   );
 };
 

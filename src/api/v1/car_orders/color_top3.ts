@@ -21,7 +21,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
         order: [['count', 'DESC']],
         limit: 3,
         logging: (sql, timing) => {
-          sqlText = sql;
+          sqlText = sql?.replaceAll('Executed (default): ', '');
           latency = timing;
         },
       });

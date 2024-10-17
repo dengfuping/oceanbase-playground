@@ -8,7 +8,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
     if (req.method === 'GET') {
       const total = await model.OLAPCarOrder.count({
         logging: (sql, timing) => {
-          sqlText = sql;
+          sqlText = sql?.replaceAll('Executed (default): ', '');
           latency = timing;
         },
       });

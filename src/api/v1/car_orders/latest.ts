@@ -18,7 +18,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
           },
           order: [['orderId', 'DESC']],
           logging: (sql, timing) => {
-            sqlText = sql;
+            sqlText = sql?.replaceAll('Executed (default): ', '');
             latency = timing;
           },
         });
@@ -32,7 +32,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
           order: [['orderId', 'DESC']],
           limit: 10,
           logging: (sql, timing) => {
-            sqlText = sql;
+            sqlText = sql?.replaceAll('Executed (default): ', '');
             latency = timing;
           },
         });

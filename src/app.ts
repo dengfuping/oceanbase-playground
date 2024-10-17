@@ -10,13 +10,13 @@ export const request: RequestConfig = {
       if (error.response) {
         const { errorMessage } = error.response?.data || {};
         // request success, response failed (status code !== 2xx)
-        message.error(`Response error: ${errorMessage}`);
+        // message.error(`Response error: ${errorMessage}`);
       } else if (error.request) {
         // request success, none response
-        message.error('None response! Please retry.');
+        // message.error('None response! Please retry.');
       } else {
         // request error
-        message.error('Request error, please retry.');
+        // message.error('Request error, please retry.');
       }
     },
   },

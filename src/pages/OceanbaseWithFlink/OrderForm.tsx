@@ -1,6 +1,7 @@
 import {
   Button,
   Carousel,
+  ConfigProvider,
   Form,
   Input,
   message,
@@ -105,7 +106,13 @@ const OrderForm: React.FC<OrderFormProps> = ({
   );
 
   return (
-    <>
+    <ConfigProvider
+      theme={{
+        token: {
+          controlHeight: 40,
+        },
+      }}
+    >
       <Form
         form={form}
         layout="vertical"
@@ -125,13 +132,13 @@ const OrderForm: React.FC<OrderFormProps> = ({
         /> */}
         <Carousel
           ref={carouselRef}
-          arrows={true}
           draggable={true}
           afterChange={(current) => {
             const newCarColor = COLOR_LIST[current].value;
             setCurrentColor(newCarColor);
             form.setFieldValue('carColor', newCarColor);
           }}
+          style={{ marginBottom: 24 }}
         >
           {COLOR_LIST.map((item) => {
             return (
@@ -313,7 +320,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
           </Form.Item>
         </Form>
       )}
-    </>
+    </ConfigProvider>
   );
 };
 

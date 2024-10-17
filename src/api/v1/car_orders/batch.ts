@@ -8,7 +8,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
     if (req.method === 'POST') {
       const carOrders = await model.OLTPCarOrder.bulkCreate(req.body, {
         logging: (sql, timing) => {
-          sqlText = sql;
+          sqlText = sql?.replaceAll('Executed (default): ', '');
           latency = timing;
         },
       });

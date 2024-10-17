@@ -21,8 +21,18 @@ const Layout: React.FC<LayoutProps> = () => {
       locale={localeMap[locale] || enUS}
       theme={{
         token: {
-          colorSuccess: '#07C846',
-          colorSuccessBg: '#F6FFED',
+          colorText: 'rgba(0, 0, 0, 0.85)',
+          colorTextSecondary: 'rgba(0, 0, 0, 0.65)',
+          colorTextTertiary: 'rgba(0, 0, 0, 0.45)',
+          borderRadius: 4,
+          colorBorder: '#ebedf0',
+          colorPrimary: '#217eff',
+          colorSuccess: '#00c483',
+        },
+        components: {
+          Form: {
+            controlHeight: 40,
+          },
         },
       }}
     >

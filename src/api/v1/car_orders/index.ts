@@ -8,7 +8,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
     if (req.method === 'GET') {
       const carOrders = await model.OLAPCarOrder.findAll({
         logging: (sql, timing) => {
-          sqlText = sql;
+          sqlText = sql?.replaceAll('Executed (default): ', '');
           latency = timing;
         },
       });
@@ -20,7 +20,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
     } else if (req.method === 'POST') {
       const carOrder = await model.OLTPCarOrder.create(req.body, {
         logging: (sql, timing) => {
-          sqlText = sql;
+          sqlText = sql?.replaceAll('Executed (default): ', '');
           latency = timing;
         },
       });

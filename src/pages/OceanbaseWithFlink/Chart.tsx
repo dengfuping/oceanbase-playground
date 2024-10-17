@@ -52,6 +52,7 @@ const Chart: React.FC<ChartProps> = ({ data = [] }) => {
         },
         y: {
           tick: false,
+          tickCount: 4,
         },
       }}
     />

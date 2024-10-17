@@ -47,7 +47,7 @@ export const generateCustomerName = (locale: Locale) => {
 export const generateCarOrder = (locale: Locale) => {
   return {
     carPrice: sample([215000, 245900, 299900]),
-    carColor: sample(COLOR_LIST.map((item) => item.value)),
+    carColor: sample(COLOR_LIST.map((item) => item.value)) as string,
     saleRegion:
       locale === 'zh-CN'
         ? sample(['Beijing', 'Shanghai', 'Shenzhen', 'Hangzhou'])

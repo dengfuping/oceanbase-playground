@@ -62,7 +62,7 @@ export async function getColorTop3(options?: RequestOptions) {
 
 export async function getLatest(
   params: {
-    orderId?: string | Date;
+    orderId?: bigint;
   },
   options?: RequestOptions,
 ) {
@@ -79,7 +79,7 @@ export async function getLatest(
 
 export async function getStatus(
   params: {
-    orderId?: string | Date;
+    orderId?: bigint;
   },
   options?: RequestOptions,
 ) {
