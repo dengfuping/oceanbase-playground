@@ -308,15 +308,23 @@ const Index: React.FC<IndexProps> = () => {
                 height: '100%',
               }}
             >
-              <OrderForm
-                debug={debug}
-                onSuccess={(sqlText) => {
-                  getStatus({
-                    orderId: latestOrder?.orderId,
-                  });
-                  updateSql(sqlText);
+              <div
+                style={{
+                  background: '#F6F8FB',
+                  height: '100%',
+                  borderRadius: 50,
                 }}
-              />
+              >
+                <OrderForm
+                  debug={debug}
+                  onSuccess={(sqlText) => {
+                    getStatus({
+                      orderId: latestOrder?.orderId,
+                    });
+                    updateSql(sqlText);
+                  }}
+                />
+              </div>
             </div>
           </Col>
           <Col span={4}>
