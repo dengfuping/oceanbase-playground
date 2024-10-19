@@ -13,6 +13,7 @@ import type { CarouselRef } from '@oceanbase/design/es/carousel';
 import { useInterval, useRequest } from 'ahooks';
 import React, { useState, useRef } from 'react';
 import { range } from 'lodash';
+import Cookies from 'js-cookie';
 import * as CarOrderController from '@/services/CarOrderController';
 import * as TrackingController from '@/services/TrackingController';
 import { formatMessage, getLocale } from 'umi';
@@ -101,6 +102,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
         type: 126,
         eventType: 1,
         userId,
+        cookieId: Cookies.get('ofx_session_key'),
         resourcesName: '汽车下单及实时分析 Demo',
         resourcesId: getParentUrl(),
       });
