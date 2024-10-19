@@ -9,6 +9,9 @@ export default defineConfig({
     'https://g.alicdn.com/AWSC/et/1.76.3/et_f.js',
     'https://g.alicdn.com/AWSC/Bee/index.js',
   ],
+  analytics: {
+    ga_v2: 'G-S5LJS5FZPH',
+  },
   routes,
   npmClient: 'pnpm',
   devtool: 'cheap-module-source-map',
