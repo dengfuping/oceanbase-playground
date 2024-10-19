@@ -147,34 +147,7 @@ const Index: React.FC<IndexProps> = () => {
     };
   }, []);
 
-  const handleMessageFromParent = (event: MessageEvent) => {
-    if (
-      event.origin !== window.location.origin &&
-      ![
-        'https://oceanbaseweb-pre.oceanbase.com',
-        'https://www.oceanbase.com',
-      ].includes(event.origin)
-    ) {
-      console.warn('Received message from untrusted origin:', event.origin);
-      return;
-    }
-
-    console.log('Received message from parent:', event.data);
-    console.log(event.origin);
-
-    // 根据消息内容发送响应回父页面
-    if (event.data === 'car-demo') {
-      event.source?.postMessage('iframe-response', {
-        targetOrigin: event.origin,
-      });
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener('message', handleMessageFromParent);
-  }, []);
-
-  const sendMessage = (msg: any) => {
+  const sendMessage = (msg: string) => {
     window.parent.postMessage(msg, '*');
   };
 
@@ -183,7 +156,7 @@ const Index: React.FC<IndexProps> = () => {
     // 监听跨域请求的返回
     window.addEventListener(
       'message',
-      function (event) {
+      (event) => {
         console.log(event, event.data);
       },
       false,
@@ -191,7 +164,7 @@ const Index: React.FC<IndexProps> = () => {
     return () => {
       window.removeEventListener(
         'message',
-        function (event) {
+        (event) => {
           console.log(event, event.data);
         },
         false,
