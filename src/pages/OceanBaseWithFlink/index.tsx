@@ -9,7 +9,7 @@ import {
   theme,
   Typography,
 } from '@oceanbase/design';
-import { useInterval, useRequest, useScroll } from 'ahooks';
+import { useInterval, useRequest, useScroll, useSize } from 'ahooks';
 import React, { useEffect, useRef, useState } from 'react';
 import { GlobalOutlined, LoadingOutlined } from '@oceanbase/icons';
 import { sortByNumber } from '@oceanbase/util';
@@ -48,6 +48,8 @@ const Index: React.FC<IndexProps> = () => {
   const i18n = searchParams.get('i18n');
   const qrcode = searchParams.get('qrcode');
   const debug = searchParams.get('debug');
+  const bodySize = useSize(document.body);
+  const sm = (bodySize?.width || 0) <= 1280;
 
   // from https://www.oceanbase.com
   const userId = searchParams.get('userId');
@@ -136,7 +138,13 @@ const Index: React.FC<IndexProps> = () => {
   useEffect(() => {
     setTimeout(() => {
       renderPath();
-    }, 16);
+    }, 0);
+    window.addEventListener('resize', () => {
+      renderPath();
+    });
+    return () => {
+      window.removeEventListener('resize', () => {});
+    };
   }, []);
 
   const handleMessageFromParent = (event: MessageEvent) => {
@@ -322,7 +330,10 @@ const Index: React.FC<IndexProps> = () => {
         <title>OceanBase With Flink | OceanBase Playground</title>
       </Helmet>
       <div
-        style={{ padding: 48, position: 'relative' }}
+        style={{
+          padding: sm ? 24 : 48,
+          position: 'relative',
+        }}
         className={styles.container}
       >
         {i18n === 'true' && (
@@ -350,8 +361,8 @@ const Index: React.FC<IndexProps> = () => {
             </Space>
           </Dropdown>
         )}
-        <Row gutter={8}>
-          <Col span={6}>
+        <Row gutter={8} style={{ height: '100%' }}>
+          <Col span={6} style={{ height: '100%' }}>
             <div
               ref={orderRef}
               style={{
@@ -373,6 +384,7 @@ const Index: React.FC<IndexProps> = () => {
                 <OrderForm
                   debug={debug}
                   userId={userId}
+                  sm={sm}
                   onSuccess={(sqlText) => {
                     getStatus({
                       orderId: latestOrder?.orderId,
@@ -383,7 +395,7 @@ const Index: React.FC<IndexProps> = () => {
               </div>
             </div>
           </Col>
-          <Col span={4}>
+          <Col span={4} style={{ height: '100%' }}>
             {qrcode === 'true' && (
               <div
                 style={{
@@ -523,25 +535,27 @@ const Index: React.FC<IndexProps> = () => {
               </div>
             </div>
           </Col>
-          <Col span={14}>
-            <Row gutter={[0, 16]}>
-              <Col span={24}>
+          <Col span={14} style={{ height: '100%' }}>
+            <Row gutter={[0, 16]} style={{ height: '100%' }}>
+              <Col span={24} style={{ height: 'calc((100% - 16px) * 0.7)' }}>
                 <Card
                   ref={dashboardRef}
                   type="inner"
                   title={<h4>实时订单看板</h4>}
                   className={styles.orderViewCard}
-                  bodyStyle={{ padding: 0 }}
+                  style={{ height: '100%' }}
+                  bodyStyle={{ padding: 0, height: 'calc(100% - 48px)' }}
                 >
-                  <Row>
+                  <Row style={{ height: '100%' }}>
                     <Col
                       span={12}
                       style={{
+                        height: '100%',
                         borderRight: `1px solid ${token.colorBorderSecondary}`,
                       }}
                     >
-                      <Row>
-                        <Col span={24}>
+                      <Row style={{ height: '100%' }}>
+                        <Col span={24} style={{ height: 154 }}>
                           <div
                             style={{
                               borderBottom: `1px solid ${token.colorBorderSecondary}`,
@@ -588,8 +602,13 @@ const Index: React.FC<IndexProps> = () => {
                             </h1>
                           </div>
                         </Col>
-                        <Col span={24}>
-                          <div style={{ padding: '24px 12px 16px 24px' }}>
+                        <Col span={24} style={{ height: 'calc(100% - 154px)' }}>
+                          <div
+                            style={{
+                              height: '100%',
+                              padding: '24px 12px 16px 24px',
+                            }}
+                          >
                             <Space direction="vertical" size={4}>
                               <h5>
                                 {formatMessage({
@@ -624,8 +643,10 @@ const Index: React.FC<IndexProps> = () => {
                         </Col>
                       </Row>
                     </Col>
-                    <Col span={12}>
-                      <div style={{ padding: '24px 0px 0px 24px' }}>
+                    <Col span={12} style={{ height: '100%' }}>
+                      <div
+                        style={{ height: '100%', padding: '24px 0px 0px 24px' }}
+                      >
                         <Space direction="vertical" size={4}>
                           <h5>
                             {formatMessage({
@@ -658,7 +679,7 @@ const Index: React.FC<IndexProps> = () => {
                         <div
                           ref={latestRef}
                           style={{
-                            maxHeight: '360px',
+                            height: 'calc(100% - 68px)',
                             overflow: 'auto',
                           }}
                         >
@@ -737,7 +758,7 @@ const Index: React.FC<IndexProps> = () => {
                                       color: token.colorTextDescription,
                                     }}
                                   >
-                                    <Space>
+                                    <span style={{ marginRight: 8 }}>
                                       {formatMessage(
                                         {
                                           id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeCarColor',
@@ -747,8 +768,8 @@ const Index: React.FC<IndexProps> = () => {
                                           color: colorItem?.label,
                                         },
                                       )}
-                                      {formatTime(item.orderTime)}
-                                    </Space>
+                                    </span>
+                                    <span>{formatTime(item.orderTime)}</span>
                                   </Typography.Text>
                                 </div>
                               </div>
@@ -773,20 +794,22 @@ const Index: React.FC<IndexProps> = () => {
                   </Row>
                 </Card>
               </Col>
-              <Col span={24}>
+              <Col span={24} style={{ height: 'calc((100% - 16px) * 0.3)' }}>
                 <Card
                   type="inner"
                   title={<h4>实时执行 SQL</h4>}
+                  style={{ height: '100%' }}
                   bodyStyle={{
                     padding: '0px',
                     fontFamily: 'Menlo',
+                    height: 'calc(100% - 48px)',
                   }}
                 >
                   <div
                     ref={sqlRef}
                     style={{
                       padding: '16px 24px',
-                      height: 164,
+                      height: '100%',
                       overflow: 'auto',
                       whiteSpace: 'pre',
                     }}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Column } from '@ant-design/charts';
 import { COLOR_LIST } from './constant';
-import { isEqual, max, omit } from 'lodash';
+import { isEqual } from 'lodash';
 import { formatMessage } from 'umi';
 
 interface ChartProps {
@@ -9,10 +9,12 @@ interface ChartProps {
 }
 
 const Chart: React.FC<ChartProps> = ({ data = [] }) => {
-  const maxCount = max(data.map((item) => item.count)) || 0;
   return (
     <Column
-      height={188}
+      containerStyle={{
+        height: 'calc(100% - 48px)',
+        position: 'relative',
+      }}
       data={data.map((item) => {
         const colorItem = COLOR_LIST.find(
           (color) => color.value === item.carColor,

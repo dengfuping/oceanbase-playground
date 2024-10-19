@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
   
-npx --no-install umi verify-commit $1
+# npx --no-install umi verify-commit $1

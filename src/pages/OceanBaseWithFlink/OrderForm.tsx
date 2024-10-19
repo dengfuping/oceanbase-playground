@@ -24,12 +24,14 @@ import styles from './OrderForm.less';
 interface OrderFormProps extends React.HTMLProps<HTMLDivElement> {
   debug?: string | null;
   userId?: string | null;
+  sm?: boolean;
   onSuccess?: (sqlText?: string) => void;
 }
 
 const OrderForm: React.FC<OrderFormProps> = ({
   debug,
   userId,
+  sm,
   onSuccess,
   ...restProps
 }) => {
@@ -142,7 +144,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
         layout="vertical"
         style={{
           height: '100%',
-          padding: 24,
+          padding: sm ? 12 : 24,
           background: `url(https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*915qTIA-IikAAAAAAAAAAAAADmfOAQ/original) no-repeat`,
           backgroundSize: '100% auto',
           borderRadius: 46,
