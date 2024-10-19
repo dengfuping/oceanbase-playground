@@ -49,6 +49,9 @@ const Index: React.FC<IndexProps> = () => {
   const qrcode = searchParams.get('qrcode');
   const debug = searchParams.get('debug');
 
+  // from https://www.oceanbase.com
+  const userId = searchParams.get('userId');
+
   const localeList = [
     {
       value: 'zh-CN',
@@ -344,6 +347,7 @@ const Index: React.FC<IndexProps> = () => {
               >
                 <OrderForm
                   debug={debug}
+                  userId={userId}
                   onSuccess={(sqlText) => {
                     getStatus({
                       orderId: latestOrder?.orderId,

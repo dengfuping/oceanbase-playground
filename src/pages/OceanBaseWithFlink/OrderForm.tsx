@@ -14,6 +14,7 @@ import { useInterval, useRequest } from 'ahooks';
 import React, { useState, useRef } from 'react';
 import { range } from 'lodash';
 import * as CarOrderController from '@/services/CarOrderController';
+import * as TrackingController from '@/services/TrackingController';
 import { formatMessage, getLocale } from 'umi';
 import { COLOR_LIST } from './constant';
 import { generateCustomerName, generateCarOrder } from './util';
@@ -21,11 +22,13 @@ import styles from './OrderForm.less';
 
 interface OrderFormProps extends React.HTMLProps<HTMLDivElement> {
   debug?: string | null;
+  userId?: string | null;
   onSuccess?: (sqlText?: string) => void;
 }
 
 const OrderForm: React.FC<OrderFormProps> = ({
   debug,
+  userId,
   onSuccess,
   ...restProps
 }) => {
@@ -69,6 +72,15 @@ const OrderForm: React.FC<OrderFormProps> = ({
     },
   );
 
+  const getParentUrl = () => {
+    const isInIframe = parent !== window;
+    let parentUrl;
+    if (isInIframe) {
+      parentUrl = document.referrer;
+    }
+    return parentUrl;
+  };
+
   // 通过表单提交订单
   const handleSubmit = () => {
     form.validateFields().then((values) => {
@@ -83,6 +95,16 @@ const OrderForm: React.FC<OrderFormProps> = ({
         }),
       );
     });
+    // event tracking
+    if (userId) {
+      TrackingController.eventTracking({
+        type: 126,
+        eventType: 1,
+        userId,
+        resourcesName: '汽车下单及实时分析 Demo',
+        resourcesId: getParentUrl(),
+      });
+    }
   };
 
   // 模拟单人连续下单
