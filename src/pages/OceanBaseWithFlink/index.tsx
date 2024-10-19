@@ -324,6 +324,8 @@ const Index: React.FC<IndexProps> = () => {
     background: token.colorPrimary,
   };
 
+  const containerPadding = sm ? 24 : 48;
+
   return (
     <>
       <Helmet>
@@ -331,7 +333,10 @@ const Index: React.FC<IndexProps> = () => {
       </Helmet>
       <div
         style={{
-          padding: sm ? 24 : 48,
+          paddingLeft: containerPadding,
+          paddingRight: containerPadding,
+          paddingBottom: containerPadding,
+          paddingTop: i18n === 'true' ? 48 : containerPadding,
           position: 'relative',
         }}
         className={styles.container}
@@ -383,6 +388,7 @@ const Index: React.FC<IndexProps> = () => {
               >
                 <OrderForm
                   debug={debug}
+                  qrcode={qrcode}
                   userId={userId}
                   sm={sm}
                   onSuccess={(sqlText) => {
@@ -396,37 +402,6 @@ const Index: React.FC<IndexProps> = () => {
             </div>
           </Col>
           <Col span={4} style={{ height: '100%' }}>
-            {qrcode === 'true' && (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <img
-                  src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*XNLHS4D8osUAAAAAAAAAAAAADmfOAQ/original"
-                  style={{
-                    width: '60px',
-                    marginRight: 20,
-                  }}
-                />
-                <div style={{ fontSize: 16, fontFamily: 'Alibaba PuHuiTi' }}>
-                  <div style={{ marginBottom: 8 }}>
-                    {formatMessage({
-                      id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.ScanQrCodeToTry',
-                      defaultMessage: '快来扫码试试吧！',
-                    })}
-                  </div>
-                  <div>
-                    {formatMessage({
-                      id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SupportMultiplePeopleOrder',
-                      defaultMessage: '支持多人同时下单',
-                    })}
-                  </div>
-                </div>
-              </div>
-            )}
             {path && (
               <div
                 style={{

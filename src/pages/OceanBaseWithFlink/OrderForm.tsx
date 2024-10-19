@@ -23,6 +23,7 @@ import styles from './OrderForm.less';
 
 interface OrderFormProps extends React.HTMLProps<HTMLDivElement> {
   debug?: string | null;
+  qrcode?: string | null;
   userId?: string | null;
   sm?: boolean;
   onSuccess?: (sqlText?: string) => void;
@@ -30,6 +31,7 @@ interface OrderFormProps extends React.HTMLProps<HTMLDivElement> {
 
 const OrderForm: React.FC<OrderFormProps> = ({
   debug,
+  qrcode,
   userId,
   sm,
   onSuccess,
@@ -69,8 +71,9 @@ const OrderForm: React.FC<OrderFormProps> = ({
     CarOrderController.batchCreateCarOrder,
     {
       manual: true,
-      onSuccess: () => {
-        onSuccess?.();
+      onSuccess: (res) => {
+        const batchSqlText = res.sqlText;
+        onSuccess?.(batchSqlText);
       },
     },
   );
@@ -312,40 +315,68 @@ const OrderForm: React.FC<OrderFormProps> = ({
             })}
           </Button>
         </Form.Item>
+        {qrcode === 'true' && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <img
+              src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*XNLHS4D8osUAAAAAAAAAAAAADmfOAQ/original"
+              style={{
+                width: '60px',
+                marginRight: 20,
+              }}
+            />
+            <div style={{ fontSize: 16, fontFamily: 'Alibaba PuHuiTi' }}>
+              <div style={{ marginBottom: 8 }}>
+                {formatMessage({
+                  id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.ScanQrCodeToTry',
+                  defaultMessage: '快来扫码试试吧！',
+                })}
+              </div>
+              <div>
+                {formatMessage({
+                  id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SupportMultiplePeopleOrder',
+                  defaultMessage: '支持多人同时下单',
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+        {debug === 'true' && (
+          <div style={{ marginTop: 16, textAlign: 'center' }}>
+            <div style={{ marginBottom: 8 }}>
+              <span>{'模拟单人连续下单：'}</span>
+              <Switch
+                size="small"
+                value={createPolling}
+                onChange={(value) => {
+                  setCreatePolling(value);
+                  if (value) {
+                    setBatchCreatePolling(false);
+                  }
+                }}
+              />
+            </div>
+            <div>
+              <span>{'模拟多人同时下单：'}</span>
+              <Switch
+                size="small"
+                value={batchCreatePolling}
+                onChange={(value) => {
+                  setBatchCreatePolling(value);
+                  if (value) {
+                    setCreatePolling(false);
+                  }
+                }}
+              />
+            </div>
+          </div>
+        )}
       </Form>
-      {debug === 'true' && (
-        <Form
-          layout="inline"
-          style={{
-            marginTop: 60,
-          }}
-        >
-          <Form.Item label="模拟单人连续下单" required={true}>
-            <Switch
-              size="small"
-              value={createPolling}
-              onChange={(value) => {
-                setCreatePolling(value);
-                if (value) {
-                  setBatchCreatePolling(false);
-                }
-              }}
-            />
-          </Form.Item>
-          <Form.Item label="模拟多人同时下单" required={true}>
-            <Switch
-              size="small"
-              value={batchCreatePolling}
-              onChange={(value) => {
-                setBatchCreatePolling(value);
-                if (value) {
-                  setCreatePolling(false);
-                }
-              }}
-            />
-          </Form.Item>
-        </Form>
-      )}
     </ConfigProvider>
   );
 };
