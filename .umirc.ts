@@ -9,9 +9,6 @@ export default defineConfig({
     'https://g.alicdn.com/AWSC/et/1.76.3/et_f.js',
     'https://g.alicdn.com/AWSC/Bee/index.js',
   ],
-  analytics: {
-    ga_v2: 'G-S5LJS5FZPH',
-  },
   routes,
   npmClient: 'pnpm',
   devtool: 'cheap-module-source-map',
@@ -19,7 +16,11 @@ export default defineConfig({
   apiRoute: {
     platform: 'vercel',
   },
-  plugins: ['@umijs/plugins/dist/request', '@umijs/plugins/dist/locale'],
+  plugins: [
+    '@umijs/plugins/dist/request',
+    '@umijs/plugins/dist/locale',
+    '@umijs/plugins/dist/analytics',
+  ],
   request: {
     dataField: '',
   },
@@ -28,6 +29,9 @@ export default defineConfig({
     baseNavigator: true,
     default: 'en-US',
     baseSeparator: '-',
+  },
+  analytics: {
+    ga_v2: 'G-S5LJS5FZPH',
   },
   esbuildMinifyIIFE: true,
   metas: [
