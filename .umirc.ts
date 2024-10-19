@@ -30,4 +30,33 @@ export default defineConfig({
     baseSeparator: '-',
   },
   esbuildMinifyIIFE: true,
+  metas: [
+    {
+      property: 'og:site_name',
+      content: 'OceanBase Playground',
+    },
+    {
+      'data-rh': 'keywords',
+      property: 'og:image',
+      content:
+        'https://mdn.alipayobjects.com/huamei_n8rchn/afts/img/A*d_ZTR7sdVzAAAAAAAAAAAAAADvSFAQ/original',
+    },
+    {
+      property: 'og:description',
+      content: 'OceanBase playground and demo',
+    },
+    {
+      name: 'keywords',
+      content:
+        'OceanBase,oceanbase,OceanBase Playground,oceanbase playground,playground,demo,olap,flink,car order,汽车下单,实时分析,流处理,流式处理',
+    },
+    {
+      name: 'apple-mobile-web-app-capable',
+      content: 'yes',
+    },
+    {
+      name: 'apple-mobile-web-app-status-bar-style',
+      content: 'black-translucent',
+    },
+  ],
 });
