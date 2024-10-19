@@ -23,6 +23,7 @@ export async function eventTracking(payload: EventTrackingPayload) {
       method: 'POST',
       contentType: 'applicationJson',
       data: payload,
+      withCredentials: true,
     },
   );
 }
