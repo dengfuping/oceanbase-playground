@@ -166,6 +166,31 @@ const Index: React.FC<IndexProps> = () => {
     window.addEventListener('message', handleMessageFromParent);
   }, []);
 
+  const sendMessage = (msg: any) => {
+    window.parent.postMessage(msg, '*');
+  };
+
+  React.useEffect(() => {
+    sendMessage('iframe-response');
+    // 监听跨域请求的返回
+    window.addEventListener(
+      'message',
+      function (event) {
+        console.log(event, event.data);
+      },
+      false,
+    );
+    return () => {
+      window.removeEventListener(
+        'message',
+        function (event) {
+          console.log(event, event.data);
+        },
+        false,
+      );
+    };
+  }, []);
+
   const {
     data: totalData,
     run: getTotal,
