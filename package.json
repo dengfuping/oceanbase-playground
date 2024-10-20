@@ -3,7 +3,7 @@
   "repository": "git@github.com:dengfuping/oceanbase-playground.git",
   "author": "dengfuping <dengfuping_private@163.com>",
   "scripts": {
-    "build": "umi build && npm run schedule",
+    "build": "umi build",
     "dev": "umi dev",
     "postinstall": "umi setup",
     "prepare": "husky install",
