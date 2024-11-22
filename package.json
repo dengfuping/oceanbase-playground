@@ -6,6 +6,7 @@
     "build": "umi build",
     "dev": "umi dev",
     "postinstall": "umi setup",
+    "pm2:schedule": "pm2 start npm --name 'oceanbase-playground-schedule' -- run schedule",
     "prepare": "husky install",
     "schedule": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' -r dotenv/config sequelize/schedule.ts",
     "seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' -r dotenv/config sequelize/seed.ts",
