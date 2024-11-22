@@ -49,7 +49,7 @@ const Index: React.FC<IndexProps> = () => {
   const qrcode = searchParams.get('qrcode');
   const debug = searchParams.get('debug');
   const bodySize = useSize(document.body);
-  const sm = (bodySize?.width || 0) <= 1280;
+  const sm = (bodySize?.width || 0) < 1280;
 
   // from https://www.oceanbase.com
   const userId = searchParams.get('userId');
@@ -340,7 +340,7 @@ const Index: React.FC<IndexProps> = () => {
           </Dropdown>
         )}
         <Row gutter={8} style={{ height: '100%' }}>
-          <Col span={6} style={{ height: '100%' }}>
+          <Col span={sm ? 7 : 6} style={{ height: '100%' }}>
             <div
               ref={orderRef}
               style={{
@@ -483,7 +483,7 @@ const Index: React.FC<IndexProps> = () => {
               </div>
             </div>
           </Col>
-          <Col span={14} style={{ height: '100%' }}>
+          <Col span={sm ? 13 : 14} style={{ height: '100%' }}>
             <Row gutter={[0, 16]} style={{ height: '100%' }}>
               <Col span={24} style={{ height: 'calc((100% - 16px) * 0.7)' }}>
                 <Card
@@ -593,7 +593,10 @@ const Index: React.FC<IndexProps> = () => {
                     </Col>
                     <Col span={12} style={{ height: '100%' }}>
                       <div
-                        style={{ height: '100%', padding: '24px 0px 0px 24px' }}
+                        style={{
+                          height: '100%',
+                          padding: '24px 0px 0px 24px',
+                        }}
                       >
                         <Space direction="vertical" size={4}>
                           <h5>
@@ -658,9 +661,7 @@ const Index: React.FC<IndexProps> = () => {
                                   borderColor: item.isNew
                                     ? token.colorSuccess
                                     : 'transparent',
-                                  marginBottom: 16,
-                                  marginRight: 16,
-                                  padding: '4px 16px 4px 8px',
+                                  marginBottom: 24,
                                   display: 'flex',
                                   alignItems: 'center',
                                   transition: 'all 0.3s ease',
