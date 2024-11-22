@@ -6,7 +6,7 @@ const BasicLayout: React.FC<any> = () => {
   return (
     <div
       style={{
-        minWidth: 1080,
+        minWidth: 960,
         height: '100%',
         display: 'flex',
         justifyContent: 'center',
