@@ -51,7 +51,7 @@ const Index: React.FC<IndexProps> = () => {
   const bodySize = useSize(document.body);
   const sm = (bodySize?.width || 0) < 1280;
 
-  // from https://www.oceanbase.com
+  // from https://www.oceanbase.com/demo/real-time-order-dashboard
   const userId = searchParams.get('userId');
 
   const localeList = [
@@ -661,7 +661,8 @@ const Index: React.FC<IndexProps> = () => {
                                   borderColor: item.isNew
                                     ? token.colorSuccess
                                     : 'transparent',
-                                  marginBottom: 24,
+                                  marginBottom: 16,
+                                  padding: '4px 0px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   transition: 'all 0.3s ease',
