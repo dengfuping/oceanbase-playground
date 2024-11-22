@@ -138,7 +138,7 @@ const Index: React.FC<IndexProps> = () => {
   useEffect(() => {
     setTimeout(() => {
       renderPath();
-    }, 0);
+    }, 16);
     window.addEventListener('resize', () => {
       renderPath();
     });
