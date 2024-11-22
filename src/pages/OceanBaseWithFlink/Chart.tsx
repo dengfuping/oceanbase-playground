@@ -12,7 +12,9 @@ const Chart: React.FC<ChartProps> = ({ data = [] }) => {
   return (
     <Column
       containerStyle={{
-        height: 'calc(100% - 48px)',
+        height: 'calc(100% - 52px)',
+        marginLeft: -24,
+        marginRight: -12,
         position: 'relative',
       }}
       data={data.map((item) => {
