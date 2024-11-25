@@ -30,6 +30,7 @@ const Chart: React.FC<ChartProps> = ({ loading, data = [] }) => {
         marginRight: -12,
         position: 'relative',
       }}
+      paddingBottom={16}
       data={data.map((item) => {
         const colorItem = COLOR_LIST.find(
           (color) => color.value === item.carColor,

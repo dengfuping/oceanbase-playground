@@ -9,7 +9,8 @@ const getTime = () => {
 
 const job = new CronJob(
   // cronTime
-  '0 0 0 * * *',
+  // insert 1000 items at 00:00:01 every day
+  '1 0 0 * * *',
   // onTick
   async () => {
     console.log(`${getTime()} [info] Schedule task started.`);
