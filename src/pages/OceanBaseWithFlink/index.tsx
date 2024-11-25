@@ -586,7 +586,10 @@ const Index: React.FC<IndexProps> = () => {
                                 />
                               </Space>
                             </Space>
-                            <Chart data={colorTop3} />
+                            <Chart
+                              loading={colorTop3Loading}
+                              data={colorTop3}
+                            />
                           </div>
                         </Col>
                       </Row>

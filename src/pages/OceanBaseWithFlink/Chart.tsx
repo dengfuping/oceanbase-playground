@@ -3,13 +3,26 @@ import { Column } from '@ant-design/charts';
 import { COLOR_LIST } from './constant';
 import { isEqual } from 'lodash';
 import { formatMessage } from 'umi';
+import { Empty } from '@oceanbase/design';
 
 interface ChartProps {
+  loading?: boolean;
   data?: { carColor: string; count: number }[];
 }
 
-const Chart: React.FC<ChartProps> = ({ data = [] }) => {
-  return (
+const Chart: React.FC<ChartProps> = ({ loading, data = [] }) => {
+  return !loading && data.length === 0 ? (
+    <div
+      style={{
+        height: 'calc(100% - 52px)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Empty />
+    </div>
+  ) : (
     <Column
       containerStyle={{
         height: 'calc(100% - 52px)',
