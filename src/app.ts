@@ -8,9 +8,12 @@ export const request: RequestConfig = {
         throw error;
       }
       if (error.response) {
-        const { errorMessage } = error.response?.data || {};
+        const { errorMessage, errorCode } = error.response?.data || {};
         // request success, response failed (status code !== 2xx)
-        // message.error(`Response error: ${errorMessage}`);
+        // only message BizError for now
+        if (errorCode === 'BizError' && errorMessage) {
+          message.error(errorMessage);
+        }
       } else if (error.request) {
         // request success, none response
         // message.error('None response! Please retry.');

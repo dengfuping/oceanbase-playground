@@ -279,6 +279,35 @@ const OrderForm: React.FC<OrderFormProps> = ({
                 defaultMessage: '请输入用户名',
               }),
             },
+            {
+              pattern: /[a-zA-Z0-9\u4e00-\u9fa5_]$/,
+              message: formatMessage({
+                id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.OnlySupportSpecificCharacter',
+                defaultMessage: '仅支持中英文、数字和下划线',
+              }),
+            },
+            {
+              validator: (rule, value: string, callback) => {
+                if (value) {
+                  if (value.match(/[\u4e00-\u9fa5]/g) && value.length > 4) {
+                    callback(
+                      formatMessage({
+                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.ChineseNameCannotOverFourCharacters',
+                        defaultMessage: '中文名不能超过 4 个字符',
+                      }),
+                    );
+                  } else if (value.length > 10) {
+                    callback(
+                      formatMessage({
+                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.UserNameCannotOverTenCharacters',
+                        defaultMessage: '用户名不能超过 10 个字符',
+                      }),
+                    );
+                  }
+                }
+                callback();
+              },
+            },
           ]}
         >
           <Input.Search

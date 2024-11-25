@@ -14,6 +14,7 @@
     "start": "npm run dev"
   },
   "dependencies": {
+    "@alicloud/pop-core": "^1.7.13",
     "@ant-design/charts": "^2.0.3",
     "@oceanbase/design": "^0.3.0",
     "@oceanbase/icons": "^0.3.0",
