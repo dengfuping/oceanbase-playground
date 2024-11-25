@@ -47,6 +47,9 @@ dependencies:
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
+  mac-scrollbar-better:
+    specifier: ^0.13.9
+    version: 0.13.9
   moment:
     specifier: ^2.29.4
     version: 2.30.1
@@ -10222,6 +10225,10 @@ packages:
   /luxon@3.4.4:
     resolution: {integrity: sha512-zobTr7akeGHnv7eBOXcRgMeCP6+uyYsczwmeRCauvpvaAltgNyTbLH/+VaEAPUeWBT+1GuNmz4wC/6jtQzbbVA==}
     engines: {node: '>=12'}
+    dev: false
+
+  /mac-scrollbar-better@0.13.9:
+    resolution: {integrity: sha512-ayvs1+a0Re0fz8S9qYsoEVa9Bja1XOq2dt6XpiUlhHRmmFoZsywLLOd4CmN7p4YAHGVuON0kLXg7vgMwtaVztQ==}
     dev: false
 
   /make-dir@2.1.0:

@@ -28,6 +28,7 @@
     "full-name-generator": "^0.1.4",
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
+    "mac-scrollbar-better": "^0.13.9",
     "moment": "^2.29.4",
     "mysql2": "^3.9.4",
     "pg-hstore": "^2.3.4",

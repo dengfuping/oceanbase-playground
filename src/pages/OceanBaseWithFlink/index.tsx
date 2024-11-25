@@ -33,6 +33,8 @@ import 'animate.css';
 import TweenOne from 'rc-tween-one';
 import PathPlugin from 'rc-tween-one/lib/plugin/PathPlugin';
 import type { IAnimObject } from 'rc-tween-one/typings/AnimObject';
+import { MacScrollbar } from 'mac-scrollbar-better';
+import 'mac-scrollbar-better/dist/mac-scrollbar-better.css';
 import './global.less';
 import styles from './index.less';
 
@@ -630,11 +632,10 @@ const Index: React.FC<IndexProps> = () => {
                             />
                           </Space>
                         </Space>
-                        <div
+                        <MacScrollbar
                           ref={latestRef}
                           style={{
                             height: 'calc(100% - 68px)',
-                            overflow: 'auto',
                           }}
                         >
                           {isLatestStartScroll && (
@@ -741,7 +742,7 @@ const Index: React.FC<IndexProps> = () => {
                               }}
                             />
                           )}
-                        </div>
+                        </MacScrollbar>
                       </div>
                     </Col>
                   </Row>
@@ -758,7 +759,7 @@ const Index: React.FC<IndexProps> = () => {
                     height: 'calc(100% - 48px)',
                   }}
                 >
-                  <div
+                  <MacScrollbar
                     ref={sqlRef}
                     style={{
                       padding: '16px 24px',
@@ -768,7 +769,7 @@ const Index: React.FC<IndexProps> = () => {
                     }}
                   >
                     {sql || <Empty style={{ marginTop: 24 }} />}
-                  </div>
+                  </MacScrollbar>
                 </Card>
               </Col>
             </Row>
