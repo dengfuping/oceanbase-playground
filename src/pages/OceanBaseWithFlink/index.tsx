@@ -29,6 +29,7 @@ import {
   useSearchParams,
 } from 'umi';
 import moment from 'moment';
+import { detect } from 'detect-browser';
 import 'animate.css';
 import TweenOne from 'rc-tween-one';
 import PathPlugin from 'rc-tween-one/lib/plugin/PathPlugin';
@@ -39,6 +40,8 @@ import './global.less';
 import styles from './index.less';
 
 TweenOne.plugins.push(PathPlugin);
+
+const browserInfo = detect();
 
 interface IndexProps {}
 
@@ -767,6 +770,11 @@ const Index: React.FC<IndexProps> = () => {
                       overflow: 'auto',
                       whiteSpace: 'pre',
                     }}
+                    className={
+                      browserInfo?.os?.includes('Windows')
+                        ? styles.sqlScrollWindows
+                        : undefined
+                    }
                   >
                     {sql || <Empty style={{ marginTop: 24 }} />}
                   </MacScrollbar>
