@@ -20,6 +20,7 @@ const job = new CronJob(
       const mockOrders = range(0, 1000).map(() => {
         return {
           ...generateCarOrder('zh-CN'),
+          customerName: 'OceanBase',
           requestId,
         };
       });
