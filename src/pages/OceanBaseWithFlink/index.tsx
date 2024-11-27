@@ -216,11 +216,7 @@ const Index: React.FC<IndexProps> = () => {
     loading: latestLoading,
     run: getLatest,
   } = useRequest(CarOrderController.getLatest, {
-    defaultParams: [
-      {
-        orderId: latestOrder.orderId,
-      },
-    ],
+    defaultParams: [{}],
     onSuccess: (res) => {
       const latest = res.data || [];
       if (latest.length > 0) {
@@ -256,9 +252,7 @@ const Index: React.FC<IndexProps> = () => {
   const getAllData = () => {
     getTotal();
     getColorTop3();
-    getLatest({
-      orderId: latestOrder.orderId,
-    });
+    getLatest();
   };
 
   // 获取同步状态和是否应该刷新
@@ -719,10 +713,11 @@ const Index: React.FC<IndexProps> = () => {
                                       {formatMessage(
                                         {
                                           id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeCarColor',
-                                          defaultMessage: '车辆颜色：{color}',
+                                          defaultMessage: '{color} {count} 辆',
                                         },
                                         {
                                           color: colorItem?.label,
+                                          count: item.count,
                                         },
                                       )}
                                     </span>

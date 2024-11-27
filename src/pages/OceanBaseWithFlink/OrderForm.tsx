@@ -17,6 +17,7 @@ import Cookies from 'js-cookie';
 import * as CarOrderController from '@/services/CarOrderController';
 import * as TrackingController from '@/services/TrackingController';
 import { formatMessage, getLocale } from 'umi';
+import { v4 as uuidv4 } from 'uuid';
 import { COLOR_LIST } from './constant';
 import { generateCustomerName, generateCarOrder } from './util';
 import styles from './OrderForm.less';
@@ -91,12 +92,14 @@ const OrderForm: React.FC<OrderFormProps> = ({
   const handleSubmit = () => {
     form.validateFields().then((values) => {
       const { count, carColor, customerName } = values;
+      const requestId = uuidv4();
       batchCreateCarOrder(
         range(0, count).map(() => {
           return {
             ...generateCarOrder(locale),
             carColor,
             customerName,
+            requestId,
           };
         }),
       );
@@ -117,7 +120,12 @@ const OrderForm: React.FC<OrderFormProps> = ({
   // 模拟单人连续下单
   useInterval(
     () => {
-      batchCreateCarOrderForPolling([generateCarOrder(locale)]);
+      batchCreateCarOrderForPolling([
+        {
+          ...generateCarOrder(locale),
+          requestId: uuidv4(),
+        },
+      ]);
     },
     createPolling ? 1000 : undefined,
   );
@@ -125,9 +133,13 @@ const OrderForm: React.FC<OrderFormProps> = ({
   // 模拟多人同时下单
   useInterval(
     () => {
+      const requestId = uuidv4();
       batchCreateCarOrderForPolling(
         range(0, 10).map(() => {
-          return generateCarOrder(locale);
+          return {
+            ...generateCarOrder(locale),
+            requestId,
+          };
         }),
       );
     },

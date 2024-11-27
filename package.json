@@ -39,7 +39,8 @@
     "reflect-metadata": "^0.2.2",
     "sequelize": "^6.37.3",
     "typeorm": "^0.3.20",
-    "umi": "^4.0.72"
+    "umi": "^4.0.72",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.0",

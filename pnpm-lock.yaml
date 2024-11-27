@@ -83,6 +83,9 @@ dependencies:
   umi:
     specifier: ^4.0.72
     version: 4.3.22(@babel/core@7.25.2)(@types/node@20.16.5)(@types/react@18.3.8)(eslint@8.57.1)(prettier@2.8.8)(react-dom@16.14.0)(react@16.14.0)(stylelint@14.16.1)(typescript@4.9.5)(webpack@5.94.0)
+  uuid:
+    specifier: ^11.0.3
+    version: 11.0.3
 
 devDependencies:
   '@types/lodash':
@@ -15082,6 +15085,11 @@ packages:
   /utils-merge@1.0.1:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
+    dev: false
+
+  /uuid@11.0.3:
+    resolution: {integrity: sha512-d0z310fCWv5dJwnX1Y/MncBAqGMKEzlBb1AOf7z9K8ALnd0utBX/msg/fA0+sbyN1ihbMsLhrBlnl1ak7Wa0rg==}
+    hasBin: true
     dev: false
 
   /uuid@8.3.2:

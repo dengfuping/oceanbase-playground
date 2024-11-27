@@ -1,5 +1,6 @@
 import { CronJob } from 'cron';
 import { range } from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 import model from '../src/api/model';
 import { generateCarOrder } from '../src/pages/OceanBaseWithFlink/util';
 
@@ -15,8 +16,12 @@ const job = new CronJob(
   async () => {
     console.log(`${getTime()} [info] Schedule task started.`);
     try {
+      const requestId = uuidv4();
       const mockOrders = range(0, 1000).map(() => {
-        return generateCarOrder('zh-CN');
+        return {
+          ...generateCarOrder('zh-CN'),
+          requestId,
+        };
       });
       const carOrders = await model.OLTPCarOrder.bulkCreate(mockOrders, {});
       console.log(

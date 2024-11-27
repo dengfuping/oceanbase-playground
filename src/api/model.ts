@@ -52,6 +52,11 @@ const option = {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  requestId: {
+    field: 'request_id',
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 };
 
 const OLTPCarOrder = oltp.define('tp_car_orders', option, {

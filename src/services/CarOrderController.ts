@@ -60,19 +60,13 @@ export async function getColorTop3(options?: RequestOptions) {
   });
 }
 
-export async function getLatest(
-  params: {
-    orderId?: bigint;
-  },
-  options?: RequestOptions,
-) {
+export async function getLatest(options?: RequestOptions) {
   return request<{
     data?: CarOrder[];
     sqlText?: string;
     latency?: number;
   }>(`/api/v1/car_orders/latest`, {
     method: 'GET',
-    params,
     ...(options || {}),
   });
 }
