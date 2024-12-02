@@ -721,7 +721,17 @@ const Index: React.FC<IndexProps> = () => {
                                         },
                                       )}
                                     </span>
-                                    <span>{formatTime(item.orderTime)}</span>
+                                    <span>
+                                      {moment(item.orderTime).isSame(
+                                        moment(),
+                                        'day',
+                                      )
+                                        ? formatTime(item.orderTime)
+                                        : // Display month and day for not today
+                                          moment(item.orderTime).format(
+                                            'MM/DD HH:mm:ss',
+                                          )}
+                                    </span>
                                   </Typography.Text>
                                 </div>
                               </div>
