@@ -17,10 +17,12 @@ const job = new CronJob(
     console.log(`${getTime()} [info] Schedule task started.`);
     try {
       const requestId = uuidv4();
+      const carColor = generateCarOrder('zh-CN').carColor;
       const mockOrders = range(0, 1000).map(() => {
         return {
           ...generateCarOrder('zh-CN'),
           customerName: 'OceanBase',
+          carColor,
           requestId,
         };
       });
