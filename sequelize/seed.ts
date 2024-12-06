@@ -1,4 +1,5 @@
 import { range } from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 import model from '../src/api/model';
 import { generateCarOrder } from '../src/pages/OceanBaseWithFlink/util';
 
@@ -9,16 +10,18 @@ const batchInsertCount = totalInsertSize / batchInsertSize;
 async function batchInsert(i: number) {
   let currentTiming: number | undefined;
   try {
-    await model.OLTPCarOrder.bulkCreate(
-      range(0, batchInsertSize).map(() => {
-        return generateCarOrder('en-US');
-      }),
-      {
-        logging: (sql, timing) => {
-          currentTiming = timing;
-        },
+    const requestId = uuidv4();
+    const mockOrders = range(0, batchInsertSize).map(() => {
+      return {
+        ...generateCarOrder('zh-CN'),
+        requestId,
+      };
+    });
+    await model.OLTPCarOrder.bulkCreate(mockOrders, {
+      logging: (sql, timing) => {
+        currentTiming = timing;
       },
-    );
+    });
     const total = await model.OLTPCarOrder.count();
     console.log(`[info] Batch insert count: ${i}`);
     console.log(
