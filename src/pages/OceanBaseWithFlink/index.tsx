@@ -311,7 +311,9 @@ const Index: React.FC<IndexProps> = () => {
           paddingTop: i18n === 'true' ? 48 : containerPadding,
           position: 'relative',
         }}
-        className={styles.container}
+        className={`${styles.container} ${
+          typeof userId === 'string' ? styles.nestedContainer : ''
+        }`}
       >
         {i18n === 'true' && (
           <Dropdown
