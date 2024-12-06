@@ -62,7 +62,7 @@ const Chart: React.FC<ChartProps> = ({ loading, data = [] }) => {
         fill: (datum) => {
           return datum?.color;
         },
-        maxWidth: 64,
+        maxWidth: 44,
         radiusTopLeft: 2,
         radiusTopRight: 2,
       }}
