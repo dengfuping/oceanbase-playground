@@ -63,6 +63,8 @@ const Chart: React.FC<ChartProps> = ({ loading, data = [] }) => {
           return datum?.color;
         },
         maxWidth: 64,
+        radiusTopLeft: 2,
+        radiusTopRight: 2,
       }}
       axis={{
         x: {
