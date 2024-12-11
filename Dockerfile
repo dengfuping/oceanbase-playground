@@ -11,6 +11,7 @@ FROM scratch AS output
 
 COPY --from=builder /app/dist /
 
+RUN mkdir -p /functions
 RUN mkdir -p /functions/__umi.func
 COPY --from=builder /app/api /functions/__umi.func/api
 COPY --from=builder /app/node_modules /functions/__umi.func/node_modules
