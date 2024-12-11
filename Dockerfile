@@ -7,15 +7,17 @@ RUN npm install -g pnpm
 RUN pnpm install
 RUN pnpm run build
 
-COPY /app/dist /app/output
+FROM scratch AS output
 
-RUN /app/mkdir -p /app/output/functions/__umi.func
-COPY /app/api /app/output/functions/__umi.func/api
-COPY /app/node_modules /app/output/functions/__umi.func/node_modules
-RUN mv /app/zbpack.json /app/output/config.json
+COPY --from=builder /app/dist /
+
+RUN mkdir -p /functions/__umi.func
+COPY --from=builder /app/api /functions/__umi.func/api
+COPY --from=builder /app/node_modules /functions/__umi.func/node_modules
+COPY --from=builder /app/config.json config.json
 
 FROM zeabur/caddy-static
 
-COPY --from=builder /app/output /usr/share/caddy
+COPY --from=output / /usr/share/caddy
  
 EXPOSE 8080
