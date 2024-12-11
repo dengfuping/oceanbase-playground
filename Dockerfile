@@ -10,9 +10,5 @@ RUN pnpm run build
 FROM nginx:alpine
 
 COPY --from=builder /app/dist /usr/share/nginx/html
-
-ENV \
-    PORT=8080 \
-    HOST=0.0.0.0
  
 EXPOSE 8000
