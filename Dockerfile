@@ -9,7 +9,7 @@ RUN pnpm install
 CMD ["pnpm", "start"]
 
 ENV \
-    PORT=8000 \
+    PORT=8080 \
     HOST=0.0.0.0
  
 EXPOSE 8080
