@@ -7,10 +7,15 @@ RUN npm install -g pnpm
 RUN pnpm install
 RUN pnpm run build
 
-FROM nginx:alpine
+COPY dist output
 
-COPY --from=builder /app/dist /usr/share/nginx/html
-COPY --from=builder /app/api /usr/share/nginx/html/api
-COPY --from=builder /app/node_modules /usr/share/nginx/html/node_modules
+RUN mkdir -p output/functions/__umi.func
+COPY api output/functions/__umi.func/api
+COPY node_modules output/functions/__umi.func/node_modules
+RUN mv zbpack.json output/config.json
+
+FROM zeabur/caddy-static
+
+COPY --from=builder /app/output /usr/share/caddy
  
 EXPOSE 8080
