@@ -5,8 +5,12 @@ COPY . .
 
 RUN npm install -g pnpm
 RUN pnpm install
+RUN pnpm run build
 
-CMD ["pnpm", "start"]
+FROM nginx:alpine
+ 
+COPY nginx.conf /etc/nginx/conf.d/configfile.template
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 ENV \
     PORT=8080 \
