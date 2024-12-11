@@ -1,6 +1,6 @@
 FROM node:20 AS builder
  
-WORKDIR /app
+WORKDIR /
 COPY . .
 
 RUN npm install -g pnpm
@@ -16,6 +16,6 @@ RUN mv zbpack.json output/config.json
 
 FROM zeabur/caddy-static
 
-COPY --from=builder /app/output /usr/share/caddy
+COPY --from=builder /output /usr/share/caddy
  
 EXPOSE 8080
