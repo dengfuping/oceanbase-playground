@@ -6,5 +6,5 @@ COPY . .
 RUN npm install -g pnpm
 RUN pnpm install
  
-EXPOSE 8080
+EXPOSE 8000
 CMD pnpm run start
