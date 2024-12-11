@@ -1,0 +1,8 @@
+{
+  "routes": [
+    {
+      "source": "/api/:match*",
+      "destination": "api/:match*"
+    }
+  ]
+}
