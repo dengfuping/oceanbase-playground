@@ -20,6 +20,7 @@ export default defineConfig({
     '@umijs/plugins/dist/request',
     '@umijs/plugins/dist/locale',
     '@umijs/plugins/dist/analytics',
+    './umi-plugin-start.ts',
   ],
   request: {
     dataField: '',

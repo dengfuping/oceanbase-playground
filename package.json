@@ -11,7 +11,7 @@
     "schedule": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' -r dotenv/config sequelize/schedule.ts",
     "seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' -r dotenv/config sequelize/seed.ts",
     "setup": "umi setup",
-    "start": "npm run dev"
+    "start": "umi start"
   },
   "dependencies": {
     "@alicloud/pop-core": "^1.7.13",
@@ -43,14 +43,19 @@
     "uuid": "^11.0.3"
   },
   "devDependencies": {
+    "@types/express": "^5.0.0",
     "@types/lodash": "^4.17.0",
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
     "@umijs/fabric": "^4.0.1",
+    "@umijs/preset-umi": "^4.3.36",
     "eslint": "^8.44.0",
+    "express": "^4.21.2",
+    "html": "^1.0.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
+    "morgan": "^1.10.0",
     "prettier": "^2.8.8",
     "prettier-plugin-organize-imports": "^2.3.4",
     "prettier-plugin-packagejson": "^2.4.5",
