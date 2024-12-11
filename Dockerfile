@@ -1,21 +1,21 @@
 FROM node:20 AS builder
  
-WORKDIR /
+WORKDIR /app
 COPY . .
 
 RUN npm install -g pnpm
 RUN pnpm install
 RUN pnpm run build
 
-COPY dist output
+COPY /app/dist /app/output
 
-RUN mkdir -p output/functions/__umi.func
-COPY api output/functions/__umi.func/api
-COPY node_modules output/functions/__umi.func/node_modules
-RUN mv zbpack.json output/config.json
+RUN /app/mkdir -p /app/output/functions/__umi.func
+COPY /app/api /app/output/functions/__umi.func/api
+COPY /app/node_modules /app/output/functions/__umi.func/node_modules
+RUN mv /app/zbpack.json /app/output/config.json
 
 FROM zeabur/caddy-static
 
-COPY --from=builder /output /usr/share/caddy
+COPY --from=builder /app/output /usr/share/caddy
  
 EXPOSE 8080
