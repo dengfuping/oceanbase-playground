@@ -5,10 +5,11 @@ COPY . .
 
 RUN npm install -g pnpm
 RUN pnpm install
-RUN pnpm run dev
+
+CMD ["pnpm", "start"]
 
 ENV \
-    PORT=8080 \
+    PORT=8000 \
     HOST=0.0.0.0
  
-EXPOSE 8080
+EXPOSE 8000
