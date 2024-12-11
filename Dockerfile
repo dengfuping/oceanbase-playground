@@ -7,8 +7,8 @@ RUN npm install -g pnpm
 RUN pnpm install
 RUN pnpm run build
 
-FROM nginx:alpine
+FROM zeabur/caddy-static
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/caddy
  
 EXPOSE 8080
