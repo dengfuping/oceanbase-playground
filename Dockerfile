@@ -8,8 +8,7 @@ RUN pnpm install
 RUN pnpm run build
 
 FROM nginx:alpine
- 
-COPY /etc/nginx/nginx.conf /etc/nginx/conf.d/configfile.template
+
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 ENV \
