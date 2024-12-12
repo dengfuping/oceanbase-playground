@@ -7,4 +7,4 @@ RUN npm install -g pnpm
 RUN pnpm install
  
 EXPOSE 8000
-CMD ["timeout", "600s", "pnpm", "start"]
+ENTRYPOINT ["timeout", "3600", "pnpm", "start"]
