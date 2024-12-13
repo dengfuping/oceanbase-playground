@@ -2,3 +2,4 @@ node_modules
 .umi
 .umi-production
 LICENSE
+/api

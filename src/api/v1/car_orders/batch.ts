@@ -28,17 +28,28 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
           errorCode: 'BizError',
         });
       } else {
-        const carOrders = await model.OLTPCarOrder.bulkCreate(req.body, {
-          logging: (sql, timing) => {
-            sqlText = sql?.replaceAll('Executed (default): ', '');
-            latency = timing;
-          },
-        });
-        res.status(200).json({
-          data: carOrders,
-          sqlText,
-          latency,
-        });
+        const transaction = await model.OLTPCarOrder.sequelize?.transaction();
+        try {
+          const carOrders = await model.OLTPCarOrder.bulkCreate(req.body, {
+            transaction,
+            logging: (sql, timing) => {
+              sqlText = sql?.replaceAll(/Executed (\S*): /g, '');
+              latency = timing;
+            },
+          });
+          res.status(200).json({
+            data: carOrders,
+            sqlText,
+            latency,
+          });
+          await transaction?.commit();
+        } catch (err) {
+          await transaction?.rollback();
+          console.log(err);
+          res.status(500).json({
+            errorMessage: 'Batch insert transaction has been rollback',
+          });
+        }
       }
     } else {
       res.status(405).json({ errorMessage: 'Method not allowed' });
