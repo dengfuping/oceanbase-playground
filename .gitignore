@@ -8,4 +8,4 @@
 /src/.umi-test
 /dist
 .swc
-#/api
+/api
