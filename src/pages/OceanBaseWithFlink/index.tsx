@@ -6,6 +6,7 @@ import {
   Row,
   Space,
   Spin,
+  Switch,
   theme,
   Typography,
 } from '@oceanbase/design';
@@ -21,13 +22,7 @@ import Chart from './Chart';
 import { formatTime } from './util';
 import type { CarOrder } from '@prisma/client';
 import { toString } from 'lodash';
-import {
-  formatMessage,
-  getLocale,
-  setLocale,
-  Helmet,
-  useSearchParams,
-} from 'umi';
+import { formatMessage, getLocale, setLocale, Helmet, useSearchParams } from 'umi';
 import moment from 'moment';
 import { detect } from 'detect-browser';
 import 'animate.css';
@@ -56,6 +51,8 @@ const Index: React.FC<IndexProps> = () => {
   const bodySize = useSize(document.body);
   const sm = (bodySize?.width || 0) < 1280;
 
+  const [materializedView, setMaterializedView] = useState(false);
+
   // from https://www.oceanbase.com/demo/real-time-order-dashboard
   const userId = searchParams.get('userId');
 
@@ -81,8 +78,7 @@ const Index: React.FC<IndexProps> = () => {
   const latestRef = useRef<HTMLDivElement>(null);
   const latestElment = latestRef.current;
   const latestScroll = useScroll(latestRef);
-  const isLatestScroll =
-    latestElment?.scrollHeight !== latestElment?.clientHeight;
+  const isLatestScroll = latestElment?.scrollHeight !== latestElment?.clientHeight;
   // start scroll
   const isLatestStartScroll = (latestScroll?.top || 0) > 0;
   // Determine if an element has been totally scrolled
@@ -205,8 +201,7 @@ const Index: React.FC<IndexProps> = () => {
       updateSql(res.sqlText);
     },
   });
-  const { data: colorTop3 = [], latency: colorTop3Latency } =
-    colorTop3Data || {};
+  const { data: colorTop3 = [], latency: colorTop3Latency } = colorTop3Data || {};
 
   const [orderList, setOrderList] = useState<CarOrder[]>([]);
   const latestOrder = orderList[0] || {};
@@ -249,24 +244,21 @@ const Index: React.FC<IndexProps> = () => {
   });
   const { latency: latestLantency } = latestData || {};
 
-  const getAllData = () => {
-    getTotal();
-    getColorTop3();
+  const getAllData = (newMaterializedView?: boolean) => {
+    getTotal({ materializedView: newMaterializedView ?? materializedView });
+    getColorTop3({ materializedView: newMaterializedView ?? materializedView });
     getLatest();
   };
 
   // 获取同步状态和是否应该刷新
-  const { data: statusData, run: getStatus } = useRequest(
-    CarOrderController.getStatus,
-    {
-      defaultParams: [{}],
-      onSuccess: (res) => {
-        if (res.shouldRefresh) {
-          getAllData();
-        }
-      },
+  const { data: statusData, run: getStatus } = useRequest(CarOrderController.getStatus, {
+    defaultParams: [{}],
+    onSuccess: (res) => {
+      if (res.shouldRefresh) {
+        getAllData();
+      }
     },
-  );
+  });
   const { syncing } = statusData || {};
 
   useInterval(() => {
@@ -452,9 +444,7 @@ const Index: React.FC<IndexProps> = () => {
                 >
                   OLAP
                 </div>
-                <div style={{ paddingBottom: 4, backgroundColor: '#ffffff' }}>
-                  OceanBase V4.3
-                </div>
+                <div style={{ paddingBottom: 4, backgroundColor: '#ffffff' }}>OceanBase V4.3</div>
               </div>
               <div
                 ref={flinkRef}
@@ -490,7 +480,19 @@ const Index: React.FC<IndexProps> = () => {
                 <Card
                   ref={dashboardRef}
                   type="inner"
-                  title={<h4>实时订单看板</h4>}
+                  title={
+                    <Space>
+                      <h4>实时订单看板</h4>
+                      <Switch
+                        value={materializedView}
+                        onChange={(value) => {
+                          setMaterializedView(value);
+                          getAllData(value);
+                        }}
+                      />
+                      物化视图查询加速
+                    </Space>
+                  }
                   className={styles.orderViewCard}
                   style={{ height: '100%' }}
                   bodyStyle={{ padding: 0, height: 'calc(100% - 48px)' }}
@@ -543,11 +545,7 @@ const Index: React.FC<IndexProps> = () => {
                               </Space>
                             </Space>
                             <h1>
-                              <CountUp
-                                duration={1}
-                                start={countRef.current}
-                                end={total}
-                              />
+                              <CountUp duration={1} start={countRef.current} end={total} />
                             </h1>
                           </div>
                         </Col>
@@ -587,10 +585,7 @@ const Index: React.FC<IndexProps> = () => {
                                 />
                               </Space>
                             </Space>
-                            <Chart
-                              loading={colorTop3Loading}
-                              data={colorTop3}
-                            />
+                            <Chart loading={colorTop3Loading} data={colorTop3} />
                           </div>
                         </Col>
                       </Row>
@@ -661,9 +656,7 @@ const Index: React.FC<IndexProps> = () => {
                                   borderRadius: token.borderRadiusSM,
                                   borderWidth: 1,
                                   borderStyle: 'solid',
-                                  borderColor: item.isNew
-                                    ? token.colorSuccess
-                                    : 'transparent',
+                                  borderColor: item.isNew ? token.colorSuccess : 'transparent',
                                   marginBottom: 16,
                                   padding: '4px 0px',
                                   display: 'flex',
@@ -683,10 +676,7 @@ const Index: React.FC<IndexProps> = () => {
                                     marginRight: 8,
                                   }}
                                 >
-                                  <img
-                                    src={colorItem?.image}
-                                    style={{ width: '100%' }}
-                                  />
+                                  <img src={colorItem?.image} style={{ width: '100%' }} />
                                 </div>
                                 <div style={{ maxWidth: 'calc(100% - 90px)' }}>
                                   <Typography.Text
@@ -696,8 +686,7 @@ const Index: React.FC<IndexProps> = () => {
                                     {formatMessage(
                                       {
                                         id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess',
-                                        defaultMessage:
-                                          '{customerName} 下单成功',
+                                        defaultMessage: '{customerName} 下单成功',
                                       },
                                       {
                                         customerName: item.customerName,
@@ -724,15 +713,10 @@ const Index: React.FC<IndexProps> = () => {
                                       )}
                                     </span>
                                     <span>
-                                      {moment(item.orderTime).isSame(
-                                        moment(),
-                                        'day',
-                                      )
+                                      {moment(item.orderTime).isSame(moment(), 'day')
                                         ? formatTime(item.orderTime)
                                         : // Display month and day for not today
-                                          moment(item.orderTime).format(
-                                            'MM/DD HH:mm:ss',
-                                          )}
+                                          moment(item.orderTime).format('MM/DD HH:mm:ss')}
                                     </span>
                                   </Typography.Text>
                                 </div>
@@ -778,9 +762,7 @@ const Index: React.FC<IndexProps> = () => {
                       whiteSpace: 'pre',
                     }}
                     className={
-                      browserInfo?.os?.includes('Windows')
-                        ? styles.sqlScrollWindows
-                        : undefined
+                      browserInfo?.os?.includes('Windows') ? styles.sqlScrollWindows : undefined
                     }
                   >
                     {sql || <Empty style={{ marginTop: 24 }} />}

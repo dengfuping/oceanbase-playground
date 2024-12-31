@@ -38,24 +38,29 @@ export async function batchCreateCarOrder(
   });
 }
 
-export async function getTotal(options?: RequestOptions) {
+export async function getTotal(params: { materializedView?: boolean }, options?: RequestOptions) {
   return request<{
     total?: number;
     sqlText?: string;
     latency?: number;
   }>(`/api/v1/car_orders/total`, {
     method: 'GET',
+    params,
     ...(options || {}),
   });
 }
 
-export async function getColorTop3(options?: RequestOptions) {
+export async function getColorTop3(
+  params: { materializedView?: boolean },
+  options?: RequestOptions,
+) {
   return request<{
     data?: { carColor: string; count: number }[];
     sqlText?: string;
     latency?: number;
   }>(`/api/v1/car_orders/color_top3`, {
     method: 'GET',
+    params,
     ...(options || {}),
   });
 }
@@ -77,12 +82,9 @@ export async function getStatus(
   },
   options?: RequestOptions,
 ) {
-  return request<{ syncing?: boolean; shouldRefresh?: boolean }>(
-    `/api/v1/car_orders/status`,
-    {
-      method: 'GET',
-      params,
-      ...(options || {}),
-    },
-  );
+  return request<{ syncing?: boolean; shouldRefresh?: boolean }>(`/api/v1/car_orders/status`, {
+    method: 'GET',
+    params,
+    ...(options || {}),
+  });
 }

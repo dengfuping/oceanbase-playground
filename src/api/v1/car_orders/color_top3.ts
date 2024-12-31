@@ -7,8 +7,11 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
     let sqlText;
     let latency;
     if (req.method === 'GET') {
+      const materializedView = req.query.materializedView === 'true';
       const result = await model.OLAPCarOrder.sequelize?.query(
-        'SELECT `car_color` AS `carColor`, COUNT(`car_color`) AS `count` FROM `ap_car_orders` AS `ap_car_orders` WHERE `order_time` >= CURRENT_DATE AND `order_time` < DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY) GROUP BY `car_color` ORDER BY `count` DESC LIMIT 3;',
+        materializedView
+          ? 'select * from mv_ap_car_orders_color_top3 order by count desc;'
+          : 'SELECT `car_color` AS `carColor`, COUNT(`car_color`) AS `count` FROM `ap_car_orders` AS `ap_car_orders` WHERE `order_time` >= CURRENT_DATE AND `order_time` < DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY) GROUP BY `car_color` ORDER BY `count` DESC LIMIT 3;',
         {
           // ref: https://sequelize.org/docs/v6/core-concepts/raw-queries/
           type: QueryTypes.SELECT,
