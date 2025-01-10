@@ -45,15 +45,14 @@ const OrderForm: React.FC<OrderFormProps> = ({
   const [batchCreatePolling, setBatchCreatePolling] = useState(false);
   const [currentCarColor, setCurrentColor] = useState('blue');
   // eslint-disable-next-line
-  const currentCarColorItem = COLOR_LIST.find(
-    (item) => item.value === currentCarColor,
-  );
+  const currentCarColorItem = COLOR_LIST.find((item) => item.value === currentCarColor);
 
   const carouselRef = useRef<CarouselRef>(null);
 
   // 下单
-  const { run: batchCreateCarOrder, loading: batchCreateCarOrderLoading } =
-    useRequest(CarOrderController.batchCreateCarOrder, {
+  const { run: batchCreateCarOrder, loading: batchCreateCarOrderLoading } = useRequest(
+    CarOrderController.batchCreateCarOrder,
+    {
       manual: true,
       onSuccess: (res) => {
         message.success(
@@ -65,7 +64,8 @@ const OrderForm: React.FC<OrderFormProps> = ({
         const batchSqlText = res.sqlText;
         onSuccess?.(batchSqlText);
       },
-    });
+    },
+  );
 
   // 用于模拟场景的下单
   const { run: batchCreateCarOrderForPolling } = useRequest(
@@ -117,31 +117,40 @@ const OrderForm: React.FC<OrderFormProps> = ({
     }
   };
 
-  // 模拟单人连续下单
+  // 模拟单人连续下单 100 辆
   useInterval(
     () => {
-      batchCreateCarOrderForPolling([
-        {
-          ...generateCarOrder(locale),
-          requestId: uuidv4(),
-        },
-      ]);
-    },
-    createPolling ? 1000 : undefined,
-  );
-
-  // 模拟多人同时下单
-  useInterval(
-    () => {
+      const customerName = generateCustomerName(locale);
       const requestId = uuidv4();
       batchCreateCarOrderForPolling(
-        range(0, 10).map(() => {
+        range(0, 100).map(() => {
           return {
             ...generateCarOrder(locale),
+            customerName,
             requestId,
           };
         }),
       );
+    },
+    createPolling ? 1000 : undefined,
+  );
+
+  // 模拟多人同时下单 100 辆
+  useInterval(
+    () => {
+      range(0, 10).forEach(() => {
+        const customerName = generateCustomerName(locale);
+        const requestId = uuidv4();
+        batchCreateCarOrderForPolling(
+          range(0, 100).map(() => {
+            return {
+              ...generateCarOrder(locale),
+              customerName,
+              requestId,
+            };
+          }),
+        );
+      });
     },
     batchCreatePolling ? 1000 : undefined,
   );
@@ -184,10 +193,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
           {COLOR_LIST.map((item) => {
             return (
               <div key={item.value}>
-                <img
-                  src={item.image}
-                  style={{ width: '100%', margin: '36px 0px' }}
-                />
+                <img src={item.image} style={{ width: '100%', margin: '36px 0px' }} />
               </div>
             );
           })}
@@ -221,9 +227,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
             }))}
             onChange={(value) => {
               setCurrentColor(value);
-              carouselRef.current?.goTo(
-                COLOR_LIST.findIndex((item) => item.value === value),
-              );
+              carouselRef.current?.goTo(COLOR_LIST.findIndex((item) => item.value === value));
             }}
           />
         </Form.Item>
@@ -387,7 +391,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
             </div>
           </div>
         )}
-        {debug === 'true' && (
+        {debug === 'true' && process.env.NODE_ENV === 'development' && (
           <div style={{ marginTop: 16, textAlign: 'center' }}>
             <div style={{ marginBottom: 8 }}>
               <span>{'模拟单人连续下单：'}</span>
