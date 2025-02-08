@@ -79,13 +79,13 @@ const OrderForm: React.FC<OrderFormProps> = ({
     },
   );
 
-  const getParentUrl = () => {
+  const getResourcesId = () => {
     const isInIframe = parent !== window;
-    let parentUrl;
+    let resourcesId;
     if (isInIframe) {
-      parentUrl = document.referrer;
+      resourcesId = 'real-time-order-dashboard';
     }
-    return parentUrl;
+    return resourcesId;
   };
 
   // 通过表单提交订单
@@ -112,7 +112,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
         userId,
         cookieId: Cookies.get('ofx_session_key'),
         resourcesName: '汽车下单及实时分析 Demo',
-        resourcesId: getParentUrl(),
+        resourcesId: getResourcesId(),
       });
     }
   };
