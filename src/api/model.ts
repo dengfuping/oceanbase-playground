@@ -13,6 +13,12 @@ const olap = new Sequelize(process.env.OLAP_DATABASE_URL as string, {
   dialectModule: mysql2,
   timezone: '+08:00',
 });
+const olapReadonly = new Sequelize(process.env.OLAP_READONLY_DATABASE_URL as string, {
+  benchmark: true,
+  logging: false,
+  dialectModule: mysql2,
+  timezone: '+08:00',
+});
 
 const option = {
   orderId: {
@@ -65,5 +71,8 @@ const OLTPCarOrder = oltp.define('tp_car_orders', option, {
 const OLAPCarOrder = olap.define('ap_car_orders', option, {
   timestamps: false,
 });
+const OLAPReadonlyCarOrder = olapReadonly.define('tp_car_orders', option, {
+  timestamps: false,
+});
 
-export default { OLTPCarOrder, OLAPCarOrder };
+export default { OLTPCarOrder, OLAPCarOrder, OLAPReadonlyCarOrder };

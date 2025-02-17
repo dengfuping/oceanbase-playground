@@ -3,15 +3,26 @@ import model from '../../model';
 
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
+    let total;
     let sqlText;
     let latency;
     if (req.method === 'GET') {
-      const total = await model.OLAPCarOrder.count({
-        logging: (sql, timing) => {
-          sqlText = sql?.replaceAll('Executed (default): ', '');
-          latency = timing;
-        },
-      });
+      const readonlyColumnStoreReplica = req.query.readonlyColumnStoreReplica === 'true';
+      if (readonlyColumnStoreReplica) {
+        total = await model.OLAPReadonlyCarOrder.count({
+          logging: (sql, timing) => {
+            sqlText = sql?.replaceAll('Executed (default): ', '');
+            latency = timing;
+          },
+        });
+      } else {
+        total = await model.OLAPCarOrder.count({
+          logging: (sql, timing) => {
+            sqlText = sql?.replaceAll('Executed (default): ', '');
+            latency = timing;
+          },
+        });
+      }
       res.status(200).json({
         total,
         sqlText,

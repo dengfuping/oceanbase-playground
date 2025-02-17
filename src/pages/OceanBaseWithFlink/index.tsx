@@ -4,6 +4,7 @@ import {
   Dropdown,
   Empty,
   Row,
+  Segmented,
   Space,
   Spin,
   theme,
@@ -27,6 +28,8 @@ import {
   setLocale,
   Helmet,
   useSearchParams,
+  history,
+  useLocation,
 } from 'umi';
 import moment from 'moment';
 import { detect } from 'detect-browser';
@@ -49,7 +52,10 @@ const Index: React.FC<IndexProps> = () => {
   const { token } = theme.useToken();
   const locale = getLocale();
 
+  const location = useLocation();
+
   const [searchParams] = useSearchParams();
+  const tab = searchParams.get('tab');
   const i18n = searchParams.get('i18n');
   const qrcode = searchParams.get('qrcode');
   const debug = searchParams.get('debug');
@@ -58,6 +64,22 @@ const Index: React.FC<IndexProps> = () => {
 
   // from https://www.oceanbase.com/demo/real-time-order-dashboard
   const userId = searchParams.get('userId');
+
+  const pathList = [
+    {
+      value: '/oceanbase-with-flink',
+      label: 'OceanBase with Flink',
+    },
+    {
+      value: '/readonly-column-store-replica',
+      label: formatMessage({
+        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.OceanBaseReadonlyColumnStoreReplica',
+        defaultMessage: 'OceanBase 只读列存副本',
+      }),
+    },
+  ];
+  const currentPath = pathList.find((item) => item.value === location.pathname) || pathList[0];
+  const readonlyColumnStoreReplica = currentPath.value === '/readonly-column-store-replica';
 
   const localeList = [
     {
@@ -81,8 +103,7 @@ const Index: React.FC<IndexProps> = () => {
   const latestRef = useRef<HTMLDivElement>(null);
   const latestElment = latestRef.current;
   const latestScroll = useScroll(latestRef);
-  const isLatestScroll =
-    latestElment?.scrollHeight !== latestElment?.clientHeight;
+  const isLatestScroll = latestElment?.scrollHeight !== latestElment?.clientHeight;
   // start scroll
   const isLatestStartScroll = (latestScroll?.top || 0) > 0;
   // Determine if an element has been totally scrolled
@@ -114,7 +135,7 @@ const Index: React.FC<IndexProps> = () => {
     const olapDom = olapRef.current;
     const dashboardDom = dashboardRef.current;
 
-    if (orderDom && flinkDom && olapDom && oltpDom && dashboardDom) {
+    if (orderDom && olapDom && oltpDom && dashboardDom) {
       const oltpPoint = {
         x: oltpDom.offsetLeft + oltpDom.offsetWidth / 2,
         y: oltpDom.offsetTop + oltpDom.offsetHeight / 2,
@@ -124,8 +145,8 @@ const Index: React.FC<IndexProps> = () => {
         y: oltpPoint.y,
       };
       const flinkPoint = {
-        x: flinkDom.offsetLeft + flinkDom.offsetWidth / 2,
-        y: flinkDom.offsetTop + flinkDom.offsetHeight / 2,
+        x: (flinkDom?.offsetLeft || 0) + (flinkDom?.offsetWidth || 0) / 2,
+        y: (flinkDom?.offsetTop || 0) + (flinkDom?.offsetHeight || 0) / 2,
       };
       const olapPoint = {
         x: olapDom.offsetLeft + olapDom.offsetWidth / 2,
@@ -135,7 +156,9 @@ const Index: React.FC<IndexProps> = () => {
         x: orderDom.offsetLeft + orderDom.offsetWidth,
         y: olapPoint.y,
       };
-      const newPath = `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${flinkPoint.x} ${flinkPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`;
+      const newPath = readonlyColumnStoreReplica
+        ? `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`
+        : `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${flinkPoint.x} ${flinkPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`;
       setPath(newPath);
     }
   };
@@ -181,8 +204,7 @@ const Index: React.FC<IndexProps> = () => {
     data: totalData,
     run: getTotal,
     loading: totalLoading,
-  } = useRequest(CarOrderController.getTotal, {
-    defaultParams: [{}],
+  } = useRequest(() => CarOrderController.getTotal({ readonlyColumnStoreReplica }), {
     onSuccess: (res) => {
       updateSql(res.sqlText);
     },
@@ -199,14 +221,12 @@ const Index: React.FC<IndexProps> = () => {
     data: colorTop3Data,
     run: getColorTop3,
     loading: colorTop3Loading,
-  } = useRequest(CarOrderController.getColorTop3, {
-    defaultParams: [{}],
+  } = useRequest(() => CarOrderController.getColorTop3({ readonlyColumnStoreReplica }), {
     onSuccess: (res) => {
       updateSql(res.sqlText);
     },
   });
-  const { data: colorTop3 = [], latency: colorTop3Latency } =
-    colorTop3Data || {};
+  const { data: colorTop3 = [], latency: colorTop3Latency } = colorTop3Data || {};
 
   const [orderList, setOrderList] = useState<CarOrder[]>([]);
   const latestOrder = orderList[0] || {};
@@ -215,8 +235,7 @@ const Index: React.FC<IndexProps> = () => {
     data: latestData,
     loading: latestLoading,
     run: getLatest,
-  } = useRequest(CarOrderController.getLatest, {
-    defaultParams: [{}],
+  } = useRequest(() => CarOrderController.getLatest({ readonlyColumnStoreReplica }), {
     onSuccess: (res) => {
       const latest = res.data || [];
       if (latest.length > 0) {
@@ -257,9 +276,9 @@ const Index: React.FC<IndexProps> = () => {
 
   // 获取同步状态和是否应该刷新
   const { data: statusData, run: getStatus } = useRequest(
-    CarOrderController.getStatus,
+    () =>
+      CarOrderController.getStatus({ readonlyColumnStoreReplica, orderId: latestOrder.orderId }),
     {
-      defaultParams: [{}],
       onSuccess: (res) => {
         if (res.shouldRefresh) {
           getAllData();
@@ -270,9 +289,7 @@ const Index: React.FC<IndexProps> = () => {
   const { syncing } = statusData || {};
 
   useInterval(() => {
-    getStatus({
-      orderId: latestOrder.orderId,
-    });
+    getStatus();
   }, 1000);
 
   const animation: IAnimObject = {
@@ -301,45 +318,66 @@ const Index: React.FC<IndexProps> = () => {
   return (
     <>
       <Helmet>
-        <title>OceanBase With Flink | OceanBase Playground</title>
+        <title>{currentPath.label}</title>
       </Helmet>
       <div
         style={{
           paddingLeft: containerPadding,
           paddingRight: containerPadding,
           paddingBottom: containerPadding,
-          paddingTop: i18n === 'true' ? 48 : containerPadding,
+          paddingTop: tab === 'true' || i18n === 'true' ? 48 : containerPadding,
           position: 'relative',
         }}
         className={`${styles.container} ${
           typeof userId === 'string' ? styles.nestedContainer : ''
         }`}
       >
-        {i18n === 'true' && (
-          <Dropdown
-            menu={{
-              items: localeList.map((item) => ({
-                key: item.value,
-                label: item.label,
-              })),
-              onClick: ({ key }) => {
-                setLocale(key);
-              },
-            }}
-          >
-            <Space
-              style={{
-                cursor: 'pointer',
-                position: 'absolute',
-                right: 48,
-                top: 16,
+        <div
+          style={{
+            cursor: 'pointer',
+            position: 'absolute',
+            width: `calc(100% - ${containerPadding * 2}px)`,
+            top: 8,
+            textAlign: 'center',
+          }}
+        >
+          {tab === 'true' && (
+            <Segmented
+              value={currentPath.value}
+              options={pathList}
+              onChange={(value) => {
+                history.push({
+                  pathname: value as string,
+                  search: location.search,
+                });
+              }}
+            />
+          )}
+          {i18n === 'true' && (
+            <Dropdown
+              menu={{
+                items: localeList.map((item) => ({
+                  key: item.value,
+                  label: item.label,
+                })),
+                onClick: ({ key }) => {
+                  setLocale(key);
+                },
               }}
             >
-              <GlobalOutlined />
-              {localeList.find((item) => item.value === locale)?.label}
-            </Space>
-          </Dropdown>
-        )}
+              <Space
+                style={{
+                  cursor: 'pointer',
+                  float: 'right',
+                  marginTop: 8,
+                }}
+              >
+                <GlobalOutlined />
+                {localeList.find((item) => item.value === locale)?.label}
+              </Space>
+            </Dropdown>
+          )}
+        </div>
         <Row gutter={8} style={{ height: '100%' }}>
           <Col span={sm ? 7 : 6} style={{ height: '100%' }}>
             <div
@@ -453,19 +491,26 @@ const Index: React.FC<IndexProps> = () => {
                   OLAP
                 </div>
                 <div style={{ paddingBottom: 4, backgroundColor: '#ffffff' }}>
-                  OceanBase V4.3
+                  {readonlyColumnStoreReplica
+                    ? formatMessage({
+                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.ReadonlyColumnStoreReplica',
+                        defaultMessage: '只读列存副本',
+                      })
+                    : 'OceanBase V4.3'}
                 </div>
               </div>
-              <div
-                ref={flinkRef}
-                style={{
-                  fontSize: 20,
-                  padding: '4px 0px',
-                  backgroundColor: '#ffffff',
-                }}
-              >
-                Flink
-              </div>
+              {readonlyColumnStoreReplica ? undefined : (
+                <div
+                  ref={flinkRef}
+                  style={{
+                    fontSize: 20,
+                    padding: '4px 0px',
+                    backgroundColor: '#ffffff',
+                  }}
+                >
+                  Flink
+                </div>
+              )}
               <div>
                 <img
                   ref={oltpRef}
@@ -480,7 +525,14 @@ const Index: React.FC<IndexProps> = () => {
                 >
                   OLTP
                 </div>
-                <div>OceanBase V4.3</div>
+                <div>
+                  {readonlyColumnStoreReplica
+                    ? formatMessage({
+                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RowStoreReplica',
+                        defaultMessage: '行存副本',
+                      })
+                    : 'OceanBase V4.3'}
+                </div>
               </div>
             </div>
           </Col>
@@ -490,7 +542,14 @@ const Index: React.FC<IndexProps> = () => {
                 <Card
                   ref={dashboardRef}
                   type="inner"
-                  title={<h4>实时订单看板</h4>}
+                  title={
+                    <h4>
+                      {formatMessage({
+                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealtimeOrderDashboard',
+                        defaultMessage: '实时订单看板',
+                      })}
+                    </h4>
+                  }
                   className={styles.orderViewCard}
                   style={{ height: '100%' }}
                   bodyStyle={{ padding: 0, height: 'calc(100% - 48px)' }}
@@ -543,11 +602,7 @@ const Index: React.FC<IndexProps> = () => {
                               </Space>
                             </Space>
                             <h1>
-                              <CountUp
-                                duration={1}
-                                start={countRef.current}
-                                end={total}
-                              />
+                              <CountUp duration={1} start={countRef.current} end={total} />
                             </h1>
                           </div>
                         </Col>
@@ -587,10 +642,7 @@ const Index: React.FC<IndexProps> = () => {
                                 />
                               </Space>
                             </Space>
-                            <Chart
-                              loading={colorTop3Loading}
-                              data={colorTop3}
-                            />
+                            <Chart loading={colorTop3Loading} data={colorTop3} />
                           </div>
                         </Col>
                       </Row>
@@ -661,9 +713,7 @@ const Index: React.FC<IndexProps> = () => {
                                   borderRadius: token.borderRadiusSM,
                                   borderWidth: 1,
                                   borderStyle: 'solid',
-                                  borderColor: item.isNew
-                                    ? token.colorSuccess
-                                    : 'transparent',
+                                  borderColor: item.isNew ? token.colorSuccess : 'transparent',
                                   marginBottom: 16,
                                   padding: '4px 0px',
                                   display: 'flex',
@@ -683,10 +733,7 @@ const Index: React.FC<IndexProps> = () => {
                                     marginRight: 8,
                                   }}
                                 >
-                                  <img
-                                    src={colorItem?.image}
-                                    style={{ width: '100%' }}
-                                  />
+                                  <img src={colorItem?.image} style={{ width: '100%' }} />
                                 </div>
                                 <div style={{ maxWidth: 'calc(100% - 90px)' }}>
                                   <Typography.Text
@@ -696,8 +743,7 @@ const Index: React.FC<IndexProps> = () => {
                                     {formatMessage(
                                       {
                                         id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess',
-                                        defaultMessage:
-                                          '{customerName} 下单成功',
+                                        defaultMessage: '{customerName} 下单成功',
                                       },
                                       {
                                         customerName: item.customerName,
@@ -724,15 +770,10 @@ const Index: React.FC<IndexProps> = () => {
                                       )}
                                     </span>
                                     <span>
-                                      {moment(item.orderTime).isSame(
-                                        moment(),
-                                        'day',
-                                      )
+                                      {moment(item.orderTime).isSame(moment(), 'day')
                                         ? formatTime(item.orderTime)
                                         : // Display month and day for not today
-                                          moment(item.orderTime).format(
-                                            'MM/DD HH:mm:ss',
-                                          )}
+                                          moment(item.orderTime).format('MM/DD HH:mm:ss')}
                                     </span>
                                   </Typography.Text>
                                 </div>
@@ -761,7 +802,14 @@ const Index: React.FC<IndexProps> = () => {
               <Col span={24} style={{ height: 'calc((100% - 16px) * 0.3)' }}>
                 <Card
                   type="inner"
-                  title={<h4>实时执行 SQL</h4>}
+                  title={
+                    <h4>
+                      {formatMessage({
+                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealtimeExecuteSql',
+                        defaultMessage: '实时执行 SQL',
+                      })}
+                    </h4>
+                  }
                   style={{ height: '100%' }}
                   bodyStyle={{
                     padding: '0px',
@@ -778,9 +826,7 @@ const Index: React.FC<IndexProps> = () => {
                       whiteSpace: 'pre',
                     }}
                     className={
-                      browserInfo?.os?.includes('Windows')
-                        ? styles.sqlScrollWindows
-                        : undefined
+                      browserInfo?.os?.includes('Windows') ? styles.sqlScrollWindows : undefined
                     }
                   >
                     {sql || <Empty style={{ marginTop: 24 }} />}

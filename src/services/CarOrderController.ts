@@ -2,6 +2,10 @@ import { request } from 'umi';
 import type { RequestOptions } from 'umi';
 import type { Prisma, CarOrder } from '@prisma/client';
 
+export interface QueryParams {
+  readonlyColumnStoreReplica?: boolean;
+}
+
 export async function createCarOrder(
   body: Omit<Prisma.CarOrderCreateInput, 'orderTime'>,
   options?: RequestOptions,
@@ -38,51 +42,51 @@ export async function batchCreateCarOrder(
   });
 }
 
-export async function getTotal(options?: RequestOptions) {
+export async function getTotal(params: QueryParams, options?: RequestOptions) {
   return request<{
     total?: number;
     sqlText?: string;
     latency?: number;
   }>(`/api/v1/car_orders/total`, {
     method: 'GET',
+    params,
     ...(options || {}),
   });
 }
 
-export async function getColorTop3(options?: RequestOptions) {
+export async function getColorTop3(params: QueryParams, options?: RequestOptions) {
   return request<{
     data?: { carColor: string; count: number }[];
     sqlText?: string;
     latency?: number;
   }>(`/api/v1/car_orders/color_top3`, {
     method: 'GET',
+    params,
     ...(options || {}),
   });
 }
 
-export async function getLatest(options?: RequestOptions) {
+export async function getLatest(params: QueryParams, options?: RequestOptions) {
   return request<{
     data?: CarOrder[];
     sqlText?: string;
     latency?: number;
   }>(`/api/v1/car_orders/latest`, {
     method: 'GET',
+    params,
     ...(options || {}),
   });
 }
 
 export async function getStatus(
-  params: {
+  params: QueryParams & {
     orderId?: bigint;
   },
   options?: RequestOptions,
 ) {
-  return request<{ syncing?: boolean; shouldRefresh?: boolean }>(
-    `/api/v1/car_orders/status`,
-    {
-      method: 'GET',
-      params,
-      ...(options || {}),
-    },
-  );
+  return request<{ syncing?: boolean; shouldRefresh?: boolean }>(`/api/v1/car_orders/status`, {
+    method: 'GET',
+    params,
+    ...(options || {}),
+  });
 }

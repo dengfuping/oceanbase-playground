@@ -19,6 +19,10 @@ export default [
             path: 'oceanbase-with-flink',
             component: 'OceanBaseWithFlink',
           },
+          {
+            path: 'readonly-column-store-replica',
+            component: 'OceanBaseWithFlink',
+          },
         ],
       },
     ],

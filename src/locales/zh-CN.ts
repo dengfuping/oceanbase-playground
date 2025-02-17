@@ -1,5 +1,10 @@
 export default {
   "oceanbase-playground.src.pages.OceanBaseWithFlink.CarOrderSystemDemo": "汽车下单 Demo",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.OceanBaseReadonlyColumnStoreReplica": "OceanBase 只读列存副本",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.ReadonlyColumnStoreReplica": "只读列存副本",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.RowStoreReplica": "行存副本",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.RealtimeOrderDashboard": "实时订单看板",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.RealtimeExecuteSql": "实时执行 SQL",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.Username": "用户名",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.PleaseEnterUsername": "请输入用户名",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.OnlySupportSpecificCharacter": "仅支持中英文、数字和下划线",

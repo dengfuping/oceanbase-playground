@@ -5,6 +5,7 @@ import model from '../../model';
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
     const { orderId } = req.query || {};
+    let lastestAPCarOrder;
     let latencyTP;
     let latencyAP;
     if (req.method === 'GET') {
@@ -14,21 +15,29 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
           latencyTP = timing;
         },
       });
-      const lastestAPCarOrder = await model.OLAPCarOrder.findOne({
-        order: [['orderId', 'DESC']],
-        logging: (sql, timing) => {
-          latencyAP = timing;
-        },
-      });
+      const readonlyColumnStoreReplica = req.query.readonlyColumnStoreReplica === 'true';
+      if (readonlyColumnStoreReplica) {
+        lastestAPCarOrder = await model.OLAPReadonlyCarOrder.findOne({
+          order: [['orderId', 'DESC']],
+          logging: (sql, timing) => {
+            latencyAP = timing;
+          },
+        });
+      } else {
+        lastestAPCarOrder = await model.OLAPCarOrder.findOne({
+          order: [['orderId', 'DESC']],
+          logging: (sql, timing) => {
+            latencyAP = timing;
+          },
+        });
+      }
       res
         .status(200)
         .header('X-TP-Sql-Latency', `${latencyTP}`)
         .header('X-AP-Sql-Latency', `${latencyAP}`)
         .json({
           syncing: lastestAPCarOrder?.orderId !== lastestTPCarOrder?.orderId,
-          shouldRefresh: orderId
-            ? toNumber(orderId) !== lastestAPCarOrder?.orderId
-            : false,
+          shouldRefresh: orderId ? toNumber(orderId) !== lastestAPCarOrder?.orderId : false,
           latencyTP,
           latencyAP,
         });

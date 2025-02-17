@@ -1,5 +1,10 @@
 export default {
   "oceanbase-playground.src.pages.OceanBaseWithFlink.CarOrderSystemDemo": "Car Ordering Demo",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.OceanBaseReadonlyColumnStoreReplica": "Readonly Column Store Replica",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.ReadonlyColumnStoreReplica": "Readonly Column Store Replica",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.RowStoreReplica": "Row Store Replica",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.RealtimeOrderDashboard": "Dashboard",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.RealtimeExecuteSql": "SQL",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.Username": "Username",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.PleaseEnterUsername": "Please enter username",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.OnlySupportSpecificCharacter": "Only support Chinese & English character, number and underline",
