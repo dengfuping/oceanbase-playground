@@ -9,8 +9,12 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
     let latency;
     if (req.method === 'GET') {
       const readonlyColumnStoreReplica = req.query.readonlyColumnStoreReplica === 'true';
-      if (readonlyColumnStoreReplica) {
-        result = await model.OLAPReadonlyCarOrder.sequelize?.query(
+      const rowStore = req.query.rowStore === 'true';
+      if (readonlyColumnStoreReplica || rowStore) {
+        const carOrder = readonlyColumnStoreReplica
+          ? model.OLAPReadonlyCarOrder
+          : model.OLTPCarOrder;
+        result = await carOrder.sequelize?.query(
           'SELECT max(`order_id`) AS `orderId`, `order_time` AS `orderTime`, `car_color` AS `carColor`, `customer_name` AS `customerName`, `request_id` as requestId, count(*) as count FROM `tp_car_orders` AS `tp_car_orders` GROUP BY `orderTime`, `customerName`, `requestId` ORDER BY `orderTime` DESC LIMIT 10;',
           {
             // ref: https://sequelize.org/docs/v6/core-concepts/raw-queries/

@@ -4,6 +4,7 @@ import type { Prisma, CarOrder } from '@prisma/client';
 
 export interface QueryParams {
   readonlyColumnStoreReplica?: boolean;
+  rowStore?: boolean;
 }
 
 export async function createCarOrder(

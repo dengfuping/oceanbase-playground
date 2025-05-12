@@ -1,6 +1,7 @@
 export default {
   "oceanbase-playground.src.pages.OceanBaseWithFlink.CarOrderSystemDemo": "Car Ordering Demo",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.OceanBaseReadonlyColumnStoreReplica": "Readonly Column Store Replica",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.OceanBaseRowStore": "Row Store",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.ReadonlyColumnStoreReplica": "Readonly Column Store Replica",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.RowStoreReplica": "Row Store Replica",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.RealtimeOrderDashboard": "Dashboard",

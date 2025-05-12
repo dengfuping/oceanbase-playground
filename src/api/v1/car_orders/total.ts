@@ -8,8 +8,12 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
     let latency;
     if (req.method === 'GET') {
       const readonlyColumnStoreReplica = req.query.readonlyColumnStoreReplica === 'true';
-      if (readonlyColumnStoreReplica) {
-        total = await model.OLAPReadonlyCarOrder.count({
+      const rowStore = req.query.rowStore === 'true';
+      if (readonlyColumnStoreReplica || rowStore) {
+        const carOrder = readonlyColumnStoreReplica
+          ? model.OLAPReadonlyCarOrder
+          : model.OLTPCarOrder;
+        total = await carOrder.count({
           logging: (sql, timing) => {
             sqlText = sql?.replaceAll('Executed (default): ', '');
             latency = timing;

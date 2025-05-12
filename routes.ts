@@ -23,6 +23,10 @@ export default [
             path: 'readonly-column-store-replica',
             component: 'OceanBaseWithFlink',
           },
+          {
+            path: 'row-store',
+            component: 'OceanBaseWithFlink',
+          },
         ],
       },
     ],

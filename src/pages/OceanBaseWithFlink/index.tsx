@@ -77,9 +77,18 @@ const Index: React.FC<IndexProps> = () => {
         defaultMessage: 'OceanBase 只读列存副本',
       }),
     },
+    {
+      value: '/row-store',
+      label: formatMessage({
+        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.OceanBaseRowStore',
+        defaultMessage: 'OceanBase 行存',
+      }),
+    },
   ];
   const currentPath = pathList.find((item) => item.value === location.pathname) || pathList[0];
+  const flink = currentPath.value === '/oceanbase-with-flink';
   const readonlyColumnStoreReplica = currentPath.value === '/readonly-column-store-replica';
+  const rowStore = currentPath.value === '/row-store';
 
   const localeList = [
     {
@@ -135,7 +144,7 @@ const Index: React.FC<IndexProps> = () => {
     const olapDom = olapRef.current;
     const dashboardDom = dashboardRef.current;
 
-    if (orderDom && olapDom && oltpDom && dashboardDom) {
+    if (orderDom && oltpDom && dashboardDom) {
       const oltpPoint = {
         x: oltpDom.offsetLeft + oltpDom.offsetWidth / 2,
         y: oltpDom.offsetTop + oltpDom.offsetHeight / 2,
@@ -149,16 +158,19 @@ const Index: React.FC<IndexProps> = () => {
         y: (flinkDom?.offsetTop || 0) + (flinkDom?.offsetHeight || 0) / 2,
       };
       const olapPoint = {
-        x: olapDom.offsetLeft + olapDom.offsetWidth / 2,
-        y: olapDom.offsetTop + olapDom.offsetHeight / 2,
+        x: (olapDom?.offsetLeft || 0) + (olapDom?.offsetWidth || 0) / 2,
+        y: (olapDom?.offsetTop || 0) + (olapDom?.offsetHeight || 0) / 2,
       };
       const dashboardPoint = {
         x: orderDom.offsetLeft + orderDom.offsetWidth,
-        y: olapPoint.y,
+        y: rowStore ? oltpPoint.y : olapPoint.y,
       };
       const newPath = readonlyColumnStoreReplica
         ? `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`
+        : rowStore
+        ? `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`
         : `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${flinkPoint.x} ${flinkPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`;
+      console.log(newPath);
       setPath(newPath);
     }
   };
@@ -204,7 +216,7 @@ const Index: React.FC<IndexProps> = () => {
     data: totalData,
     run: getTotal,
     loading: totalLoading,
-  } = useRequest(() => CarOrderController.getTotal({ readonlyColumnStoreReplica }), {
+  } = useRequest(() => CarOrderController.getTotal({ readonlyColumnStoreReplica, rowStore }), {
     onSuccess: (res) => {
       updateSql(res.sqlText);
     },
@@ -221,7 +233,7 @@ const Index: React.FC<IndexProps> = () => {
     data: colorTop3Data,
     run: getColorTop3,
     loading: colorTop3Loading,
-  } = useRequest(() => CarOrderController.getColorTop3({ readonlyColumnStoreReplica }), {
+  } = useRequest(() => CarOrderController.getColorTop3({ readonlyColumnStoreReplica, rowStore }), {
     onSuccess: (res) => {
       updateSql(res.sqlText);
     },
@@ -235,7 +247,7 @@ const Index: React.FC<IndexProps> = () => {
     data: latestData,
     loading: latestLoading,
     run: getLatest,
-  } = useRequest(() => CarOrderController.getLatest({ readonlyColumnStoreReplica }), {
+  } = useRequest(() => CarOrderController.getLatest({ readonlyColumnStoreReplica, rowStore }), {
     onSuccess: (res) => {
       const latest = res.data || [];
       if (latest.length > 0) {
@@ -277,7 +289,11 @@ const Index: React.FC<IndexProps> = () => {
   // 获取同步状态和是否应该刷新
   const { data: statusData, run: getStatus } = useRequest(
     () =>
-      CarOrderController.getStatus({ readonlyColumnStoreReplica, orderId: latestOrder.orderId }),
+      CarOrderController.getStatus({
+        readonlyColumnStoreReplica,
+        rowStore,
+        orderId: latestOrder.orderId,
+      }),
     {
       onSuccess: (res) => {
         if (res.shouldRefresh) {
@@ -404,9 +420,7 @@ const Index: React.FC<IndexProps> = () => {
                   userId={userId}
                   sm={sm}
                   onSuccess={(sqlText) => {
-                    getStatus({
-                      orderId: latestOrder?.orderId,
-                    });
+                    getStatus();
                     updateSql(sqlText);
                   }}
                 />
@@ -465,7 +479,7 @@ const Index: React.FC<IndexProps> = () => {
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'space-between',
+                justifyContent: rowStore ? 'center' : 'space-between',
                 alignItems: 'center',
                 textAlign: 'center',
                 height: '100%',
@@ -475,31 +489,34 @@ const Index: React.FC<IndexProps> = () => {
                 fontFamily: 'Roboto',
               }}
             >
-              <div>
-                <img
-                  ref={olapRef}
-                  src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*LGTUSYGnB2gAAAAAAAAAAAAADmfOAQ/original"
-                />
-                <div
-                  style={{
-                    fontSize: 20,
-                    paddingTop: 8,
-                    paddingBottom: 4,
-                    backgroundColor: '#ffffff',
-                  }}
-                >
-                  OLAP
+              {(flink || readonlyColumnStoreReplica) && (
+                <div>
+                  <img
+                    ref={olapRef}
+                    src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*LGTUSYGnB2gAAAAAAAAAAAAADmfOAQ/original"
+                  />
+                  <div
+                    style={{
+                      fontSize: 20,
+                      paddingTop: 8,
+                      paddingBottom: 4,
+                      backgroundColor: '#ffffff',
+                    }}
+                  >
+                    OLAP
+                  </div>
+                  <div style={{ paddingBottom: 4, backgroundColor: '#ffffff' }}>
+                    {readonlyColumnStoreReplica
+                      ? formatMessage({
+                          id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.ReadonlyColumnStoreReplica',
+                          defaultMessage: '只读列存副本',
+                        })
+                      : 'OceanBase V4.3'}
+                  </div>
                 </div>
-                <div style={{ paddingBottom: 4, backgroundColor: '#ffffff' }}>
-                  {readonlyColumnStoreReplica
-                    ? formatMessage({
-                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.ReadonlyColumnStoreReplica',
-                        defaultMessage: '只读列存副本',
-                      })
-                    : 'OceanBase V4.3'}
-                </div>
-              </div>
-              {readonlyColumnStoreReplica ? undefined : (
+              )}
+
+              {flink && (
                 <div
                   ref={flinkRef}
                   style={{

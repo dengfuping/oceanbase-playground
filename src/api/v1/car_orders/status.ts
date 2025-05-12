@@ -16,8 +16,12 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
         },
       });
       const readonlyColumnStoreReplica = req.query.readonlyColumnStoreReplica === 'true';
-      if (readonlyColumnStoreReplica) {
-        lastestAPCarOrder = await model.OLAPReadonlyCarOrder.findOne({
+      const rowStore = req.query.rowStore === 'true';
+      if (readonlyColumnStoreReplica || rowStore) {
+        const carOrder = readonlyColumnStoreReplica
+          ? model.OLAPReadonlyCarOrder
+          : model.OLTPCarOrder;
+        lastestAPCarOrder = await carOrder.findOne({
           order: [['orderId', 'DESC']],
           logging: (sql, timing) => {
             latencyAP = timing;
