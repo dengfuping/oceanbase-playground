@@ -9,15 +9,18 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
     let latencyTP;
     let latencyAP;
     if (req.method === 'GET') {
-      const lastestTPCarOrder = await model.OLTPCarOrder.findOne({
+      const readonlyColumnStoreReplica = req.query.readonlyColumnStoreReplica === 'true';
+      const rowStore = req.query.rowStore === 'true';
+      const htap = req.query.htap === 'true';
+      const type = req.query.type;
+
+      const lastestTPCarOrder = await (htap ? model.TPCarOrder : model.OLTPCarOrder).findOne({
         order: [['orderId', 'DESC']],
         logging: (sql, timing) => {
           latencyTP = timing;
         },
       });
-      const readonlyColumnStoreReplica = req.query.readonlyColumnStoreReplica === 'true';
-      const rowStore = req.query.rowStore === 'true';
-      const htap = req.query.htap === 'true';
+
       if (readonlyColumnStoreReplica || rowStore) {
         const carOrder = readonlyColumnStoreReplica
           ? model.OLAPReadonlyCarOrder
@@ -28,8 +31,8 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
             latencyAP = timing;
           },
         });
-      } else if (htap) {
-        const carOrder = true ? model.TPCarOrder : model.APCarOrder;
+      } else if (htap && type) {
+        const carOrder = type === 'tp' ? model.TPCarOrder : model.APCarOrder;
         lastestAPCarOrder = await carOrder.findOne({
           order: [['orderId', 'DESC']],
           logging: (sql, timing) => {

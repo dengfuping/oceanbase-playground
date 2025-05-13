@@ -528,6 +528,7 @@ const Index: React.FC<IndexProps> = () => {
                   readonlyColumnStoreReplica={readonlyColumnStoreReplica}
                   rowStore={rowStore}
                   htap={htap}
+                  type="ap"
                 />
               </Col>
               {htap && (
@@ -550,7 +551,7 @@ const Index: React.FC<IndexProps> = () => {
                     readonlyColumnStoreReplica={readonlyColumnStoreReplica}
                     rowStore={rowStore}
                     htap={htap}
-                    isSlow={true}
+                    type="tp"
                   />
                 </Col>
               )}

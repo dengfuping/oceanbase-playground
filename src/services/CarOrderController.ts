@@ -6,6 +6,7 @@ export interface QueryParams {
   readonlyColumnStoreReplica?: boolean;
   rowStore?: boolean;
   htap?: boolean;
+  type?: 'tp' | 'ap';
 }
 
 export async function createCarOrder(

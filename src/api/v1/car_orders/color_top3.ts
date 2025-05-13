@@ -11,6 +11,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
       const readonlyColumnStoreReplica = req.query.readonlyColumnStoreReplica === 'true';
       const rowStore = req.query.rowStore === 'true';
       const htap = req.query.htap === 'true';
+      const type = req.query.type;
       if (readonlyColumnStoreReplica || rowStore) {
         const carOrder = readonlyColumnStoreReplica
           ? model.OLAPReadonlyCarOrder
@@ -26,8 +27,8 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
             },
           },
         );
-      } else if (htap) {
-        const carOrder = true ? model.TPCarOrder : model.APCarOrder;
+      } else if (htap && type) {
+        const carOrder = type === 'tp' ? model.TPCarOrder : model.APCarOrder;
         result = await carOrder.sequelize?.query(
           'SELECT `car_color` AS `carColor`, COUNT(`car_color`) AS `count` FROM `car_orders` AS `car_orders` WHERE `order_time` >= CURRENT_DATE AND `order_time` < DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY) GROUP BY `car_color` ORDER BY `count` DESC LIMIT 3;',
           {

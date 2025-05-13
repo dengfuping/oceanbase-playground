@@ -10,6 +10,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
       const readonlyColumnStoreReplica = req.query.readonlyColumnStoreReplica === 'true';
       const rowStore = req.query.rowStore === 'true';
       const htap = req.query.htap === 'true';
+      const type = req.query.type;
       if (readonlyColumnStoreReplica || rowStore) {
         const carOrder = readonlyColumnStoreReplica
           ? model.OLAPReadonlyCarOrder
@@ -20,8 +21,8 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
             latency = timing;
           },
         });
-      } else if (htap) {
-        const carOrder = true ? model.TPCarOrder : model.APCarOrder;
+      } else if (htap && type) {
+        const carOrder = type === 'tp' ? model.TPCarOrder : model.APCarOrder;
         total = await carOrder.count({
           logging: (sql, timing) => {
             sqlText = sql?.replaceAll('Executed (default): ', '');

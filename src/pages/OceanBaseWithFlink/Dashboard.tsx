@@ -26,7 +26,7 @@ interface DashboardProps extends CardProps {
   readonlyColumnStoreReplica: boolean;
   rowStore: boolean;
   htap: boolean;
-  isSlow?: boolean;
+  type: 'tp' | 'ap';
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
@@ -36,7 +36,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   readonlyColumnStoreReplica,
   rowStore,
   htap,
-  isSlow,
+  type,
   ...restProps
 }) => {
   const { token } = theme.useToken();
@@ -61,7 +61,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     run: getTotal,
     loading: totalLoading,
   } = useRequest(
-    () => CarOrderController.getTotal({ readonlyColumnStoreReplica, rowStore, htap }),
+    () => CarOrderController.getTotal({ readonlyColumnStoreReplica, rowStore, htap, type }),
     {
       onSuccess: (res) => {
         updateSql(res.sqlText);
@@ -81,7 +81,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     run: getColorTop3,
     loading: colorTop3Loading,
   } = useRequest(
-    () => CarOrderController.getColorTop3({ readonlyColumnStoreReplica, rowStore, htap }),
+    () => CarOrderController.getColorTop3({ readonlyColumnStoreReplica, rowStore, htap, type }),
     {
       onSuccess: (res) => {
         updateSql(res.sqlText);
@@ -98,7 +98,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     loading: latestLoading,
     run: getLatest,
   } = useRequest(
-    () => CarOrderController.getLatest({ readonlyColumnStoreReplica, rowStore, htap }),
+    () => CarOrderController.getLatest({ readonlyColumnStoreReplica, rowStore, htap, type }),
     {
       onSuccess: (res) => {
         const latest = res.data || [];
@@ -146,6 +146,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         readonlyColumnStoreReplica,
         rowStore,
         htap,
+        type,
         orderId: latestOrder.orderId,
       }),
     {
@@ -177,7 +178,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       }
       className={styles.orderViewCard}
       style={{ height: '100%' }}
-      bodyStyle={{ padding: 0, height: htap ? 'calc(100% - 38px)' : 'calc(100% - 48px)' }}
+      bodyStyle={{ padding: 0, height: htap ? 'calc(100% - 22px)' : 'calc(100% - 48px)' }}
       {...restProps}
     >
       <Row style={{ height: '100%' }}>
@@ -217,8 +218,9 @@ const Dashboard: React.FC<DashboardProps> = ({
                       htap
                         ? {
                             fontSize: 12,
-                            color: isSlow ? token.colorError : token.colorSuccess,
-                            backgroundColor: isSlow ? token.colorErrorBg : token.colorSuccessBg,
+                            color: type === 'tp' ? token.colorError : token.colorSuccess,
+                            backgroundColor:
+                              type === 'tp' ? token.colorErrorBg : token.colorSuccessBg,
                             borderRadius: 2,
                             padding: '0px 4px',
                             marginBottom: 0,
@@ -241,7 +243,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         <LoadingOutlined
                           style={{
                             fontSize: 14,
-                            color: isSlow ? token.colorError : token.colorSuccess,
+                            color: type === 'tp' ? token.colorError : token.colorSuccess,
                           }}
                         />
                       }
@@ -263,7 +265,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </h1>
               </div>
             </Col>
-            <Col span={24} style={{ height: htap ? 'calc(100% - 85px)' : 'calc(100% - 154px)' }}>
+            <Col span={24} style={{ height: htap ? 'calc(100% - 32px)' : 'calc(100% - 154px)' }}>
               <div
                 style={{
                   height: '100%',
@@ -291,8 +293,9 @@ const Dashboard: React.FC<DashboardProps> = ({
                       htap
                         ? {
                             fontSize: 12,
-                            color: isSlow ? token.colorError : token.colorSuccess,
-                            backgroundColor: isSlow ? token.colorErrorBg : token.colorSuccessBg,
+                            color: type === 'tp' ? token.colorError : token.colorSuccess,
+                            backgroundColor:
+                              type === 'tp' ? token.colorErrorBg : token.colorSuccessBg,
                             borderRadius: 2,
                             padding: '0px 4px',
                             marginBottom: 0,
@@ -313,7 +316,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         <LoadingOutlined
                           style={{
                             fontSize: 14,
-                            color: isSlow ? token.colorError : token.colorSuccess,
+                            color: type === 'tp' ? token.colorError : token.colorSuccess,
                           }}
                         />
                       }
@@ -352,8 +355,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                   htap
                     ? {
                         fontSize: 12,
-                        color: isSlow ? token.colorError : token.colorSuccess,
-                        backgroundColor: isSlow ? token.colorErrorBg : token.colorSuccessBg,
+                        color: type === 'tp' ? token.colorError : token.colorSuccess,
+                        backgroundColor: type === 'tp' ? token.colorErrorBg : token.colorSuccessBg,
                         borderRadius: 2,
                         padding: '0px 4px',
                         marginBottom: 0,
@@ -375,7 +378,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     <LoadingOutlined
                       style={{
                         fontSize: 14,
-                        color: isSlow ? token.colorError : token.colorSuccess,
+                        color: type === 'tp' ? token.colorError : token.colorSuccess,
                       }}
                     />
                   }
@@ -386,7 +389,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <MacScrollbar
               ref={latestRef}
               style={{
-                height: 'calc(100% - 68px)',
+                height: htap ? 'calc(100% - 22px)' : 'calc(100% - 68px)',
               }}
             >
               {isLatestStartScroll && (
@@ -394,7 +397,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   style={{
                     position: 'absolute',
                     left: 0,
-                    height: 60,
+                    height: htap ? 30 : 60,
                     width: '100%',
                     backgroundImage: 'linear-gradient(360deg, #fefefe00 0%, #ffffff 100%)',
                     zIndex: 10,
@@ -411,7 +414,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       borderWidth: 1,
                       borderStyle: 'solid',
                       borderColor: item.isNew ? token.colorSuccess : 'transparent',
-                      marginBottom: 16,
+                      marginBottom: htap ? 0 : 16,
                       padding: '4px 0px',
                       display: 'flex',
                       alignItems: 'center',
@@ -480,7 +483,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     position: 'absolute',
                     left: 0,
                     bottom: 0,
-                    height: 60,
+                    height: htap ? 30 : 60,
                     width: '100%',
                     backgroundImage: 'linear-gradient(180deg, #fefefe00 0%, #ffffff 100%)',
                   }}
