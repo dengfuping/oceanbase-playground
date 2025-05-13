@@ -27,6 +27,9 @@ interface OrderFormProps extends React.HTMLProps<HTMLDivElement> {
   qrcode?: string | null;
   userId?: string | null;
   sm?: boolean;
+  readonlyColumnStoreReplica?: boolean;
+  rowStore?: boolean;
+  htap?: boolean;
   onSuccess?: (sqlText?: string) => void;
 }
 
@@ -35,6 +38,9 @@ const OrderForm: React.FC<OrderFormProps> = ({
   qrcode,
   userId,
   sm,
+  readonlyColumnStoreReplica,
+  rowStore,
+  htap,
   onSuccess,
   ...restProps
 }) => {
@@ -94,6 +100,11 @@ const OrderForm: React.FC<OrderFormProps> = ({
       const { count, carColor, customerName } = values;
       const requestId = uuidv4();
       batchCreateCarOrder(
+        {
+          readonlyColumnStoreReplica,
+          rowStore,
+          htap,
+        },
         range(0, count).map(() => {
           return {
             ...generateCarOrder(locale),
@@ -123,6 +134,11 @@ const OrderForm: React.FC<OrderFormProps> = ({
       const customerName = generateCustomerName(locale);
       const requestId = uuidv4();
       batchCreateCarOrderForPolling(
+        {
+          readonlyColumnStoreReplica,
+          rowStore,
+          htap,
+        },
         range(0, 100).map(() => {
           return {
             ...generateCarOrder(locale),
@@ -142,6 +158,11 @@ const OrderForm: React.FC<OrderFormProps> = ({
         const customerName = generateCustomerName(locale);
         const requestId = uuidv4();
         batchCreateCarOrderForPolling(
+          {
+            readonlyColumnStoreReplica,
+            rowStore,
+            htap,
+          },
           range(0, 100).map(() => {
             return {
               ...generateCarOrder(locale),

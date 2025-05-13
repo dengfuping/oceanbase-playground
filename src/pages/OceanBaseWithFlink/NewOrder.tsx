@@ -18,10 +18,19 @@ import { COLOR_LIST } from './constant';
 import type { CarouselRef } from 'antd/es/carousel';
 
 interface OrderProps extends React.HTMLProps<HTMLDivElement> {
+  readonlyColumnStoreReplica?: boolean;
+  rowStore?: boolean;
+  htap?: boolean;
   onSuccess?: () => void;
 }
 
-const Order: React.FC<OrderProps> = ({ onSuccess, ...restProps }) => {
+const Order: React.FC<OrderProps> = ({
+  onSuccess,
+  readonlyColumnStoreReplica,
+  rowStore,
+  htap,
+  ...restProps
+}) => {
   const [form] = Form.useForm();
   const [carColor, setCarColor] = useState('blue');
   const [createPolling, setCreatePolling] = useState(false);
@@ -30,14 +39,16 @@ const Order: React.FC<OrderProps> = ({ onSuccess, ...restProps }) => {
   const carouselRef = useRef<CarouselRef>(null);
 
   // 下单
-  const { run: batchCreateCarOrder, loading: batchCreateCarOrderLoading } =
-    useRequest(CarOrderController.batchCreateCarOrder, {
+  const { run: batchCreateCarOrder, loading: batchCreateCarOrderLoading } = useRequest(
+    CarOrderController.batchCreateCarOrder,
+    {
       manual: true,
       onSuccess: () => {
         message.success('下单成功');
         onSuccess?.();
       },
-    });
+    },
+  );
 
   // 用于模拟场景的下单
   const { run: batchCreateCarOrderForPolling } = useRequest(
@@ -52,10 +63,7 @@ const Order: React.FC<OrderProps> = ({ onSuccess, ...restProps }) => {
 
   // 随机生成用户名
   const generateCustomerName = () => {
-    return `${lastName('CN', sample([0, 1]))}${firstName(
-      'CN',
-      sample([0, 1]),
-    )}`;
+    return `${lastName('CN', sample([0, 1]))}${firstName('CN', sample([0, 1]))}`;
   };
 
   // 随机生成订单
@@ -72,12 +80,17 @@ const Order: React.FC<OrderProps> = ({ onSuccess, ...restProps }) => {
   // 通过表单提交订单
   const handleSubmit = () => {
     form.validateFields().then((values) => {
-      const { count, carColor, customerName } = values;
+      const { count, carColor: formCarColor, customerName } = values;
       batchCreateCarOrder(
+        {
+          readonlyColumnStoreReplica,
+          rowStore,
+          htap,
+        },
         range(0, count).map(() => {
           return {
             ...generateCarOrder(),
-            carColor,
+            carColor: formCarColor,
             customerName,
           };
         }),
@@ -88,7 +101,14 @@ const Order: React.FC<OrderProps> = ({ onSuccess, ...restProps }) => {
   // 模拟单人连续下单
   useInterval(
     () => {
-      batchCreateCarOrderForPolling([generateCarOrder()]);
+      batchCreateCarOrderForPolling(
+        {
+          readonlyColumnStoreReplica,
+          rowStore,
+          htap,
+        },
+        [generateCarOrder()],
+      );
     },
     createPolling ? 1000 : undefined,
   );
@@ -97,6 +117,11 @@ const Order: React.FC<OrderProps> = ({ onSuccess, ...restProps }) => {
   useInterval(
     () => {
       batchCreateCarOrderForPolling(
+        {
+          readonlyColumnStoreReplica,
+          rowStore,
+          htap,
+        },
         range(0, 10).map(() => {
           return generateCarOrder();
         }),
@@ -133,8 +158,7 @@ const Order: React.FC<OrderProps> = ({ onSuccess, ...restProps }) => {
                 backgroundColor: item.value,
                 height: item.value === carColor ? 62 : 60,
                 borderRadius: 4,
-                border:
-                  item.value === carColor ? '2px solid yellow' : undefined,
+                border: item.value === carColor ? '2px solid yellow' : undefined,
               }}
             />
           </Col>

@@ -10,12 +10,26 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
     if (req.method === 'GET') {
       const readonlyColumnStoreReplica = req.query.readonlyColumnStoreReplica === 'true';
       const rowStore = req.query.rowStore === 'true';
+      const htap = req.query.htap === 'true';
       if (readonlyColumnStoreReplica || rowStore) {
         const carOrder = readonlyColumnStoreReplica
           ? model.OLAPReadonlyCarOrder
           : model.OLTPCarOrder;
         result = await carOrder.sequelize?.query(
           'SELECT max(`order_id`) AS `orderId`, `order_time` AS `orderTime`, `car_color` AS `carColor`, `customer_name` AS `customerName`, `request_id` as requestId, count(*) as count FROM `tp_car_orders` AS `tp_car_orders` GROUP BY `orderTime`, `customerName`, `requestId` ORDER BY `orderTime` DESC LIMIT 10;',
+          {
+            // ref: https://sequelize.org/docs/v6/core-concepts/raw-queries/
+            type: QueryTypes.SELECT,
+            logging: (sql, timing) => {
+              sqlText = sql?.replaceAll('Executed (default): ', '');
+              latency = timing;
+            },
+          },
+        );
+      } else if (htap) {
+        const carOrder = true ? model.TPCarOrder : model.APCarOrder;
+        result = await carOrder.sequelize?.query(
+          'SELECT max(`order_id`) AS `orderId`, `order_time` AS `orderTime`, `car_color` AS `carColor`, `customer_name` AS `customerName`, `request_id` as requestId, count(*) as count FROM `car_orders` AS `car_orders` GROUP BY `orderTime`, `customerName`, `requestId` ORDER BY `orderTime` DESC LIMIT 10;',
           {
             // ref: https://sequelize.org/docs/v6/core-concepts/raw-queries/
             type: QueryTypes.SELECT,

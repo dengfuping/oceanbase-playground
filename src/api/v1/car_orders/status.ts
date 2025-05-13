@@ -17,10 +17,19 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
       });
       const readonlyColumnStoreReplica = req.query.readonlyColumnStoreReplica === 'true';
       const rowStore = req.query.rowStore === 'true';
+      const htap = req.query.htap === 'true';
       if (readonlyColumnStoreReplica || rowStore) {
         const carOrder = readonlyColumnStoreReplica
           ? model.OLAPReadonlyCarOrder
           : model.OLTPCarOrder;
+        lastestAPCarOrder = await carOrder.findOne({
+          order: [['orderId', 'DESC']],
+          logging: (sql, timing) => {
+            latencyAP = timing;
+          },
+        });
+      } else if (htap) {
+        const carOrder = true ? model.TPCarOrder : model.APCarOrder;
         lastestAPCarOrder = await carOrder.findOne({
           order: [['orderId', 'DESC']],
           logging: (sql, timing) => {

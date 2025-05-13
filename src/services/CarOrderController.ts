@@ -5,9 +5,11 @@ import type { Prisma, CarOrder } from '@prisma/client';
 export interface QueryParams {
   readonlyColumnStoreReplica?: boolean;
   rowStore?: boolean;
+  htap?: boolean;
 }
 
 export async function createCarOrder(
+  params: QueryParams,
   body: Omit<Prisma.CarOrderCreateInput, 'orderTime'>,
   options?: RequestOptions,
 ) {
@@ -20,12 +22,14 @@ export async function createCarOrder(
     headers: {
       'Content-Type': 'application/json',
     },
+    params,
     data: body,
     ...(options || {}),
   });
 }
 
 export async function batchCreateCarOrder(
+  params: QueryParams,
   body: Omit<Prisma.CarOrderCreateInput, 'orderTime'>[],
   options?: RequestOptions,
 ) {
@@ -38,6 +42,7 @@ export async function batchCreateCarOrder(
     headers: {
       'Content-Type': 'application/json',
     },
+    params,
     data: body,
     ...(options || {}),
   });

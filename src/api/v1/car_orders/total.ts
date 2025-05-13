@@ -9,10 +9,19 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
     if (req.method === 'GET') {
       const readonlyColumnStoreReplica = req.query.readonlyColumnStoreReplica === 'true';
       const rowStore = req.query.rowStore === 'true';
+      const htap = req.query.htap === 'true';
       if (readonlyColumnStoreReplica || rowStore) {
         const carOrder = readonlyColumnStoreReplica
           ? model.OLAPReadonlyCarOrder
           : model.OLTPCarOrder;
+        total = await carOrder.count({
+          logging: (sql, timing) => {
+            sqlText = sql?.replaceAll('Executed (default): ', '');
+            latency = timing;
+          },
+        });
+      } else if (htap) {
+        const carOrder = true ? model.TPCarOrder : model.APCarOrder;
         total = await carOrder.count({
           logging: (sql, timing) => {
             sqlText = sql?.replaceAll('Executed (default): ', '');

@@ -1,27 +1,8 @@
-import {
-  Card,
-  Col,
-  Dropdown,
-  Empty,
-  Row,
-  Segmented,
-  Space,
-  Spin,
-  theme,
-  Typography,
-} from '@oceanbase/design';
-import { useInterval, useRequest, useScroll, useSize } from 'ahooks';
+import { Card, Col, Dropdown, Empty, Row, Segmented, Space, theme } from '@oceanbase/design';
+import { useSize } from 'ahooks';
 import React, { useEffect, useRef, useState } from 'react';
-import { GlobalOutlined, LoadingOutlined } from '@oceanbase/icons';
-import { sortByNumber } from '@oceanbase/util';
-import CountUp from 'react-countup';
-import * as CarOrderController from '@/services/CarOrderController';
-import { COLOR_LIST } from './constant';
+import { GlobalOutlined } from '@oceanbase/icons';
 import OrderForm from './OrderForm';
-import Chart from './Chart';
-import { formatTime } from './util';
-import type { CarOrder } from '@prisma/client';
-import { toString } from 'lodash';
 import {
   formatMessage,
   getLocale,
@@ -31,7 +12,6 @@ import {
   history,
   useLocation,
 } from 'umi';
-import moment from 'moment';
 import { detect } from 'detect-browser';
 import 'animate.css';
 import TweenOne from 'rc-tween-one';
@@ -41,6 +21,7 @@ import { MacScrollbar } from 'mac-scrollbar-better';
 import 'mac-scrollbar-better/dist/mac-scrollbar-better.css';
 import './global.less';
 import styles from './index.less';
+import Dashboard from './Dashboard';
 
 TweenOne.plugins.push(PathPlugin);
 
@@ -84,11 +65,19 @@ const Index: React.FC<IndexProps> = () => {
         defaultMessage: 'OceanBase 行存',
       }),
     },
+    {
+      value: '/htap',
+      label: formatMessage({
+        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.OceanBaseHtap',
+        defaultMessage: 'OceanBase HTAP',
+      }),
+    },
   ];
   const currentPath = pathList.find((item) => item.value === location.pathname) || pathList[0];
   const flink = currentPath.value === '/oceanbase-with-flink';
   const readonlyColumnStoreReplica = currentPath.value === '/readonly-column-store-replica';
   const rowStore = currentPath.value === '/row-store';
+  const htap = currentPath.value === '/htap';
 
   const localeList = [
     {
@@ -105,24 +94,14 @@ const Index: React.FC<IndexProps> = () => {
   const oltpRef = useRef<HTMLImageElement>(null);
   const flinkRef = useRef<HTMLDivElement>(null);
   const olapRef = useRef<HTMLImageElement>(null);
-  const dashboardRef = useRef<HTMLDivElement>(null);
-  const [path, setPath] = useState<string>('');
+  const dashboardRef1 = useRef<HTMLDivElement>(null);
+  const dashboardRef2 = useRef<HTMLDivElement>(null);
+  const [path1, setPath1] = useState<string>('');
+  const [path2, setPath2] = useState<string>('');
   const [sql, setSql] = useState('');
 
-  const latestRef = useRef<HTMLDivElement>(null);
-  const latestElment = latestRef.current;
-  const latestScroll = useScroll(latestRef);
-  const isLatestScroll = latestElment?.scrollHeight !== latestElment?.clientHeight;
-  // start scroll
-  const isLatestStartScroll = (latestScroll?.top || 0) > 0;
-  // Determine if an element has been totally scrolled
-  // ref: https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight#determine_if_an_element_has_been_totally_scrolled
-  const isLatestTotalScroll =
-    Math.abs(
-      (latestElment?.scrollHeight || 0) -
-        (latestElment?.clientHeight || 0) -
-        (latestElment?.scrollTop || 0),
-    ) < 1;
+  const [syncing1, setSyncing1] = useState(false);
+  const [syncing2, setSyncing2] = useState(false);
 
   const sqlRef = useRef<HTMLDivElement>(null);
   const sqlElment = sqlRef.current;
@@ -142,15 +121,16 @@ const Index: React.FC<IndexProps> = () => {
     const oltpDom = oltpRef.current;
     const flinkDom = flinkRef.current;
     const olapDom = olapRef.current;
-    const dashboardDom = dashboardRef.current;
+    const dashboardDom1 = dashboardRef1.current;
+    const dashboardDom2 = dashboardRef2.current;
 
-    if (orderDom && oltpDom && dashboardDom) {
+    if (orderDom && oltpDom && dashboardDom1 && (!htap || (htap && dashboardDom2))) {
       const oltpPoint = {
         x: oltpDom.offsetLeft + oltpDom.offsetWidth / 2,
-        y: oltpDom.offsetTop + oltpDom.offsetHeight / 2,
+        y: oltpDom.offsetTop + (htap ? oltpDom.offsetHeight / 3 : oltpDom.offsetHeight / 2),
       };
       const orderPoint = {
-        x: dashboardDom.offsetLeft,
+        x: dashboardDom1.offsetLeft,
         y: oltpPoint.y,
       };
       const flinkPoint = {
@@ -165,13 +145,34 @@ const Index: React.FC<IndexProps> = () => {
         x: orderDom.offsetLeft + orderDom.offsetWidth,
         y: rowStore ? oltpPoint.y : olapPoint.y,
       };
-      const newPath = readonlyColumnStoreReplica
-        ? `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`
-        : rowStore
-        ? `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`
-        : `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${flinkPoint.x} ${flinkPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`;
-      console.log(newPath);
-      setPath(newPath);
+      const newPath1 =
+        readonlyColumnStoreReplica || htap
+          ? `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`
+          : rowStore
+          ? `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`
+          : `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${flinkPoint.x} ${flinkPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`;
+      setPath1(newPath1);
+
+      if (htap) {
+        const oltpLeftPoint = {
+          x: oltpPoint.x,
+          y: oltpDom.offsetTop + (oltpDom.offsetHeight * 2) / 3,
+        };
+        const oltpRightPoint = {
+          x: oltpPoint.x + oltpDom.offsetWidth / 2,
+          y: oltpDom.offsetTop + (oltpDom.offsetHeight * 2) / 3,
+        };
+        const orderPoint2 = {
+          x: orderPoint.x,
+          y: oltpLeftPoint.y,
+        };
+        const dashboard2Point = {
+          x: orderDom.offsetLeft + orderDom.offsetWidth,
+          y: oltpRightPoint.y,
+        };
+        const newPath2 = `M ${orderPoint2.x} ${orderPoint2.y}L ${oltpLeftPoint.x} ${oltpLeftPoint.y}L ${oltpRightPoint.x} ${oltpRightPoint.y}L ${dashboard2Point.x} ${dashboard2Point.y}`;
+        setPath2(newPath2);
+      }
     }
   };
 
@@ -212,104 +213,14 @@ const Index: React.FC<IndexProps> = () => {
     };
   }, []);
 
-  const {
-    data: totalData,
-    run: getTotal,
-    loading: totalLoading,
-  } = useRequest(() => CarOrderController.getTotal({ readonlyColumnStoreReplica, rowStore }), {
-    onSuccess: (res) => {
-      updateSql(res.sqlText);
-    },
-  });
-  const { total = 0, latency: totalLatency } = totalData || {};
-
-  // to preserve previous total
-  const countRef = useRef(total);
-  useEffect(() => {
-    countRef.current = total;
-  }, [total]);
-
-  const {
-    data: colorTop3Data,
-    run: getColorTop3,
-    loading: colorTop3Loading,
-  } = useRequest(() => CarOrderController.getColorTop3({ readonlyColumnStoreReplica, rowStore }), {
-    onSuccess: (res) => {
-      updateSql(res.sqlText);
-    },
-  });
-  const { data: colorTop3 = [], latency: colorTop3Latency } = colorTop3Data || {};
-
-  const [orderList, setOrderList] = useState<CarOrder[]>([]);
-  const latestOrder = orderList[0] || {};
-
-  const {
-    data: latestData,
-    loading: latestLoading,
-    run: getLatest,
-  } = useRequest(() => CarOrderController.getLatest({ readonlyColumnStoreReplica, rowStore }), {
-    onSuccess: (res) => {
-      const latest = res.data || [];
-      if (latest.length > 0) {
-        updateSql(res.sqlText);
-        let newOrderList = [...latest, ...orderList].slice(0, 10);
-        newOrderList = newOrderList
-          .map((item) => ({
-            ...item,
-            isNew:
-              orderList.length === 0 ||
-              orderList.map((order) => order.orderId).includes(item.orderId)
-                ? false
-                : true,
-            // 增加时间戳，每次都生成唯一 key，保证滚动动画正常执行
-            key: `${toString(item.orderId)}-${moment().format()}`,
-          }))
-          // 从大到小排序
-          .sort((a, b) => sortByNumber(b, a, 'orderId'));
-        setOrderList(newOrderList);
-        setTimeout(() => {
-          setOrderList(
-            newOrderList.map((item) => ({
-              ...item,
-              isNew: false,
-            })),
-          );
-        }, 1000);
-      }
-    },
-  });
-  const { latency: latestLantency } = latestData || {};
-
-  const getAllData = () => {
-    getTotal();
-    getColorTop3();
-    getLatest();
+  const animation1: IAnimObject = {
+    path: path1,
+    repeat: -1,
+    duration: 1250,
+    ease: 'linear',
   };
-
-  // 获取同步状态和是否应该刷新
-  const { data: statusData, run: getStatus } = useRequest(
-    () =>
-      CarOrderController.getStatus({
-        readonlyColumnStoreReplica,
-        rowStore,
-        orderId: latestOrder.orderId,
-      }),
-    {
-      onSuccess: (res) => {
-        if (res.shouldRefresh) {
-          getAllData();
-        }
-      },
-    },
-  );
-  const { syncing } = statusData || {};
-
-  useInterval(() => {
-    getStatus();
-  }, 1000);
-
-  const animation: IAnimObject = {
-    path,
+  const animation2: IAnimObject = {
+    path: path2,
     repeat: -1,
     duration: 1250,
     ease: 'linear',
@@ -419,8 +330,10 @@ const Index: React.FC<IndexProps> = () => {
                   qrcode={qrcode}
                   userId={userId}
                   sm={sm}
+                  readonlyColumnStoreReplica={readonlyColumnStoreReplica}
+                  rowStore={rowStore}
+                  htap={htap}
                   onSuccess={(sqlText) => {
-                    getStatus();
                     updateSql(sqlText);
                   }}
                 />
@@ -428,7 +341,7 @@ const Index: React.FC<IndexProps> = () => {
             </div>
           </Col>
           <Col span={4} style={{ height: '100%' }}>
-            {path && (
+            {path1 && (
               <div
                 style={{
                   position: 'absolute',
@@ -437,9 +350,9 @@ const Index: React.FC<IndexProps> = () => {
                   height: '100%',
                 }}
               >
-                {syncing && (
+                {syncing1 && (
                   <>
-                    <TweenOne animation={animation} style={animationStyle} />
+                    <TweenOne animation={animation1} style={animationStyle} />
                     {/* <TweenOne
                       animation={{
                         ...animation,
@@ -458,7 +371,48 @@ const Index: React.FC<IndexProps> = () => {
                 )}
                 <svg style={{ width: '100%', height: '100%' }}>
                   <path
-                    d={path}
+                    d={path1}
+                    fill="none"
+                    stroke="#adb2bd"
+                    strokeWidth={1}
+                    strokeDasharray="6 6"
+                    markerEnd="url(#arrow)"
+                  />
+                </svg>
+              </div>
+            )}
+
+            {htap && path2 && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  width: 'calc(100% - 8px)',
+                  height: '100%',
+                }}
+              >
+                {syncing2 && (
+                  <>
+                    <TweenOne animation={animation2} style={animationStyle} />
+                    {/* <TweenOne
+                      animation={{
+                        ...animation,
+                        delay: 50,
+                      }}
+                      style={animationStyle}
+                    />
+                    <TweenOne
+                      animation={{
+                        ...animation,
+                        delay: 100,
+                      }}
+                      style={animationStyle}
+                    /> */}
+                  </>
+                )}
+                <svg style={{ width: '100%', height: '100%' }}>
+                  <path
+                    d={path2}
                     fill="none"
                     stroke="#adb2bd"
                     strokeWidth={1}
@@ -483,13 +437,13 @@ const Index: React.FC<IndexProps> = () => {
                 alignItems: 'center',
                 textAlign: 'center',
                 height: '100%',
-                padding: '64px 0px',
+                padding: htap ? '150px 0px' : '64px 0px',
                 zIndex: 10,
                 position: 'relative',
                 fontFamily: 'Roboto',
               }}
             >
-              {(flink || readonlyColumnStoreReplica) && (
+              {(flink || readonlyColumnStoreReplica || htap) && (
                 <div>
                   <img
                     ref={olapRef}
@@ -555,272 +509,60 @@ const Index: React.FC<IndexProps> = () => {
           </Col>
           <Col span={sm ? 13 : 14} style={{ height: '100%' }}>
             <Row gutter={[0, 16]} style={{ height: '100%' }}>
-              <Col span={24} style={{ height: 'calc((100% - 16px) * 0.7)' }}>
-                <Card
-                  ref={dashboardRef}
-                  type="inner"
-                  title={
-                    <h4>
-                      {formatMessage({
-                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealtimeOrderDashboard',
-                        defaultMessage: '实时订单看板',
-                      })}
-                    </h4>
-                  }
-                  className={styles.orderViewCard}
-                  style={{ height: '100%' }}
-                  bodyStyle={{ padding: 0, height: 'calc(100% - 48px)' }}
-                >
-                  <Row style={{ height: '100%' }}>
-                    <Col
-                      span={12}
-                      style={{
-                        height: '100%',
-                        borderRight: `1px solid ${token.colorBorderSecondary}`,
-                      }}
-                    >
-                      <Row style={{ height: '100%' }}>
-                        <Col span={24} style={{ height: 154 }}>
-                          <div
-                            style={{
-                              borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                              padding: '24px 12px 16px 24px',
-                            }}
-                          >
-                            <Space direction="vertical" size={4}>
-                              <h5>
-                                {formatMessage({
-                                  id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.TotalOrderCount',
-                                  defaultMessage: '总预定量',
-                                })}
-                              </h5>
-                              <Space className="sql-rt">
-                                {formatMessage(
-                                  {
-                                    id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
-                                    defaultMessage: 'SQL 耗时：{latency}ms',
-                                  },
-                                  {
-                                    latency: totalLatency,
-                                  },
-                                )}
-                                <Spin
-                                  spinning={totalLoading}
-                                  indicator={
-                                    <LoadingOutlined
-                                      style={{
-                                        fontSize: 14,
-                                        color: token.colorSuccess,
-                                      }}
-                                    />
-                                  }
-                                  style={{ marginTop: -4 }}
-                                />
-                              </Space>
-                            </Space>
-                            <h1>
-                              <CountUp duration={1} start={countRef.current} end={total} />
-                            </h1>
-                          </div>
-                        </Col>
-                        <Col span={24} style={{ height: 'calc(100% - 154px)' }}>
-                          <div
-                            style={{
-                              height: '100%',
-                              padding: '24px 12px 16px 24px',
-                            }}
-                          >
-                            <Space direction="vertical" size={4}>
-                              <h5>
-                                {formatMessage({
-                                  id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Top3ColorsOfToday',
-                                  defaultMessage: '今日颜色预定量 Top3',
-                                })}
-                              </h5>
-                              <Space className="sql-rt">
-                                {formatMessage(
-                                  {
-                                    id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
-                                    defaultMessage: 'SQL 耗时：{latency}ms',
-                                  },
-                                  { latency: colorTop3Latency },
-                                )}
-                                <Spin
-                                  spinning={colorTop3Loading}
-                                  indicator={
-                                    <LoadingOutlined
-                                      style={{
-                                        fontSize: 14,
-                                        color: token.colorSuccess,
-                                      }}
-                                    />
-                                  }
-                                  style={{ marginTop: -4 }}
-                                />
-                              </Space>
-                            </Space>
-                            <Chart loading={colorTop3Loading} data={colorTop3} />
-                          </div>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col span={12} style={{ height: '100%' }}>
-                      <div
-                        style={{
-                          height: '100%',
-                          padding: '24px 0px 0px 24px',
-                        }}
-                      >
-                        <Space direction="vertical" size={4}>
-                          <h5>
-                            {formatMessage({
-                              id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders',
-                              defaultMessage: '实时订单',
-                            })}
-                          </h5>
-                          <Space className="sql-rt">
-                            {formatMessage(
-                              {
-                                id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
-                                defaultMessage: 'SQL 耗时：{latency}ms',
-                              },
-                              { latency: latestLantency },
-                            )}
-                            <Spin
-                              spinning={latestLoading}
-                              indicator={
-                                <LoadingOutlined
-                                  style={{
-                                    fontSize: 14,
-                                    color: token.colorSuccess,
-                                  }}
-                                />
-                              }
-                              style={{ marginTop: -4 }}
-                            />
-                          </Space>
-                        </Space>
-                        <MacScrollbar
-                          ref={latestRef}
-                          style={{
-                            height: 'calc(100% - 68px)',
-                          }}
-                        >
-                          {isLatestStartScroll && (
-                            <div
-                              style={{
-                                position: 'absolute',
-                                left: 0,
-                                height: 60,
-                                width: '100%',
-                                backgroundImage:
-                                  'linear-gradient(360deg, #fefefe00 0%, #ffffff 100%)',
-                                zIndex: 10,
-                              }}
-                            />
-                          )}
-                          {orderList.map((item) => {
-                            const colorItem = COLOR_LIST.find(
-                              (color) => color.value === item.carColor,
-                            );
-                            return (
-                              <div
-                                key={item.key}
-                                style={{
-                                  borderRadius: token.borderRadiusSM,
-                                  borderWidth: 1,
-                                  borderStyle: 'solid',
-                                  borderColor: item.isNew ? token.colorSuccess : 'transparent',
-                                  marginBottom: 16,
-                                  padding: '4px 0px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  transition: 'all 0.3s ease',
-                                }}
-                                className="animate__animated animate__slideInDown"
-                              >
-                                <div
-                                  style={{
-                                    width: 70,
-                                    height: 36,
-                                    background: `url(https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*ZgXlRqDlwmYAAAAAAAAAAAAADmfOAQ/original) no-repeat`,
-                                    backgroundSize: 'cover',
-                                    borderRadius: 6,
-                                    padding: '6px 4px',
-                                    marginRight: 8,
-                                  }}
-                                >
-                                  <img src={colorItem?.image} style={{ width: '100%' }} />
-                                </div>
-                                <div style={{ maxWidth: 'calc(100% - 90px)' }}>
-                                  <Typography.Text
-                                    ellipsis={{ tooltip: true }}
-                                    style={{ fontWeight: 700 }}
-                                  >
-                                    {formatMessage(
-                                      {
-                                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess',
-                                        defaultMessage: '{customerName} 下单成功',
-                                      },
-                                      {
-                                        customerName: item.customerName,
-                                      },
-                                    )}
-                                  </Typography.Text>
-                                  <br />
-                                  <Typography.Text
-                                    ellipsis={{ tooltip: true }}
-                                    style={{
-                                      color: token.colorTextDescription,
-                                    }}
-                                  >
-                                    <span style={{ marginRight: 8 }}>
-                                      {formatMessage(
-                                        {
-                                          id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeCarColor',
-                                          defaultMessage: '{color} {count} 辆',
-                                        },
-                                        {
-                                          color: colorItem?.label,
-                                          count: item.count,
-                                        },
-                                      )}
-                                    </span>
-                                    <span>
-                                      {moment(item.orderTime).isSame(moment(), 'day')
-                                        ? formatTime(item.orderTime)
-                                        : // Display month and day for not today
-                                          moment(item.orderTime).format('MM/DD HH:mm:ss')}
-                                    </span>
-                                  </Typography.Text>
-                                </div>
-                              </div>
-                            );
-                          })}
-                          {isLatestScroll && !isLatestTotalScroll && (
-                            <div
-                              style={{
-                                position: 'absolute',
-                                left: 0,
-                                bottom: 0,
-                                height: 60,
-                                width: '100%',
-                                backgroundImage:
-                                  'linear-gradient(180deg, #fefefe00 0%, #ffffff 100%)',
-                              }}
-                            />
-                          )}
-                        </MacScrollbar>
-                      </div>
-                    </Col>
-                  </Row>
-                </Card>
+              <Col
+                span={24}
+                style={{
+                  height: htap ? 'calc((100% - 32px) * 0.4)' : 'calc((100% - 16px) * 0.8)',
+                }}
+              >
+                <Dashboard
+                  title={formatMessage({
+                    id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealtimeOrderDashboardReadonlyColumnStoreReplica',
+                    defaultMessage: '实时订单看板（方案一：从只读列存副本查询）',
+                  })}
+                  dashboardRef={dashboardRef1}
+                  updateSql={updateSql}
+                  updateSyncing={(syncing) => {
+                    setSyncing1(syncing);
+                  }}
+                  readonlyColumnStoreReplica={readonlyColumnStoreReplica}
+                  rowStore={rowStore}
+                  htap={htap}
+                />
               </Col>
-              <Col span={24} style={{ height: 'calc((100% - 16px) * 0.3)' }}>
+              {htap && (
+                <Col
+                  span={24}
+                  style={{
+                    height: htap ? 'calc((100% - 32px) * 0.4)' : 'calc((100% - 16px) * 0.8)',
+                  }}
+                >
+                  <Dashboard
+                    title={formatMessage({
+                      id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealtimeOrderDashboardRowStore',
+                      defaultMessage: '实时订单看板（方案二：从行存副本查询）',
+                    })}
+                    dashboardRef={dashboardRef2}
+                    updateSql={updateSql}
+                    updateSyncing={(syncing) => {
+                      setSyncing2(syncing);
+                    }}
+                    readonlyColumnStoreReplica={readonlyColumnStoreReplica}
+                    rowStore={rowStore}
+                    htap={htap}
+                    isSlow={true}
+                  />
+                </Col>
+              )}
+              <Col
+                span={24}
+                style={{ height: htap ? 'calc((100% - 32px) * 0.2)' : 'calc((100% - 16px) * 0.2)' }}
+              >
                 <Card
                   type="inner"
+                  size={htap ? 'small' : 'default'}
                   title={
-                    <h4>
+                    <h4 style={htap ? { fontSize: 14 } : {}}>
                       {formatMessage({
                         id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealtimeExecuteSql',
                         defaultMessage: '实时执行 SQL',
@@ -831,13 +573,13 @@ const Index: React.FC<IndexProps> = () => {
                   bodyStyle={{
                     padding: '0px',
                     fontFamily: 'Menlo',
-                    height: 'calc(100% - 48px)',
+                    height: htap ? 'calc(100% - 38px)' : 'calc(100% - 48px)',
                   }}
                 >
                   <MacScrollbar
                     ref={sqlRef}
                     style={{
-                      padding: '16px 24px',
+                      padding: htap ? 16 : '16px 24px',
                       height: '100%',
                       overflow: 'auto',
                       whiteSpace: 'pre',

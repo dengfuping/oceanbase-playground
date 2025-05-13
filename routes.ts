@@ -4,8 +4,8 @@ export default [
     component: 'Layout',
     routes: [
       {
-        path: 'oceanbase-with-flink/order',
-        component: 'OceanBaseWithFlink/Order',
+        path: '/order',
+        component: 'Order',
       },
       {
         path: '/',
@@ -25,6 +25,10 @@ export default [
           },
           {
             path: 'row-store',
+            component: 'OceanBaseWithFlink',
+          },
+          {
+            path: 'htap',
             component: 'OceanBaseWithFlink',
           },
         ],

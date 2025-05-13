@@ -5,15 +5,12 @@ import security from '../../security';
 
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
+    const htap = req.query.htap === 'true';
     let sqlText;
     let latency;
     if (req.method === 'POST') {
-      const customerNames: string[] = uniq(
-        req.body?.map((item: any) => item.customerName),
-      );
-      const promiseList = customerNames.map((item) =>
-        security.nicknameDetection(item),
-      );
+      const customerNames: string[] = uniq(req.body?.map((item: any) => item.customerName));
+      const promiseList = customerNames.map((item) => security.nicknameDetection(item));
       const responses = await Promise.all(promiseList);
       const existNotSecure = responses.some((response) => {
         const labels = response.Data?.labels || '';
@@ -28,9 +25,10 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
           errorCode: 'BizError',
         });
       } else {
-        const transaction = await model.OLTPCarOrder.sequelize?.transaction();
+        const carOrder = htap ? model.TPCarOrder : model.OLTPCarOrder;
+        const transaction = await carOrder.sequelize?.transaction();
         try {
-          const carOrders = await model.OLTPCarOrder.bulkCreate(req.body, {
+          const carOrders = await carOrder.bulkCreate(req.body, {
             transaction,
             logging: (sql, timing) => {
               sqlText = sql?.replaceAll(/Executed (\S*): /g, '');
