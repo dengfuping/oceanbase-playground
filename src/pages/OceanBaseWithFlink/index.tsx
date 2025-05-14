@@ -99,10 +99,12 @@ const Index: React.FC<IndexProps> = () => {
   const dashboardRef2 = useRef<HTMLDivElement>(null);
   const dashboardForwardRef1 = useRef<DashboardRefType>(null);
   const dashboardForwardRef2 = useRef<DashboardRefType>(null);
+  const [path, setPath] = useState<string>('');
   const [path1, setPath1] = useState<string>('');
   const [path2, setPath2] = useState<string>('');
   const [sql, setSql] = useState('');
 
+  const [creating, setCreating] = useState(false);
   const [syncing1, setSyncing1] = useState(false);
   const [syncing2, setSyncing2] = useState(false);
 
@@ -130,7 +132,7 @@ const Index: React.FC<IndexProps> = () => {
     if (orderDom && oltpDom && dashboardDom1 && (!htap || (htap && dashboardDom2))) {
       const oltpPoint = {
         x: oltpDom.offsetLeft + oltpDom.offsetWidth / 2,
-        y: oltpDom.offsetTop + (htap ? oltpDom.offsetHeight / 3 : oltpDom.offsetHeight / 2),
+        y: oltpDom.offsetTop + oltpDom.offsetHeight / 2,
       };
       const orderPoint = {
         x: dashboardDom1.offsetLeft,
@@ -148,32 +150,29 @@ const Index: React.FC<IndexProps> = () => {
         x: orderDom.offsetLeft + orderDom.offsetWidth,
         y: rowStore ? oltpPoint.y : olapPoint.y,
       };
-      const newPath1 =
-        readonlyColumnStoreReplica || htap
-          ? `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`
-          : rowStore
-          ? `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`
-          : `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${flinkPoint.x} ${flinkPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`;
+
+      const newPath1 = readonlyColumnStoreReplica
+        ? `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`
+        : htap
+        ? `M ${oltpPoint.x} ${oltpPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`
+        : rowStore
+        ? `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`
+        : `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}L ${flinkPoint.x} ${flinkPoint.y}L ${olapPoint.x} ${olapPoint.y}L ${dashboardPoint.x} ${dashboardPoint.y}`;
       setPath1(newPath1);
 
       if (htap) {
-        const oltpLeftPoint = {
-          x: oltpPoint.x,
-          y: oltpDom.offsetTop + (oltpDom.offsetHeight * 2) / 3,
-        };
+        const newPath = `M ${orderPoint.x} ${orderPoint.y}L ${oltpPoint.x} ${oltpPoint.y}`;
+        setPath(newPath);
+
         const oltpRightPoint = {
           x: oltpPoint.x + oltpDom.offsetWidth / 2,
-          y: oltpDom.offsetTop + (oltpDom.offsetHeight * 2) / 3,
-        };
-        const orderPoint2 = {
-          x: orderPoint.x,
-          y: oltpLeftPoint.y,
+          y: oltpDom.offsetTop + oltpDom.offsetHeight / 2,
         };
         const dashboard2Point = {
           x: orderDom.offsetLeft + orderDom.offsetWidth,
           y: oltpRightPoint.y,
         };
-        const newPath2 = `M ${orderPoint2.x} ${orderPoint2.y}L ${oltpLeftPoint.x} ${oltpLeftPoint.y}L ${oltpRightPoint.x} ${oltpRightPoint.y}L ${dashboard2Point.x} ${dashboard2Point.y}`;
+        const newPath2 = `M ${oltpPoint.x} ${oltpPoint.y}L ${oltpRightPoint.x} ${oltpRightPoint.y}L ${dashboard2Point.x} ${dashboard2Point.y}`;
         setPath2(newPath2);
       }
     }
@@ -216,16 +215,22 @@ const Index: React.FC<IndexProps> = () => {
     };
   }, []);
 
+  const animation: IAnimObject = {
+    path: path,
+    repeat: -1,
+    duration: 500,
+    ease: 'linear',
+  };
   const animation1: IAnimObject = {
     path: path1,
     repeat: -1,
-    duration: 1250,
+    duration: htap ? 1000 : 1250,
     ease: 'linear',
   };
   const animation2: IAnimObject = {
     path: path2,
     repeat: -1,
-    duration: 1250,
+    duration: 1000,
     ease: 'linear',
   };
   const animationStyle: React.CSSProperties = {
@@ -239,8 +244,13 @@ const Index: React.FC<IndexProps> = () => {
     height: 12,
     transform: 'translate(-6px, -6px)',
     borderRadius: '50%',
-    // border: '1px solid #adb2bd',
-    background: token.colorPrimary,
+    ...(htap
+      ? {
+          background: '#ffffff',
+        }
+      : {
+          background: token.colorPrimary,
+        }),
   };
 
   const containerPadding = sm ? 24 : 48;
@@ -336,6 +346,9 @@ const Index: React.FC<IndexProps> = () => {
                   readonlyColumnStoreReplica={readonlyColumnStoreReplica}
                   rowStore={rowStore}
                   htap={htap}
+                  updateCreating={(newCreating) => {
+                    setCreating(newCreating);
+                  }}
                   onSuccess={(sqlText) => {
                     setSyncing1(true);
                     setSyncing2(true);
@@ -348,6 +361,38 @@ const Index: React.FC<IndexProps> = () => {
             </div>
           </Col>
           <Col span={4} style={{ height: '100%' }}>
+            {path && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  width: 'calc(100% - 8px)',
+                  height: '100%',
+                }}
+              >
+                {creating && (
+                  <>
+                    <TweenOne
+                      animation={animation}
+                      style={{
+                        ...animationStyle,
+                        border: htap ? `1.5px solid ${token.colorTextTertiary}` : 'none',
+                      }}
+                    />
+                  </>
+                )}
+                <svg style={{ width: '100%', height: '100%' }}>
+                  <path
+                    d={path}
+                    fill="none"
+                    stroke="#adb2bd"
+                    strokeWidth={htap ? 1.5 : 1}
+                    strokeDasharray="6 5"
+                    markerEnd="url(#arrow)"
+                  />
+                </svg>
+              </div>
+            )}
             {path1 && (
               <div
                 style={{
@@ -359,30 +404,22 @@ const Index: React.FC<IndexProps> = () => {
               >
                 {syncing1 && (
                   <>
-                    <TweenOne animation={animation1} style={animationStyle} />
-                    {/* <TweenOne
-                      animation={{
-                        ...animation,
-                        delay: 50,
-                      }}
-                      style={animationStyle}
-                    />
                     <TweenOne
-                      animation={{
-                        ...animation,
-                        delay: 100,
+                      animation={animation1}
+                      style={{
+                        ...animationStyle,
+                        border: htap ? `1.5px solid ${token.colorSuccess}` : 'none',
                       }}
-                      style={animationStyle}
-                    /> */}
+                    />
                   </>
                 )}
                 <svg style={{ width: '100%', height: '100%' }}>
                   <path
                     d={path1}
                     fill="none"
-                    stroke="#adb2bd"
-                    strokeWidth={1}
-                    strokeDasharray="6 6"
+                    stroke={htap ? token.colorSuccess : '#adb2bd'}
+                    strokeWidth={htap ? 1.5 : 1}
+                    strokeDasharray="6 5"
                     markerEnd="url(#arrow)"
                   />
                 </svg>
@@ -400,7 +437,13 @@ const Index: React.FC<IndexProps> = () => {
               >
                 {syncing2 && (
                   <>
-                    <TweenOne animation={animation2} style={animationStyle} />
+                    <TweenOne
+                      animation={animation2}
+                      style={{
+                        ...animationStyle,
+                        border: htap ? `1.5px solid ${token.colorError}` : 'none',
+                      }}
+                    />
                     {/* <TweenOne
                       animation={{
                         ...animation,
@@ -421,9 +464,9 @@ const Index: React.FC<IndexProps> = () => {
                   <path
                     d={path2}
                     fill="none"
-                    stroke="#adb2bd"
-                    strokeWidth={1}
-                    strokeDasharray="6 6"
+                    stroke={htap ? token.colorError : '#adb2bd'}
+                    strokeWidth={htap ? 1.5 : 1}
+                    strokeDasharray="6 5"
                     markerEnd="url(#arrow)"
                   />
                 </svg>

@@ -21,6 +21,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { COLOR_LIST } from './constant';
 import { generateCustomerName, generateCarOrder } from './util';
 import styles from './OrderForm.less';
+import { useEffect } from 'react';
 
 interface OrderFormProps extends React.HTMLProps<HTMLDivElement> {
   debug?: string | null;
@@ -30,6 +31,7 @@ interface OrderFormProps extends React.HTMLProps<HTMLDivElement> {
   readonlyColumnStoreReplica?: boolean;
   rowStore?: boolean;
   htap?: boolean;
+  updateCreating?: (creating: boolean) => void;
   onSuccess?: (sqlText?: string) => void;
 }
 
@@ -41,6 +43,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
   readonlyColumnStoreReplica,
   rowStore,
   htap,
+  updateCreating,
   onSuccess,
   ...restProps
 }) => {
@@ -84,6 +87,10 @@ const OrderForm: React.FC<OrderFormProps> = ({
       },
     },
   );
+
+  useEffect(() => {
+    updateCreating?.(batchCreateCarOrderLoading || batchCreateCarOrderForPolling);
+  }, [batchCreateCarOrderLoading, batchCreateCarOrderForPolling]);
 
   const getResourcesId = () => {
     const isInIframe = parent !== window;
