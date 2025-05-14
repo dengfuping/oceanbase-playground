@@ -22,7 +22,6 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
       if (existNotSecure) {
         res.status(500).json({
           errorMessage: 'Username is illegal or sensitive, please input again',
-          errorCode: 'BizError',
         });
       } else {
         const carOrder = htap ? model.TPCarOrder : model.OLTPCarOrder;

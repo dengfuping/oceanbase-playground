@@ -8,10 +8,9 @@ export const request: RequestConfig = {
         throw error;
       }
       if (error.response) {
-        const { errorMessage, errorCode } = error.response?.data || {};
+        const { errorMessage } = error.response?.data || {};
         // request success, response failed (status code !== 2xx)
-        // only message BizError for now
-        if (errorCode === 'BizError' && errorMessage) {
+        if (errorMessage) {
           message.error(errorMessage);
         }
       } else if (error.request) {
