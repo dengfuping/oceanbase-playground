@@ -21,6 +21,7 @@ import { MacScrollbar } from 'mac-scrollbar-better';
 import 'mac-scrollbar-better/dist/mac-scrollbar-better.css';
 import './global.less';
 import styles from './index.less';
+import type { DashboardRefType } from './Dashboard';
 import Dashboard from './Dashboard';
 
 TweenOne.plugins.push(PathPlugin);
@@ -96,6 +97,8 @@ const Index: React.FC<IndexProps> = () => {
   const olapRef = useRef<HTMLImageElement>(null);
   const dashboardRef1 = useRef<HTMLDivElement>(null);
   const dashboardRef2 = useRef<HTMLDivElement>(null);
+  const dashboardForwardRef1 = useRef<DashboardRefType>(null);
+  const dashboardForwardRef2 = useRef<DashboardRefType>(null);
   const [path1, setPath1] = useState<string>('');
   const [path2, setPath2] = useState<string>('');
   const [sql, setSql] = useState('');
@@ -334,6 +337,10 @@ const Index: React.FC<IndexProps> = () => {
                   rowStore={rowStore}
                   htap={htap}
                   onSuccess={(sqlText) => {
+                    setSyncing1(true);
+                    setSyncing2(true);
+                    dashboardForwardRef1.current?.getStatus();
+                    dashboardForwardRef2.current?.getStatus();
                     updateSql(sqlText);
                   }}
                 />
@@ -520,6 +527,7 @@ const Index: React.FC<IndexProps> = () => {
                     id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealtimeOrderDashboardReadonlyColumnStoreReplica',
                     defaultMessage: '实时订单看板（方案一：从只读列存副本查询）',
                   })}
+                  ref={dashboardForwardRef1}
                   dashboardRef={dashboardRef1}
                   updateSql={updateSql}
                   updateSyncing={(syncing) => {
@@ -543,6 +551,7 @@ const Index: React.FC<IndexProps> = () => {
                       id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealtimeOrderDashboardRowStore',
                       defaultMessage: '实时订单看板（方案二：从行存副本查询）',
                     })}
+                    ref={dashboardForwardRef2}
                     dashboardRef={dashboardRef2}
                     updateSql={updateSql}
                     updateSyncing={(syncing) => {
