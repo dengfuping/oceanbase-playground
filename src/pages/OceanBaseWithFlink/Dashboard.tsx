@@ -359,7 +359,7 @@ const Dashboard = forwardRef(
                 <h5 style={htap ? { fontSize: 14 } : {}}>
                   {formatMessage({
                     id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders',
-                    defaultMessage: '实时订单',
+                    defaultMessage: '今日实时订单',
                   })}
                 </h5>
                 <Space

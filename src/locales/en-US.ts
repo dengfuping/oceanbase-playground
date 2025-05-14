@@ -23,7 +23,7 @@ export default {
   "oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency": "SQL Execution Time: {latency}ms",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.Top3ColorsOfToday": "Top3 Colors of Today",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.OrderCountOfToday": "Order Count of Today",
-  "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders": "Real Time Orders",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders": "Today Real Time Orders",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.OrderSuccess": "Place order successfully",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrderSuccess": "{customerName} placed an order",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeCarColor": "{color} {count} cars",
