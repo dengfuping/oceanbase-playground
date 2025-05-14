@@ -30,7 +30,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
           const carOrders = await carOrder.bulkCreate(req.body, {
             transaction,
             logging: (sql, timing) => {
-              sqlText = sql?.replaceAll(/Executed (\S*): /g, '');
+              sqlText = sql?.replaceAll(/Executed (\S*): /g, htap ? model.htapMap.tp : '');
               latency = timing;
             },
           });

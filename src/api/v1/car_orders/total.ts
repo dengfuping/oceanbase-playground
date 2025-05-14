@@ -25,7 +25,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
         const carOrder = type === 'tp' ? model.TPCarOrder : model.APCarOrder;
         total = await carOrder.count({
           logging: (sql, timing) => {
-            sqlText = sql?.replaceAll('Executed (default): ', '');
+            sqlText = sql?.replaceAll('Executed (default): ', model.htapMap[type]);
             latency = timing;
           },
         });

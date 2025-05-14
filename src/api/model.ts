@@ -94,4 +94,16 @@ const APCarOrder = ap.define('car_orders', option, {
   timestamps: false,
 });
 
-export default { OLTPCarOrder, OLAPCarOrder, OLAPReadonlyCarOrder, TPCarOrder, APCarOrder };
+const htapMap = {
+  tp: '[行存] ',
+  ap: '[列存] ',
+};
+
+export default {
+  OLTPCarOrder,
+  OLAPCarOrder,
+  OLAPReadonlyCarOrder,
+  TPCarOrder,
+  APCarOrder,
+  htapMap,
+};

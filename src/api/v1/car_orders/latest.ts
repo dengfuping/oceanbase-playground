@@ -35,7 +35,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
             // ref: https://sequelize.org/docs/v6/core-concepts/raw-queries/
             type: QueryTypes.SELECT,
             logging: (sql, timing) => {
-              sqlText = sql?.replaceAll('Executed (default): ', '');
+              sqlText = sql?.replaceAll('Executed (default): ', model.htapMap[type]);
               latency = timing;
             },
           },
