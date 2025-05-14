@@ -205,7 +205,7 @@ const Dashboard = forwardRef(
                 <div
                   style={{
                     borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                    padding: htap ? 16 : '24px 12px 16px 24px',
+                    padding: htap ? '16px 16px 12px 16px' : '24px 12px 16px 24px',
                   }}
                 >
                   <Space
@@ -217,7 +217,7 @@ const Dashboard = forwardRef(
                         : {}
                     }
                   >
-                    <h5 style={htap ? { fontSize: 14 } : {}}>
+                    <h5 style={htap ? { fontSize: 14, fontWeight: 'bold' } : {}}>
                       {formatMessage({
                         id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.TotalOrderCount',
                         defaultMessage: '总预定量',
@@ -266,8 +266,9 @@ const Dashboard = forwardRef(
                     style={
                       htap
                         ? {
-                            fontSize: 18,
+                            fontSize: 24,
                             lineHeight: '30px',
+                            marginTop: 4,
                           }
                         : {}
                     }
@@ -292,7 +293,7 @@ const Dashboard = forwardRef(
                         : {}
                     }
                   >
-                    <h5 style={htap ? { fontSize: 14 } : {}}>
+                    <h5 style={htap ? { fontSize: 14, fontWeight: 'bold' } : {}}>
                       {formatMessage({
                         id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Top3ColorsOfToday',
                         defaultMessage: '今日颜色预定量 Top3',
@@ -356,7 +357,7 @@ const Dashboard = forwardRef(
                     : {}
                 }
               >
-                <h5 style={htap ? { fontSize: 14 } : {}}>
+                <h5 style={htap ? { fontSize: 14, fontWeight: 'bold' } : {}}>
                   {formatMessage({
                     id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders',
                     defaultMessage: '今日实时订单',

@@ -467,7 +467,7 @@ const Index: React.FC<IndexProps> = () => {
                     OLAP
                   </div>
                   <div style={{ paddingBottom: 4, backgroundColor: '#ffffff' }}>
-                    {readonlyColumnStoreReplica
+                    {readonlyColumnStoreReplica || htap
                       ? formatMessage({
                           id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.ReadonlyColumnStoreReplica',
                           defaultMessage: '只读列存副本',
@@ -504,7 +504,7 @@ const Index: React.FC<IndexProps> = () => {
                   OLTP
                 </div>
                 <div>
-                  {readonlyColumnStoreReplica
+                  {readonlyColumnStoreReplica || htap
                     ? formatMessage({
                         id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RowStoreReplica',
                         defaultMessage: '行存副本',
