@@ -395,7 +395,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
             }}
           >
             <img
-              src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*XNLHS4D8osUAAAAAAAAAAAAADmfOAQ/original"
+              src="https://mdn.alipayobjects.com/huamei_fhnyvh/afts/img/A*1fUmTZafJtAAAAAAAAAAAAAAemfOAQ/original"
               style={{
                 width: '60px',
                 marginRight: 20,
