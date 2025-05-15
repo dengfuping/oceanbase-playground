@@ -77,20 +77,18 @@ const OrderForm: React.FC<OrderFormProps> = ({
   );
 
   // 用于模拟场景的下单
-  const { run: batchCreateCarOrderForPolling } = useRequest(
-    CarOrderController.batchCreateCarOrder,
-    {
+  const { run: batchCreateCarOrderForPolling, loading: batchCreateCarOrderForPollingLoading } =
+    useRequest(CarOrderController.batchCreateCarOrder, {
       manual: true,
       onSuccess: (res) => {
         const batchSqlText = res.sqlText;
         onSuccess?.(batchSqlText);
       },
-    },
-  );
+    });
 
   useEffect(() => {
-    updateCreating?.(batchCreateCarOrderLoading || batchCreateCarOrderForPolling);
-  }, [batchCreateCarOrderLoading, batchCreateCarOrderForPolling]);
+    updateCreating?.(batchCreateCarOrderLoading || batchCreateCarOrderForPollingLoading);
+  }, [batchCreateCarOrderLoading, batchCreateCarOrderForPollingLoading]);
 
   const getResourcesId = () => {
     const isInIframe = parent !== window;
