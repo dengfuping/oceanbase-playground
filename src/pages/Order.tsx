@@ -1,19 +1,18 @@
 import React from 'react';
 import OrderForm from './OceanBaseWithFlink/OrderForm';
+import { useSearchParams } from 'umi';
 
-interface OrderProps {
-  readonlyColumnStoreReplica?: string;
-  rowStore?: string;
-  htap?: string;
-}
+interface OrderProps {}
 
-const Order: React.FC<OrderProps> = ({ readonlyColumnStoreReplica, rowStore, htap }) => {
+const Order: React.FC<OrderProps> = () => {
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get('type') as 'readonlyColumnStoreReplica' | 'rowStore' | 'htap';
   return (
     <>
       <OrderForm
-        readonlyColumnStoreReplica={readonlyColumnStoreReplica === 'true'}
-        rowStore={rowStore === 'true'}
-        htap={htap === 'true'}
+        readonlyColumnStoreReplica={type === 'readonlyColumnStoreReplica'}
+        rowStore={type === 'rowStore'}
+        htap={type === 'htap'}
         style={{ padding: '2em' }}
       />
     </>
