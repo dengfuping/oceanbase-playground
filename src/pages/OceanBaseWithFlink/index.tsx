@@ -41,6 +41,14 @@ const Index: React.FC<IndexProps> = () => {
   const i18n = searchParams.get('i18n');
   const qrcode = searchParams.get('qrcode');
   const debug = searchParams.get('debug');
+  const language = searchParams.get('language') || 'zh-CN';
+
+  useEffect(() => {
+    if (language) {
+      setLocale(language);
+    }
+  }, [language]);
+
   const bodySize = useSize(document.body);
   const sm = (bodySize?.width || 0) < 1280;
 
