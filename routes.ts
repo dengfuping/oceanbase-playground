@@ -13,7 +13,7 @@ export default [
         routes: [
           {
             path: '/',
-            redirect: '/oceanbase-with-flink',
+            redirect: '/htap',
           },
           {
             path: 'oceanbase-with-flink',

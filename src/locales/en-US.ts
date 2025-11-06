@@ -29,6 +29,8 @@ export default {
   "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeCarColor": "{color} {count} cars",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.Blue": "Blue",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.Black": "Black",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.Cyan": "Aqua Blue",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.Gray": "Gray",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.Yellow": "Orange",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.Red": "Red",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.White": "White",
