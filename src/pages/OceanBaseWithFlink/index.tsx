@@ -496,7 +496,7 @@ const Index: React.FC<IndexProps> = () => {
                 textAlign: 'center',
                 height: '100%',
                 padding: htap ? '150px 0px' : '64px 0px',
-                zIndex: 10,
+                // zIndex: 10,
                 position: 'relative',
                 fontFamily: 'Roboto',
               }}
