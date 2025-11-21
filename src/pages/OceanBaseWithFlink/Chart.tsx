@@ -32,9 +32,7 @@ const Chart: React.FC<ChartProps> = ({ loading, data = [] }) => {
       }}
       paddingBottom={16}
       data={data.map((item) => {
-        const colorItem = COLOR_LIST.find(
-          (color) => color.value === item.carColor,
-        );
+        const colorItem = COLOR_LIST.find((color) => color.value === item.carColor);
         return {
           ...item,
           carColor: colorItem?.label,
@@ -79,6 +77,4 @@ const Chart: React.FC<ChartProps> = ({ loading, data = [] }) => {
   );
 };
 
-export default React.memo(Chart, (prevProps, nextProps) =>
-  isEqual(prevProps.data, nextProps.data),
-);
+export default React.memo(Chart, (prevProps, nextProps) => isEqual(prevProps.data, nextProps.data));

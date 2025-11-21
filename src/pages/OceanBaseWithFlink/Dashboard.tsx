@@ -208,60 +208,93 @@ const Dashboard = forwardRef(
                     padding: htap ? '16px 16px 12px 16px' : '24px 12px 16px 24px',
                   }}
                 >
-                  <Space
-                    direction="vertical"
+                  <div
                     size={4}
                     style={
                       htap
-                        ? { width: '100%', flexDirection: 'row', justifyContent: 'space-between' }
+                        ? {
+                            display: 'flex',
+                            width: '100%',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                          }
                         : {}
                     }
                   >
-                    <h5 style={htap ? { fontSize: 14, fontWeight: 'bold' } : {}}>
+                    <h5
+                      style={
+                        htap
+                          ? {
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              width: '100%',
+                            }
+                          : {}
+                      }
+                    >
                       {formatMessage({
                         id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.TotalOrderCount',
                         defaultMessage: '总预定量',
                       })}
                     </h5>
-                    <Space
+                    <div
                       className="sql-rt"
                       style={
                         htap
                           ? {
-                              fontSize: 12,
-                              color: type === 'tp' ? token.colorError : token.colorSuccess,
-                              backgroundColor:
-                                type === 'tp' ? token.colorErrorBg : token.colorSuccessBg,
-                              borderRadius: 2,
-                              padding: '0px 4px',
-                              marginBottom: 0,
+                              display: 'flex',
+                              width: '100%',
+                              flexDirection: 'row-reverse',
                             }
                           : {}
                       }
                     >
-                      {formatMessage(
-                        {
-                          id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
-                          defaultMessage: 'SQL 耗时：{latency}ms',
-                        },
-                        {
-                          latency: totalLatency,
-                        },
-                      )}
-                      <Spin
-                        spinning={totalLoading}
-                        indicator={
-                          <LoadingOutlined
-                            style={{
-                              fontSize: 14,
-                              color: type === 'tp' ? token.colorError : token.colorSuccess,
-                            }}
-                          />
+                      <div
+                        style={
+                          htap
+                            ? {
+                                fontSize: 12,
+                                color: type === 'tp' ? token.colorError : token.colorSuccess,
+                                backgroundColor:
+                                  type === 'tp' ? token.colorErrorBg : token.colorSuccessBg,
+                                borderRadius: 2,
+                                padding: '0px 4px',
+                                marginBottom: 0,
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                display: 'inline-block',
+                              }
+                            : {}
                         }
-                        style={{ marginTop: -4 }}
-                      />
-                    </Space>
-                  </Space>
+                      >
+                        {formatMessage(
+                          {
+                            id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
+                            defaultMessage: 'SQL 耗时：{latency}ms',
+                          },
+                          {
+                            latency: totalLatency,
+                          },
+                        )}
+                        <Spin
+                          spinning={totalLoading}
+                          indicator={
+                            <LoadingOutlined
+                              style={{
+                                fontSize: 14,
+                                color: type === 'tp' ? token.colorError : token.colorSuccess,
+                              }}
+                            />
+                          }
+                          style={{ marginTop: -4 }}
+                        />
+                      </div>
+                    </div>
+                  </div>
                   <h1
                     style={
                       htap
@@ -284,58 +317,91 @@ const Dashboard = forwardRef(
                     padding: htap ? 16 : '24px 12px 16px 24px',
                   }}
                 >
-                  <Space
-                    direction="vertical"
+                  <div
                     size={4}
                     style={
                       htap
-                        ? { width: '100%', flexDirection: 'row', justifyContent: 'space-between' }
+                        ? {
+                            display: 'flex',
+                            width: '100%',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                          }
                         : {}
                     }
                   >
-                    <h5 style={htap ? { fontSize: 14, fontWeight: 'bold' } : {}}>
+                    <h5
+                      style={
+                        htap
+                          ? {
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              width: '100%',
+                            }
+                          : {}
+                      }
+                    >
                       {formatMessage({
                         id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Top3ColorsOfToday',
                         defaultMessage: '今日颜色预定量 Top3',
                       })}
                     </h5>
-                    <Space
+                    <div
                       className="sql-rt"
                       style={
                         htap
                           ? {
-                              fontSize: 12,
-                              color: type === 'tp' ? token.colorError : token.colorSuccess,
-                              backgroundColor:
-                                type === 'tp' ? token.colorErrorBg : token.colorSuccessBg,
-                              borderRadius: 2,
-                              padding: '0px 4px',
-                              marginBottom: 0,
+                              width: '100%',
+                              display: 'flex',
+                              flexDirection: 'row-reverse',
                             }
                           : {}
                       }
                     >
-                      {formatMessage(
-                        {
-                          id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
-                          defaultMessage: 'SQL 耗时：{latency}ms',
-                        },
-                        { latency: colorTop3Latency },
-                      )}
-                      <Spin
-                        spinning={colorTop3Loading}
-                        indicator={
-                          <LoadingOutlined
-                            style={{
-                              fontSize: 14,
-                              color: type === 'tp' ? token.colorError : token.colorSuccess,
-                            }}
-                          />
+                      <div
+                        style={
+                          htap
+                            ? {
+                                fontSize: 12,
+                                color: type === 'tp' ? token.colorError : token.colorSuccess,
+                                backgroundColor:
+                                  type === 'tp' ? token.colorErrorBg : token.colorSuccessBg,
+                                borderRadius: 2,
+                                padding: '0px 4px',
+                                marginBottom: 0,
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                display: 'inline-block',
+                              }
+                            : {}
                         }
-                        style={{ marginTop: -4 }}
-                      />
-                    </Space>
-                  </Space>
+                      >
+                        {formatMessage(
+                          {
+                            id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
+                            defaultMessage: 'SQL 耗时：{latency}ms',
+                          },
+                          { latency: colorTop3Latency },
+                        )}
+                        <Spin
+                          spinning={colorTop3Loading}
+                          indicator={
+                            <LoadingOutlined
+                              style={{
+                                fontSize: 14,
+                                color: type === 'tp' ? token.colorError : token.colorSuccess,
+                              }}
+                            />
+                          }
+                          style={{ marginTop: -4 }}
+                        />
+                      </div>
+                    </div>
+                  </div>
                   <Chart loading={colorTop3Loading} data={colorTop3} />
                 </div>
               </Col>
@@ -348,59 +414,92 @@ const Dashboard = forwardRef(
                 padding: htap ? '16px 0px 0px 16px' : '24px 0px 0px 24px',
               }}
             >
-              <Space
-                direction="vertical"
+              <div
                 size={4}
                 style={
                   htap
-                    ? { width: '100%', flexDirection: 'row', justifyContent: 'space-between' }
+                    ? {
+                        display: 'flex',
+                        width: '100%',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                      }
                     : {}
                 }
               >
-                <h5 style={htap ? { fontSize: 14, fontWeight: 'bold' } : {}}>
+                <h5
+                  style={
+                    htap
+                      ? {
+                          fontSize: 14,
+                          fontWeight: 'bold',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          width: '100%',
+                        }
+                      : {}
+                  }
+                >
                   {formatMessage({
                     id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders',
                     defaultMessage: '今日实时订单',
                   })}
                 </h5>
-                <Space
+                <div
                   className="sql-rt"
                   style={
                     htap
                       ? {
-                          fontSize: 12,
-                          color: type === 'tp' ? token.colorError : token.colorSuccess,
-                          backgroundColor:
-                            type === 'tp' ? token.colorErrorBg : token.colorSuccessBg,
-                          borderRadius: 2,
-                          padding: '0px 4px',
-                          marginBottom: 0,
-                          marginRight: 16,
+                          display: 'flex',
+                          width: '100%',
+                          flexDirection: 'row-reverse',
                         }
                       : {}
                   }
                 >
-                  {formatMessage(
-                    {
-                      id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
-                      defaultMessage: 'SQL 耗时：{latency}ms',
-                    },
-                    { latency: latestLantency },
-                  )}
-                  <Spin
-                    spinning={latestLoading}
-                    indicator={
-                      <LoadingOutlined
-                        style={{
-                          fontSize: 14,
-                          color: type === 'tp' ? token.colorError : token.colorSuccess,
-                        }}
-                      />
+                  <div
+                    style={
+                      htap
+                        ? {
+                            fontSize: 12,
+                            color: type === 'tp' ? token.colorError : token.colorSuccess,
+                            backgroundColor:
+                              type === 'tp' ? token.colorErrorBg : token.colorSuccessBg,
+                            borderRadius: 2,
+                            padding: '0px 4px',
+                            marginBottom: 0,
+                            marginRight: 16,
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: 'inline-block',
+                          }
+                        : {}
                     }
-                    style={{ marginTop: -4 }}
-                  />
-                </Space>
-              </Space>
+                  >
+                    {formatMessage(
+                      {
+                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency',
+                        defaultMessage: 'SQL 耗时：{latency}ms',
+                      },
+                      { latency: latestLantency },
+                    )}
+                    <Spin
+                      spinning={latestLoading}
+                      indicator={
+                        <LoadingOutlined
+                          style={{
+                            fontSize: 14,
+                            color: type === 'tp' ? token.colorError : token.colorSuccess,
+                          }}
+                        />
+                      }
+                      style={{ marginTop: -4 }}
+                    />
+                  </div>
+                </div>
+              </div>
               <MacScrollbar
                 ref={latestRef}
                 style={{
