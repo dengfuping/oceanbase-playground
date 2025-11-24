@@ -349,6 +349,7 @@ const Dashboard = forwardRef(
                           id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Top3ColorsOfToday',
                           defaultMessage: '今日颜色预定量 Top3',
                         })}
+                        placement="topLeft"
                       >
                         {' '}
                         {formatMessage({
@@ -450,6 +451,7 @@ const Dashboard = forwardRef(
                   }
                 >
                   <Tooltip
+                    placement="topLeft"
                     title={formatMessage({
                       id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders',
                       defaultMessage: '今日实时订单',
