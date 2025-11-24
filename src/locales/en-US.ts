@@ -20,7 +20,7 @@ export default {
   "oceanbase-playground.src.pages.OceanBaseWithFlink.OrderSubmit": "SUBMIT YOUR ORDER",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.DataVisualization": "Data Visualization",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.TotalOrderCount": "Total Orders",
-  "oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency": "SQL Execution Time: {latency}ms",
+  "oceanbase-playground.src.pages.OceanBaseWithFlink.SqlLatency": "SQL Time: {latency}ms",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.Top3ColorsOfToday": "Top 3 Colors of Today",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.OrderCountOfToday": "Order Count of Today",
   "oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders": "Today's Real-time Orders",
