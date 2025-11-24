@@ -1,4 +1,4 @@
-import { Card, Col, Row, Space, Spin, theme, Typography } from '@oceanbase/design';
+import { Card, Col, Row, Space, Spin, theme, Typography, Tooltip } from '@oceanbase/design';
 import type { CardProps } from '@oceanbase/design';
 import { useRequest } from 'ahooks';
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
@@ -344,10 +344,18 @@ const Dashboard = forwardRef(
                           : {}
                       }
                     >
-                      {formatMessage({
-                        id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Top3ColorsOfToday',
-                        defaultMessage: '今日颜色预定量 Top3',
-                      })}
+                      <Tooltip
+                        title={formatMessage({
+                          id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Top3ColorsOfToday',
+                          defaultMessage: '今日颜色预定量 Top3',
+                        })}
+                      >
+                        {' '}
+                        {formatMessage({
+                          id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.Top3ColorsOfToday',
+                          defaultMessage: '今日颜色预定量 Top3',
+                        })}
+                      </Tooltip>
                     </h5>
                     <div
                       className="sql-rt"
@@ -441,10 +449,17 @@ const Dashboard = forwardRef(
                       : {}
                   }
                 >
-                  {formatMessage({
-                    id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders',
-                    defaultMessage: '今日实时订单',
-                  })}
+                  <Tooltip
+                    title={formatMessage({
+                      id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders',
+                      defaultMessage: '今日实时订单',
+                    })}
+                  >
+                    {formatMessage({
+                      id: 'oceanbase-playground.src.pages.OceanBaseWithFlink.RealTimeOrders',
+                      defaultMessage: '今日实时订单',
+                    })}
+                  </Tooltip>
                 </h5>
                 <div
                   className="sql-rt"
