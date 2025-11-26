@@ -35,6 +35,9 @@ export default defineConfig({
     ga_v2: 'G-S5LJS5FZPH',
   },
   esbuildMinifyIIFE: true,
+  jsMinifierOptions: {
+    target: ['chrome80', 'es2020'],
+  },
   metas: [
     {
       property: 'og:site_name',
