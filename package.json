@@ -16,6 +16,7 @@
   "dependencies": {
     "@alicloud/pop-core": "^1.8.0",
     "@ant-design/charts": "^2.2.7",
+    "@faker-js/faker": "^10.1.0",
     "@oceanbase/design": "^0.4.10",
     "@oceanbase/icons": "^0.4.6",
     "@oceanbase/util": "^0.4.2",
@@ -26,7 +27,6 @@
     "antd": "^5.25.1",
     "cron": "^3.5.0",
     "detect-browser": "^5.3.0",
-    "full-name-generator": "^1.1.0",
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
     "mac-scrollbar-better": "^0.13.9",

@@ -1,7 +1,9 @@
 import moment from 'moment';
 import { sample } from 'lodash';
-import { firstName, lastName } from 'full-name-generator';
 import { COLOR_LIST } from './constant';
+import { fakerZH_CN, fakerEN_US } from '@faker-js/faker';
+
+import { getLocale } from 'umi';
 
 export function formatTime(value?: string | Date) {
   return moment(value).format('HH:mm:ss');
@@ -37,10 +39,13 @@ export function desensitizeName(name?: string) {
 export type Locale = 'en-US' | 'zh-CN';
 
 // 随机生成用户名
-export const generateCustomerName = (locale: Locale) => {
-  return locale === 'zh-CN'
-    ? `${lastName('CN', sample([0, 1]))}${firstName('CN', sample([0, 1]))}`
-    : `${firstName('US', sample([0, 1]))}`;
+export const generateCustomerName = () => {
+  const locale = getLocale();
+  if (locale === 'zh-CN') {
+    return fakerZH_CN.person.fullName();
+  } else {
+    return fakerEN_US.person.fullName();
+  }
 };
 
 // 随机生成订单
@@ -53,6 +58,6 @@ export const generateCarOrder = (locale: Locale) => {
         ? sample(['Beijing', 'Shanghai', 'Shenzhen', 'Hangzhou'])
         : sample(['New York', 'Los Angeles', 'Washington', 'Chicago']),
     saleNation: locale === 'zh-CN' ? 'China' : 'America',
-    customerName: generateCustomerName(locale),
+    customerName: generateCustomerName(),
   };
 };
